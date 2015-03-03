@@ -1,0 +1,102 @@
+fileFormatVersion: 2
+guid: 5e22805482fbb445fa90ae6cd2045fdf
+PluginImporter:
+  serializedVersion: 1
+  iconMap: {}
+  executionOrder: {}
+  isPreloaded: 1
+  platformData:
+    <SecretPlatform20>:
+      enabled: 0
+      settings: {}
+    Android:
+      enabled: 0
+      settings: {}
+    Any:
+      enabled: 0
+      settings: {}
+    BlackBerry:
+      enabled: 0
+      settings: {}
+    Editor:
+      enabled: 1
+      settings:
+        CPU: AnyCPU
+        DefaultValueInitialized: true
+        OS: AnyOS
+    Linux:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+    Linux64:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+    LinuxUniversal:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+    NaCl:
+      enabled: 0
+      settings: {}
+    OSXIntel:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+    OSXIntel64:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+    OSXUniversal:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+    PS3:
+      enabled: 0
+      settings: {}
+    PS4:
+      enabled: 0
+      settings: {}
+    PSM:
+      enabled: 0
+      settings: {}
+    PSP2:
+      enabled: 0
+      settings: {}
+    SamsungTV:
+      enabled: 0
+      settings: {}
+    Tizen:
+      enabled: 0
+      settings: {}
+    WP8:
+      enabled: 0
+      settings: {}
+    Web:
+      enabled: 0
+      settings: {}
+    WebStreamed:
+      enabled: 0
+      settings: {}
+    Win:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+    Win64:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+    WindowsStoreApps:
+      enabled: 0
+      settings: {}
+    Xbox360:
+      enabled: 0
+      settings: {}
+    XboxOne:
+      enabled: 0
+      settings: {}
+    iPhone:
+      enabled: 0
+      settings: {}
+  userData: 
+  assetBundleName: 
