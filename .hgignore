@@ -9,6 +9,13 @@ syntax:glob # Beware: globs are not rooted but matches in any dir - don't make t
 \#*\#
 *.sublime-workspace
 xcuserdata   # Xcode
+build
+CoreAudioUtilityClasses
+CoreAudioUtilityClasses.zip
+Library
+bin
+obj
+*.orig.*
 
 # vs:
 *.csproj.user   # except PlatformDependent/WinRT/Tests/VSUnitTests/Assembly-CSharp/Assembly-CSharp.csproj.user
