@@ -50,7 +50,7 @@ Shader "Custom/fractal"
 			{
 			    float a1 = 0.3, c1 = cos(a1), s1 = sin(a1);
 			    float r, iter = 0.0, scale = 1.55, col = 0.0;
-			    for(int i = 0; i < 20; i++)
+			    for(int i = 0; i < 16; i++)
 			    {
 			        float3 q = max(abs(p) - 0.2, 0.0) - 0.3;
 			        r = dot(q, q);

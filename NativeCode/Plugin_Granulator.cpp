@@ -7,6 +7,7 @@ namespace Granulator
     const int MAXSAMPLE = 16;
 
     Mutex sampleMutex;
+	int debug_graincount = 0;
 
     struct GranulatorSample
     {
@@ -41,10 +42,13 @@ namespace Granulator
         P_RSPEED,
         P_ROFS,
         P_RWLEN,
-        P_NUMGRAINS,
         P_FREEZE,
         P_OFFSET,
-        P_RSTP,
+		P_RATE,
+		P_RRATE,
+		P_PANBASE,
+		P_PANRANGE,
+		P_SHAPE,
         P_USESAMPLE,
         P_NUM
     };
@@ -54,39 +58,40 @@ namespace Granulator
         float offset;
         int length;
         int numsamples;
-        int numchannels;
         const float* src;
         float pos;
         float speed;
-        inline void Setup(Random& random, const float wavesamplerate, const float samplerate, const float sampletime, const int writepos, const float* params, const float* _src, int _numsamples, int _numchannels)
+		float pan;
+		float shape;
+        inline void Setup(Random& random, const float wavesamplerate, const float samplerate, const float sampletime, const int writepos, const float* params, const float* _src, int _numsamples, float startsample)
         {
             src = _src;
             numsamples = _numsamples;
-            numchannels = _numchannels;
             float maxtime = (float)(numsamples - 1);
             length = (int)(maxtime * random.GetFloat(params[P_WLEN], params[P_WLEN] + params[P_RWLEN]));
             float invlength = 1.0f / (float)length;
-            float relpos = maxtime * (random.GetFloat(params[P_OFFSET], params[P_OFFSET] + params[P_ROFS]));
-            offset = writepos + relpos;
+            offset = writepos + maxtime * FastClip(random.GetFloat(params[P_OFFSET] - params[P_ROFS], params[P_OFFSET]), 0.0f, 1.0f);
             speed = FastMax(0.001f, random.GetFloat(params[P_SPEED], params[P_SPEED] + params[P_RSPEED])) * invlength * wavesamplerate * sampletime;
-            pos = -speed * samplerate * random.GetFloat(0.0f, params[P_RSTP]);
+            pos = -speed * startsample;
+			pan = params[P_PANBASE] + random.GetFloat(-params[P_PANRANGE], params[P_PANRANGE]);
+			shape = params[P_SHAPE];
         }
 
-        inline float Scan()
+        inline float Scan(int numsrcchannels)
         {
             float p = FastMax(0.0f, pos);
+			pos += speed;
             float amp = 1.0f - fabsf(p + p - 1.0f);
+			amp = FastClip(amp * shape, 0.0f, 1.0f);
             p = offset + p * length;
-            int i = (int)floorf(p);
+            int i = FastFloor(p);
             p -= i;
-            while (i >= numsamples)
-                i -= numsamples;
-            float s1 = src[numchannels * i++];
-            while (i >= numsamples)
-                i -= numsamples;
-            float s2 = src[numchannels * i];
-            pos = FastMin(pos + speed, 1.0f);
-            return (s1 + (s2 - s1) * p) * amp;
+            if (i >= numsamples)
+				return 0.0f;
+            float s = src[numsrcchannels * i++];
+            if (i >= numsamples)
+				return s * amp;
+            return amp * (s + (src[numsrcchannels * i] - s) * p);
         }
     };
 
@@ -94,15 +99,15 @@ namespace Granulator
     {
         float p[P_NUM];
         Random random;
-        struct Channel
-        {
-            int writepos;
-            float env;
-            float previewsum;
-            Grain grains[MAXGRAINS];
-            float delay[MAXLENGTH];
-            float preview[MAXLENGTH];
-        } channel[8];
+		int writepos;
+        float env;
+        float previewsum;
+		float samplecounter;
+		float nextrandtime;
+		int activegrains;
+        Grain grains[MAXGRAINS];
+        float delay[MAXLENGTH];
+        float preview[MAXLENGTH];
     };
 
     int InternalRegisterEffectDefinition(UnityAudioEffectDefinition& definition)
@@ -114,19 +119,21 @@ namespace Granulator
         RegisterParameter(definition, "Rnd speed", "%", 0.0f, 5.0f, 0.0f, 100.0f, 2.5f, P_RSPEED, "Randomized amount of speed in samples");
         RegisterParameter(definition, "Rnd offset", "%", 0.0f, 1.0f, 0.0f, 100.0f, 2.5f, P_ROFS, "Randomized offset in seconds");
         RegisterParameter(definition, "Rnd window len", "%", 0.0f, 1.0f, 0.0f, 100.0f, 2.5f, P_RWLEN, "Randomized amount of grain length in seconds");
-        RegisterParameter(definition, "Num grains", "", 1.0f, MAXGRAINS, 5.0f, 1.0f, 1.0f, P_NUMGRAINS, "Number of grains");
         RegisterParameter(definition, "Freeze", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_FREEZE, "Freeze threshold (only for live input)");
         RegisterParameter(definition, "Offset", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_OFFSET, "Offset in recorded or sampled waveform");
-        RegisterParameter(definition, "Random startpos", "s", 0.01f, 2.0f, 0.5f, 1.0f, 2.5f, P_RSTP, "Random start position");
+        RegisterParameter(definition, "Rate", "Hz", 0.0f, 1000.0f, 0.5f, 1.0f, 2.5f, P_RATE, "Grain emission rate");
+		RegisterParameter(definition, "Random rate", "Hz", 0.0f, 1000.0f, 0.5f, 1.0f, 2.5f, P_RRATE, "Random grain emission rate");
+		RegisterParameter(definition, "Pan base", "%", 0.0f, 1.0f, 0.5f, 100.0f, 1.0f, P_PANBASE, "Panning position base");
+		RegisterParameter(definition, "Pan range", "%", 0.0f, 1.0f, 0.5f, 100.0f, 1.0f, P_PANRANGE, "Panning position range");
+		RegisterParameter(definition, "Shape", "%", 1.0f, 10.0f, 1.0f, 100.0f, 1.0f, P_SHAPE, "Grain shape (1 = triangular)");
         RegisterParameter(definition, "Use Sample", "", -1.0f, MAXSAMPLE - 1, -1.0f, 1.0f, 1.0f, P_USESAMPLE, "-1 = use live input, otherwise indicates the slot of a sample uploaded by scripts via Granulator_UploadSample");
         return numparams;
     }
 
     void ResetGrains(EffectData* data)
     {
-        for (int c = 0; c < 8; c++)
-            for (int n = 0; n < MAXGRAINS; n++)
-                data->channel[c].grains[n].pos = 1.0f;
+		for (int n = 0; n < MAXGRAINS; n++)
+			data->grains[n].pos = 1.0f;
     }
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK CreateCallback(UnityAudioEffectState* state)
@@ -178,30 +185,28 @@ namespace Granulator
             GranulatorSample* gs = (useSample >= 0) ? &GetGranulatorSample(useSample) : NULL;
             if (gs != NULL && gs->numsamples == 0)
                 gs = NULL;
-            int wp = (gs == NULL) ? data->channel[channel].writepos : 0;
+            int wp = (gs == NULL) ? data->writepos : 0;
             int numchannels = (gs != NULL) ? gs->numchannels : 1;
-            int wavelength = (gs != NULL) ? gs->numsamples : MAXLENGTH;
-            const float* src = (gs != NULL) ? (gs->data + channel) : data->channel[channel].preview;
-            float scale = (float)(wavelength - 2) / (float)numsamples;
+            int numsrcsamples = (gs != NULL) ? gs->numsamples : MAXLENGTH;
+            const float* src = (gs != NULL) ? (gs->data + channel) : data->preview;
+            float scale = (float)(numsrcsamples - 2) / (float)numsamples;
             float invscale = 1.0f / scale, prev = 0.0f;
             for (int n = 0; n < numsamples; n++)
             {
                 float f = n * scale;
-                int i = (int)floorf(f);
+                int i = FastFloor(f);
                 f -= i;
                 if (gs == NULL)
                     i += wp;
-                while (i < 0)
-                    i += wavelength;
-                while (i >= wavelength)
-                    i -= wavelength;
-                float s1 = src[numchannels * i++];
-                while (i >= wavelength)
-                    i -= wavelength;
-                float s2 = src[numchannels * i];
-                float curr = s1 + (s2 - s1) * f;
-                buffer[n] = (curr - prev) * invscale;
-                prev = curr;
+				float s = 0.0f;
+                if (i < numsrcsamples)
+				{
+                    s = src[numchannels * i++];
+	                if (i < numsrcsamples)
+		                s += (src[numchannels * i] - s) * f;
+				}
+                buffer[n] = (s - prev) * invscale;
+                prev = s;
             }
         }
         return UNITY_AUDIODSP_OK;
@@ -215,7 +220,6 @@ namespace Granulator
         const float sampletime = 1.0f / (float)samplerate;
         const float freeze = data->p[P_FREEZE];
         const int useSample = (int)data->p[P_USESAMPLE];
-        const int numgrains = (int)data->p[P_NUMGRAINS];
         const float* params = data->p;
 
         MutexScopeLock mutexScope(Granulator::sampleMutex, useSample >= 0);
@@ -224,7 +228,6 @@ namespace Granulator
         if (gs != NULL && gs->numsamples == 0)
             gs = NULL;
 
-        EffectData::Channel* ch = data->channel;
         for (int c = 0; c < inchannels; c++)
         {
             const float* src = inbuffer + c;
@@ -234,13 +237,13 @@ namespace Granulator
                 float input = *src;
                 src += inchannels;
 
-                ch->env += (fabsf(input) - ch->env) * 0.01f;
-                if (ch->env > freeze)
+                data->env += (fabsf(input) - data->env) * 0.01f;
+                if (data->env > freeze)
                 {
-                    ch->previewsum = ch->previewsum * 0.999f + input;
-                    ch->delay[ch->writepos] = input;
-                    ch->preview[ch->writepos] = ch->previewsum;
-                    ch->writepos = (ch->writepos + MAXLENGTH - 1) & (MAXLENGTH - 1);
+                    data->previewsum = data->previewsum * 0.999f + input;
+                    data->delay[data->writepos] = input;
+                    data->preview[data->writepos] = data->previewsum;
+                    data->writepos = (data->writepos + MAXLENGTH - 1) & (MAXLENGTH - 1);
                 }
             }
         }
@@ -250,35 +253,57 @@ namespace Granulator
         if (state->flags & (UnityAudioEffectStateFlags_IsMuted | UnityAudioEffectStateFlags_IsPaused))
             return UNITY_AUDIODSP_OK;
 
-        if (!state->flags & UnityAudioEffectStateFlags_IsPlaying)
+        if ((state->flags & UnityAudioEffectStateFlags_IsPlaying) == 0)
         {
             ResetGrains(data);
             return UNITY_AUDIODSP_OK;
         }
 
-        for (int c = 0; c < inchannels; c++)
-        {
-            Grain* g = ch->grains;
-            for (int i = 0; i < numgrains; i++)
-            {
-                float* dst = outbuffer + c;
-                for (int n = 0; n < length; n++)
-                {
-                    if ((int)(g->pos + 0.00001f) >= 1)
-                    {
-                        if (gs == NULL)
-                            g->Setup(data->random, samplerate, samplerate, sampletime, ch->writepos, params, ch->delay, MAXLENGTH, 1);
-                        else
-                            g->Setup(data->random, gs->samplerate, samplerate, sampletime, 0, params, gs->data, gs->numsamples + c, gs->numchannels);
-                    }
-                    *dst += g->Scan();
-                    dst += outchannels;
-                }
-                ++g;
-            }
-
-            ch++;
-        }
+		debug_graincount = data->activegrains;
+			
+		int numsrcchannels = (gs == NULL) ? 1 : gs->numchannels;
+		
+		// Fill in new grains
+		float rate = data->p[P_RATE] + data->p[P_RRATE] * data->nextrandtime;
+		float nexteventsample = (rate > 0.0f) ? (samplerate / rate) : 100000000;
+		for (int n = 0; n < length; n++)
+		{
+			if (++data->samplecounter >= nexteventsample)
+			{
+				data->samplecounter -= nexteventsample;
+				float fracpos = 1.0f - data->samplecounter;
+				data->nextrandtime = data->random.GetFloat(0.0f, 1.0f);
+				rate = data->p[P_RATE] + data->p[P_RRATE] * data->nextrandtime;
+				nexteventsample = (rate > 0.0f) ? (samplerate / rate) : 100000000;
+				if (data->activegrains >= MAXGRAINS)
+					continue;
+				Grain* g = &data->grains[data->activegrains++];
+				if (gs == NULL)
+					g->Setup(data->random, samplerate, samplerate, sampletime, data->writepos, params, data->delay, MAXLENGTH, n + fracpos);
+				else
+					g->Setup(data->random, gs->samplerate, samplerate, sampletime, 0, params, gs->data + (data->random.Get() % numsrcchannels), gs->numsamples, n + fracpos);
+			}
+		}
+		
+		// Process grains
+		Grain* g = data->grains;
+		Grain* g_end = data->grains + data->activegrains;
+		while (g < g_end)
+		{
+			float* dst = outbuffer;
+			for (int n = 0; n < length; n++)
+			{
+				float s = g->Scan(numsrcchannels);
+				dst[0] += s * (1.0f - g->pan);
+				dst[1] += s * g->pan;
+				dst += outchannels;
+			}
+			if (g->pos >= 0.99999f)
+				*g = *(--g_end);
+			else
+				++g;
+		}
+		data->activegrains = g_end - data->grains;
 
         return UNITY_AUDIODSP_OK;
     }
@@ -338,4 +363,9 @@ extern "C" UNITY_AUDIODSP_EXPORT_API const char* Granulator_GetSampleName(int in
     }
 
     return "Undefined";
+}
+
+extern "C" UNITY_AUDIODSP_EXPORT_API int Granulator_DebugGetGrainCount()
+{
+	return Granulator::debug_graincount;
 }

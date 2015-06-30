@@ -28,6 +28,10 @@ const float kPI = 3.141592653589f;
 inline float FastClip(float x, float minval, float maxval) { return (fabsf(x - minval) - fabsf(x - maxval) + (minval + maxval)) * 0.5f; }
 inline float FastMin(float a, float b) { return (a + b - fabsf(a - b)) * 0.5f; }
 inline float FastMax(float a, float b) { return (a + b + fabsf(a - b)) * 0.5f; }
+inline int FastFloor(float x) { return (int)floorf(x); } // TODO: Optimize
+
+char* strnew(const char* src);
+char* tmpstr(int index, const char* fmtstr, ...);
 
 class UnityComplexNumber
 {
@@ -104,12 +108,12 @@ public:
         return result;
     }
 
-    inline float Magnitude()
+    inline float Magnitude() const
     {
         return sqrtf(re * re + im * im);
     }
 
-    inline float Magnitude2()
+    inline float Magnitude2() const
     {
         return re * re + im * im;
     }
@@ -182,8 +186,8 @@ class RingBuffer
 public:
     enum { LENGTH = _LENGTH };
 
-    int readpos;
-    int writepos;
+    volatile int readpos;
+    volatile int writepos;
     T buffer[LENGTH];
 
     inline bool Read(T& val)
@@ -191,8 +195,9 @@ public:
         int r = readpos;
         if (r == writepos)
             return false;
-        readpos = (r == LENGTH - 1) ? 0 : (r + 1);
+        r = (r == LENGTH - 1) ? 0 : (r + 1);
         val = buffer[r];
+		readpos = r;
         return true;
     }
 
@@ -328,6 +333,44 @@ void BiquadFilter::SetupHighpass(float cutoff, float samplerate, float Q)
     float inv_a0 = 1.0f / a0; a1 *= inv_a0; a2 *= inv_a0; b0 *= inv_a0; b1 *= inv_a0; b2 *= inv_a0;
 }
 
+class StateVariableFilter
+{
+public:
+	float cutoff;
+	float bandwidth;
+	
+public:
+	inline float ProcessHPF(float input)
+	{
+		input += 1.0e-11f; // Kill denormals
+
+		lpf += cutoff * bpf;
+		float hpf = (input - bpf) * bandwidth - lpf;
+		bpf += cutoff * hpf;
+		
+		lpf += cutoff * bpf;
+		hpf = (input - bpf) * bandwidth - lpf;
+		bpf += cutoff * hpf;
+		
+		return hpf;
+	}
+	
+	inline float ProcessBPF(float input)
+	{
+		ProcessHPF(input);
+		return bpf;
+	}
+	
+	inline float ProcessLPF(float input)
+	{
+		ProcessHPF(input);
+		return lpf;
+	}
+	
+public:
+	float lpf, bpf;
+};
+
 class Random
 {
 public:
@@ -349,6 +392,54 @@ public:
 
 protected:
     unsigned long seed;
+};
+
+class NoiseGenerator
+{
+public:
+	void Init()
+	{
+		level = 0.0f;
+		delta = 0.0f;
+		minval = 0.0f;
+		maxval = 1.0f;
+		period = 100.0f;
+		invperiod = 0.01f;
+		samplesleft = 0;
+		
+	}
+	inline void SetRange(float minval, float maxval)
+	{
+		this->minval = minval;
+		this->maxval = maxval;
+	}
+	inline void SetPeriod(float period)
+	{
+		SetPeriod(period, 1.0f / period);
+	}
+	inline void SetPeriod(float period, float invperiod)
+	{
+		period = period;
+		invperiod = invperiod;
+	}
+	inline float Sample(Random& random)
+	{
+		if(--samplesleft <= 0)
+		{
+			samplesleft = (int)period;
+			delta = (random.GetFloat(minval, maxval) - level) * invperiod;
+		}
+		level += delta;
+		return level;
+	}
+public:
+	float level;
+	float delta;
+	float minval;
+	float maxval;
+	float period;
+	float invperiod;
+	int samplesleft;
 };
 
 class Mutex

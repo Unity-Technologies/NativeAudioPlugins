@@ -9,9 +9,18 @@
 /* Begin PBXBuildFile section */
 		2BC2A8D5144C433D00D5EF79 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BC2A8D4144C433D00D5EF79 /* OpenGL.framework */; };
 		3B1BEC7A1A8459B600AF69CD /* Plugin_PitchDetector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B1BEC791A8459B600AF69CD /* Plugin_PitchDetector.cpp */; };
+		3B1FCEE71AAD4092003DE763 /* Plugin_Synthesizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B1FCEE61AAD4092003DE763 /* Plugin_Synthesizer.cpp */; };
+		3B24F9831AE65F6E0097AE14 /* Plugin_WahWah.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B24F9821AE65F6E0097AE14 /* Plugin_WahWah.cpp */; };
 		3B269D9A1A9AD48900CA74DA /* Plugin_ImpactGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B269D991A9AD48900CA74DA /* Plugin_ImpactGenerator.cpp */; };
+		3B7842711B03A78800DF893B /* Plugin_TubeResonator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B7842701B03A78800DF893B /* Plugin_TubeResonator.cpp */; };
 		3B91CA661A7FC62D00BB861B /* Plugin_Granulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B91CA641A7FC62D00BB861B /* Plugin_Granulator.cpp */; };
 		3B91CA671A7FC62D00BB861B /* Plugin_ModalFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B91CA651A7FC62D00BB861B /* Plugin_ModalFilter.cpp */; };
+		3BA205681AD1A54300CA4036 /* Plugin_Spatializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BA205651AD1A54300CA4036 /* Plugin_Spatializer.cpp */; };
+		3BA205691AD1A54300CA4036 /* Plugin_SpatializerReverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BA205661AD1A54300CA4036 /* Plugin_SpatializerReverb.cpp */; };
+		3BA2056A1AD1A54300CA4036 /* hrtftable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BA205671AD1A54300CA4036 /* hrtftable.cpp */; };
+		3BBFF7D71AE662590091DB6A /* Plugin_ImpulseGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BBFF7D61AE662590091DB6A /* Plugin_ImpulseGenerator.cpp */; };
+		3BBFF7D91AE667600091DB6A /* Plugin_Oscilloscope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BBFF7D81AE667600091DB6A /* Plugin_Oscilloscope.cpp */; };
+		3BC406E41AFB7CDF00E92CB9 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC406E31AFB7CDF00E92CB9 /* CoreMIDI.framework */; };
 		3BD6214A1A9054BF0099DA97 /* Plugin_Routing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BD621491A9054BF0099DA97 /* Plugin_Routing.cpp */; };
 		3BFA3CD519816BA7005A8824 /* Plugin_Teleport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BFA3CD419816BA7005A8824 /* Plugin_Teleport.cpp */; };
 		3D199B6E1858F3E60063EC53 /* AudioPluginUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D199B5E1858F3E60063EC53 /* AudioPluginUtil.cpp */; };
@@ -35,9 +44,18 @@
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		2BC2A8D4144C433D00D5EF79 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		3B1BEC791A8459B600AF69CD /* Plugin_PitchDetector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_PitchDetector.cpp; path = ../Plugin_PitchDetector.cpp; sourceTree = "<group>"; };
+		3B1FCEE61AAD4092003DE763 /* Plugin_Synthesizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_Synthesizer.cpp; path = ../Plugin_Synthesizer.cpp; sourceTree = "<group>"; };
+		3B24F9821AE65F6E0097AE14 /* Plugin_WahWah.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_WahWah.cpp; path = ../Plugin_WahWah.cpp; sourceTree = "<group>"; };
 		3B269D991A9AD48900CA74DA /* Plugin_ImpactGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_ImpactGenerator.cpp; path = ../Plugin_ImpactGenerator.cpp; sourceTree = "<group>"; };
+		3B7842701B03A78800DF893B /* Plugin_TubeResonator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_TubeResonator.cpp; path = ../Plugin_TubeResonator.cpp; sourceTree = "<group>"; };
 		3B91CA641A7FC62D00BB861B /* Plugin_Granulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_Granulator.cpp; path = ../Plugin_Granulator.cpp; sourceTree = "<group>"; };
 		3B91CA651A7FC62D00BB861B /* Plugin_ModalFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_ModalFilter.cpp; path = ../Plugin_ModalFilter.cpp; sourceTree = "<group>"; };
+		3BA205651AD1A54300CA4036 /* Plugin_Spatializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_Spatializer.cpp; path = ../Plugin_Spatializer.cpp; sourceTree = "<group>"; };
+		3BA205661AD1A54300CA4036 /* Plugin_SpatializerReverb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_SpatializerReverb.cpp; path = ../Plugin_SpatializerReverb.cpp; sourceTree = "<group>"; };
+		3BA205671AD1A54300CA4036 /* hrtftable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hrtftable.cpp; path = ../hrtftable.cpp; sourceTree = "<group>"; };
+		3BBFF7D61AE662590091DB6A /* Plugin_ImpulseGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_ImpulseGenerator.cpp; path = ../Plugin_ImpulseGenerator.cpp; sourceTree = "<group>"; };
+		3BBFF7D81AE667600091DB6A /* Plugin_Oscilloscope.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_Oscilloscope.cpp; path = ../Plugin_Oscilloscope.cpp; sourceTree = "<group>"; };
+		3BC406E31AFB7CDF00E92CB9 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
 		3BD621491A9054BF0099DA97 /* Plugin_Routing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_Routing.cpp; path = ../Plugin_Routing.cpp; sourceTree = "<group>"; };
 		3BFA3CD419816BA7005A8824 /* Plugin_Teleport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_Teleport.cpp; path = ../Plugin_Teleport.cpp; sourceTree = "<group>"; };
 		3D199B5E1858F3E60063EC53 /* AudioPluginUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioPluginUtil.cpp; path = ../AudioPluginUtil.cpp; sourceTree = "<group>"; };
@@ -66,6 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3BC406E41AFB7CDF00E92CB9 /* CoreMIDI.framework in Frameworks */,
 				8D576314048677EA00EA77CD /* CoreFoundation.framework in Frameworks */,
 				2BC2A8D5144C433D00D5EF79 /* OpenGL.framework in Frameworks */,
 			);
@@ -77,6 +96,7 @@
 		089C166AFE841209C02AAC07 /* AudioPluginDemo */ = {
 			isa = PBXGroup;
 			children = (
+				3BC406E31AFB7CDF00E92CB9 /* CoreMIDI.framework */,
 				08FB77AFFE84173DC02AAC07 /* Source */,
 				089C167CFE841241C02AAC07 /* Resources */,
 				089C1671FE841209C02AAC07 /* External Frameworks and Libraries */,
@@ -105,6 +125,7 @@
 		08FB77AFFE84173DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				3BA205671AD1A54300CA4036 /* hrtftable.cpp */,
 				3D199B5E1858F3E60063EC53 /* AudioPluginUtil.cpp */,
 				3D199B5F1858F3E60063EC53 /* AudioPluginUtil.h */,
 				3D199B601858F3E60063EC53 /* Plugin_ConvolutionReverb.cpp */,
@@ -112,20 +133,27 @@
 				3D199B621858F3E60063EC53 /* Plugin_Equalizer.cpp */,
 				3B91CA641A7FC62D00BB861B /* Plugin_Granulator.cpp */,
 				3B269D991A9AD48900CA74DA /* Plugin_ImpactGenerator.cpp */,
+				3BBFF7D61AE662590091DB6A /* Plugin_ImpulseGenerator.cpp */,
 				3D199B641858F3E60063EC53 /* Plugin_LevelMixer.cpp */,
 				3DB07A141949AB42009FC325 /* Plugin_Lofinator.cpp */,
 				3D199B651858F3E60063EC53 /* Plugin_LoudnessMeter.cpp */,
 				3B91CA651A7FC62D00BB861B /* Plugin_ModalFilter.cpp */,
 				3D199B661858F3E60063EC53 /* Plugin_Multiband.cpp */,
 				3D199B671858F3E60063EC53 /* Plugin_NoiseBox.cpp */,
+				3BBFF7D81AE667600091DB6A /* Plugin_Oscilloscope.cpp */,
 				3B1BEC791A8459B600AF69CD /* Plugin_PitchDetector.cpp */,
 				3D199B681858F3E60063EC53 /* Plugin_RingModulator.cpp */,
 				3BD621491A9054BF0099DA97 /* Plugin_Routing.cpp */,
+				3BA205651AD1A54300CA4036 /* Plugin_Spatializer.cpp */,
+				3BA205661AD1A54300CA4036 /* Plugin_SpatializerReverb.cpp */,
 				3D199B691858F3E60063EC53 /* Plugin_StereoWidener.cpp */,
+				3B1FCEE61AAD4092003DE763 /* Plugin_Synthesizer.cpp */,
 				3D199B6A1858F3E60063EC53 /* Plugin_TeeBee.cpp */,
 				3D199B6B1858F3E60063EC53 /* Plugin_TeeDee.cpp */,
 				3BFA3CD419816BA7005A8824 /* Plugin_Teleport.cpp */,
+				3B7842701B03A78800DF893B /* Plugin_TubeResonator.cpp */,
 				B00F07AC1977EE05005E5E2F /* Plugin_Vocoder.cpp */,
+				3B24F9821AE65F6E0097AE14 /* Plugin_WahWah.cpp */,
 				3D199B6D1858F3E60063EC53 /* PluginList.h */,
 				3DA35E0E175F7CA000FA3842 /* AudioPluginInterface.h */,
 			);
@@ -202,9 +230,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3BA2056A1AD1A54300CA4036 /* hrtftable.cpp in Sources */,
+				3BA205691AD1A54300CA4036 /* Plugin_SpatializerReverb.cpp in Sources */,
 				3D199B6E1858F3E60063EC53 /* AudioPluginUtil.cpp in Sources */,
 				3D199B711858F3E60063EC53 /* Plugin_Equalizer.cpp in Sources */,
+				3BBFF7D71AE662590091DB6A /* Plugin_ImpulseGenerator.cpp in Sources */,
 				3D199B791858F3E60063EC53 /* Plugin_TeeBee.cpp in Sources */,
+				3B24F9831AE65F6E0097AE14 /* Plugin_WahWah.cpp in Sources */,
 				3B91CA661A7FC62D00BB861B /* Plugin_Granulator.cpp in Sources */,
 				3D199B741858F3E60063EC53 /* Plugin_LoudnessMeter.cpp in Sources */,
 				3B1BEC7A1A8459B600AF69CD /* Plugin_PitchDetector.cpp in Sources */,
@@ -213,7 +245,11 @@
 				3D199B761858F3E60063EC53 /* Plugin_NoiseBox.cpp in Sources */,
 				3BFA3CD519816BA7005A8824 /* Plugin_Teleport.cpp in Sources */,
 				3BD6214A1A9054BF0099DA97 /* Plugin_Routing.cpp in Sources */,
+				3BA205681AD1A54300CA4036 /* Plugin_Spatializer.cpp in Sources */,
+				3B7842711B03A78800DF893B /* Plugin_TubeResonator.cpp in Sources */,
+				3BBFF7D91AE667600091DB6A /* Plugin_Oscilloscope.cpp in Sources */,
 				3DB07A151949AB42009FC325 /* Plugin_Lofinator.cpp in Sources */,
+				3B1FCEE71AAD4092003DE763 /* Plugin_Synthesizer.cpp in Sources */,
 				B00F07AD1977EE05005E5E2F /* Plugin_Vocoder.cpp in Sources */,
 				3D199B6F1858F3E60063EC53 /* Plugin_ConvolutionReverb.cpp in Sources */,
 				3B269D9A1A9AD48900CA74DA /* Plugin_ImpactGenerator.cpp in Sources */,
@@ -243,7 +279,7 @@
 				INSTALL_PATH = /Plugins;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = AudioPluginDemo;
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				SKIP_INSTALL = NO;
 				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/AudioUnitExamples/AUPublic/AUBase $(PROJECT_DIR)/AudioUnitExamples/AUPublic/OtherBases $(PROJECT_DIR)/AudioUnitExamples/AUPublic/Utility $(PROJECT_DIR)/AudioUnitExamples/PublicUtility";
 				WRAPPER_EXTENSION = bundle;
@@ -261,7 +297,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Plugins;
 				PRODUCT_NAME = AudioPluginDemo;
-				SDKROOT = macosx10.8;
+				SDKROOT = macosx10.9;
 				SKIP_INSTALL = NO;
 				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/AudioUnitExamples/AUPublic/AUBase $(PROJECT_DIR)/AudioUnitExamples/AUPublic/OtherBases $(PROJECT_DIR)/AudioUnitExamples/AUPublic/Utility $(PROJECT_DIR)/AudioUnitExamples/PublicUtility";
 				WRAPPER_EXTENSION = bundle;
@@ -279,7 +315,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.9;
 			};
 			name = Debug;
 		};
@@ -292,7 +328,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PREBINDING = NO;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.9;
 			};
 			name = Release;
 		};
@@ -306,7 +342,7 @@
 				1DEB911C08733D790010E9CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		1DEB911E08733D790010E9CD /* Build configuration list for PBXProject "AudioPluginDemo" */ = {
 			isa = XCConfigurationList;
@@ -315,7 +351,7 @@
 				1DEB912008733D790010E9CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};

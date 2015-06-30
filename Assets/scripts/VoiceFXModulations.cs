@@ -11,15 +11,21 @@ public class VoiceFXModulations : MonoBehaviour
         private System.Random random = new System.Random();
         private float currValue;
         private float nextValue;
-        private float phase;
+        private float phase = -1;
 
         public float Evaluate(float freq, float minval, float maxval)
         {
             if (phase <= 0.0f)
             {
-                phase = 1.0f;
                 currValue = nextValue;
                 nextValue = (float)random.NextDouble() * (maxval - minval) + minval;
+				if(phase == -1)
+				{
+					currValue = nextValue;
+					phase = 0.0f;
+				}
+				else
+					phase = 1.0f;
             }
             float value = currValue + (nextValue - currValue) * (1.0f - phase);
             phase -= freq;
@@ -37,7 +43,7 @@ public class VoiceFXModulations : MonoBehaviour
 
     void Update()
     {
-        float t = Time.deltaTime * 2.0f;
+        float t = Time.deltaTime * 0.5f;
         mixer.SetFloat("RingModFreq1",
             randomCurve[0].Evaluate(2.3f * t, 300.0f, 11000.0f));
         mixer.SetFloat("RingModFreq2", randomCurve[1].Evaluate(1.31f * t, 300.0f, 11000.0f));

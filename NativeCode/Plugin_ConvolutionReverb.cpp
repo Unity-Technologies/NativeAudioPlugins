@@ -418,7 +418,7 @@ namespace ConvolutionReverb
             {
                 // resample pre-integrated curve via box-filtering: f(x) = (F(x+dx)-F(x)) / dx
                 float next_time = n * scale;
-                int i = (int)floorf(next_time);
+                int i = FastFloor(next_time);
                 float next_val = src[i] + (src[i + 1] - src[i]) * (next_time - i);
                 buffer[n] = (next_val - prev_val) * time_scale;
                 prev_val = next_val;

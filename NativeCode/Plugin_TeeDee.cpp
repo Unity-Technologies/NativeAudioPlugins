@@ -179,7 +179,7 @@ namespace TeeDee
                 }
             }
             data->phase += (data->p[P_FREQ] + data->penv) * st;
-            data->phase -= floorf(data->phase);
+            data->phase -= FastFloor(data->phase);
             data->aenv = data->aenv * adecay + 1.0e-11f;
             data->fenv = data->fenv * fdecay + 1.0e-11f;
             data->penv = data->penv * pdecay + 1.0e-11f;

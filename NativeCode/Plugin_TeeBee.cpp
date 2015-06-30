@@ -166,9 +166,9 @@ namespace TeeBee
                 data->cutrnd = data->random.GetFloat(0.0f, data->p[P_CUTRND]);
             }
             data->phase += data->freq;
-            data->phase -= floorf(data->phase);
+            data->phase -= FastFloor(data->phase);
             data->lfophase += data->p[P_LFOFREQ] * st;
-            data->lfophase -= floorf(data->lfophase);
+            data->lfophase -= FastFloor(data->lfophase);
             data->freq += (data->pattern[data->pattern_index] * st - data->freq) * glide;
             float outval = data->phase * 2.0f - 1.0f;
             float lfocut = 0.5f + 0.5f * sinf(data->lfophase * 2.0f * kPI);

@@ -14,30 +14,6 @@ namespace Vocoder
         P_NUM
     };
 
-    struct Filter
-    {
-        float cut, bw;
-        float prev1, lpf1, bpf1;
-        float prev2, lpf2, bpf2;
-        inline float Process(float input)
-        {
-            input += 1.0e-11f; // Kill denormals
-            float s1 = (input + prev1) * 0.5f;
-            lpf1 += cut * bpf1;
-            bpf1 += cut * ((s1 - bpf1) * bw - lpf1);
-            lpf1 += cut * bpf1;
-            bpf1 += cut * (-bpf1 * bw - lpf1);
-            prev1 = input;
-            float s2 = (bpf1 + prev2) * 0.5f;
-            lpf2 += cut * bpf2;
-            bpf2 += cut * ((s2 - bpf2) * bw - lpf2);
-            lpf2 += cut * bpf2;
-            bpf2 += cut * (-bpf2 * bw - lpf2);
-            prev2 = bpf1;
-            return bpf2;
-        }
-    };
-
     struct EnvFollower
     {
         float env;
@@ -50,8 +26,10 @@ namespace Vocoder
 
     struct Band
     {
-        Filter analysis;
-        Filter synthesis;
+        StateVariableFilter analysis1;
+		StateVariableFilter analysis2;
+		StateVariableFilter synthesis1;
+        StateVariableFilter synthesis2;
         EnvFollower envfollow;
     };
 
@@ -169,10 +147,14 @@ namespace Vocoder
             float cs = 2.0f * sinf(w);
             for (int i = 0; i < inchannels; i++)
             {
-                data->bands[i][j].analysis.cut = ca;
-                data->bands[i][j].analysis.bw = ra;
-                data->bands[i][j].synthesis.cut = cs;
-                data->bands[i][j].synthesis.bw = rs;
+                data->bands[i][j].analysis1.cutoff = ca;
+				data->bands[i][j].analysis2.cutoff = ca;
+                data->bands[i][j].analysis1.bandwidth = ra;
+				data->bands[i][j].analysis2.bandwidth = ra;
+				data->bands[i][j].synthesis1.cutoff = cs;
+                data->bands[i][j].synthesis2.cutoff = cs;
+                data->bands[i][j].synthesis1.bandwidth = rs;
+				data->bands[i][j].synthesis2.bandwidth = rs;
             }
             gain *= emph;
         }
@@ -189,8 +171,8 @@ namespace Vocoder
                 Band* b_end = b + NUMBANDS;
                 while (b != b_end)
                 {
-                    float carrier = b->synthesis.Process(input);
-                    float source = b->analysis.Process(sidechainInput);
+                    float carrier = b->synthesis2.ProcessBPF(b->synthesis1.ProcessBPF(input));
+                    float source = b->analysis2.ProcessBPF(b->analysis1.ProcessBPF(sidechainInput));
                     float env = b->envfollow.Process(source, envdecay);
                     sum += carrier * env;
                     ++b;

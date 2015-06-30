@@ -202,7 +202,7 @@ namespace PitchDetector
             }
 
             data->phase += detected_freqs[(int)data->p[P_INDEX]] * oscpitch;
-            data->phase -= floorf(data->phase);
+            data->phase -= FastFloor(data->phase);
 
             for (int c = 0; c < outchannels; c++)
                 outbuffer[n * outchannels + c] += ((data->phase * 2.0f - 1.0f) * data->env - outbuffer[n * outchannels + c]) * monitor;

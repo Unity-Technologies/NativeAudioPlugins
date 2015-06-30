@@ -1,10 +1,21 @@
 #include "AudioPluginUtil.h"
+#include <stdarg.h>
 
 char* strnew(const char* src)
 {
     char* newstr = new char[strlen(src) + 1];
     strcpy(newstr, src);
     return newstr;
+}
+
+char* tmpstr(int index, const char* fmtstr, ...)
+{
+	static char buf[4][1024];
+	va_list args;
+	va_start(args, fmtstr);
+	vsprintf(buf[index], fmtstr, args);
+	va_end(args);
+	return buf[index];
 }
 
 template<typename T> void UnitySwap(T& a, T& b) { T t = a; a = b; b = t; }
@@ -162,7 +173,7 @@ void FFTAnalyzer::ReadBuffer(float* buffer, int numsamples, bool readInputBuffer
     for (int n = 0; n < numsamples; n++)
     {
         float f = n * scale;
-        int i = (int)floorf(f);
+        int i = FastFloor(f);
         buffer[n] = buf[i] + (buf[i + 1] - buf[i]) * (f - i);
     }
 }
@@ -197,7 +208,7 @@ void HistoryBuffer::ReadBuffer(float* buffer, int numsamplesTarget, int numsampl
         float f = w - p;
         if (f < 0.0f)
             f += length;
-        int i = (int)floorf(f);
+        int i = FastFloor(f);
         float s1 = data[(i == 0) ? (length - 1) : (i - 1)];
         float s2 = data[i];
         buffer[numsamplesTarget - 1 - n] = s1 + (s2 - s1) * (f - i);
