@@ -38,9 +38,10 @@ namespace MIDI
     MidiInput::MidiInput()
     {
     #if UNITY_WIN
+		int numdevs = midiInGetNumDevs();
         for (int n = 0; n < numdevs; n++)
         {
-            midiInOpen(&m_midihandle, n, (DWORD)&Impl::MidiInCallbackProc, n, CALLBACK_FUNCTION);
+            midiInOpen(&m_midihandle, n, (DWORD_PTR)&MidiInCallbackProc, n, CALLBACK_FUNCTION);
             midiInStart(m_midihandle);
         }
     #elif UNITY_OSX
@@ -71,10 +72,10 @@ namespace MIDI
     }
 
     #if UNITY_WIN
-    void CALLBACK MidiInput::Impl::MidiInCallbackProc(HMIDIIN hMidiIn, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
+    void CALLBACK MidiInput::MidiInCallbackProc(HMIDIIN hMidiIn, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
     {
         if (wMsg == MIM_DATA)
-            livedata.Write(dwParam1);
+            livedata.Feed(dwParam1);
     }
     #elif UNITY_OSX
     void MidiInput::MidiInCallbackProc(const MIDIPacketList* pktlist, void* refCon, void* connRefCon)
@@ -393,9 +394,7 @@ namespace Synthesizer
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK CreateCallback(UnityAudioEffectState* state)
     {
-#if UNITY_WIN || UNITY_OSX
 		static MIDI::MidiInput midiinput;
-#endif
 		EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
 		for(int n = 0; n < MAXCHANNELS; n++)
