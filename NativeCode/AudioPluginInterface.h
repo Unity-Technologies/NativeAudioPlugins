@@ -182,6 +182,7 @@ enum UnityAudioEffectStateFlags
 	UnityAudioEffectStateFlags_IsSideChainTarget       = 1 << 3,   // Does this effect need a side chain buffer and can it be targeted by a Send?
 };
 
+// Note that the spatialization API is still work in progress currently targetted at the 5.2 release.
 struct UnityAudioSpatializerData
 {
 	float listenermatrix[16];       // Matrix that transforms sourcepos into the local space of the listener
