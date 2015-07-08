@@ -16,7 +16,7 @@ namespace Spatializer
 
 	const int HRTFLEN = 512;
 	
-	const float GAINCORRECTION = 1.0f;
+	const float GAINCORRECTION = 2.0f;
 
 	class HRTFData
 	{
@@ -187,7 +187,7 @@ namespace Spatializer
 		float* m = state->spatializerdata->listenermatrix;
 		float* s = state->spatializerdata->sourcematrix;
 
-		state->spatializerdata->distanceattenuationwrite = state->spatializerdata->distanceattenuationread * data->p[P_DISTANCEATTN] + data->p[P_FIXEDVOLUME];
+		state->spatializerdata->distanceattenuationoverride = state->spatializerdata->distanceattenuationsource * data->p[P_DISTANCEATTN] + data->p[P_FIXEDVOLUME];
 
 		// Currently we ignore source orientation and only use the position
 		float px = s[12];
@@ -209,18 +209,33 @@ namespace Spatializer
 
 		GetHRTF (0, data->ch[0].h, azimuth, elevation);
 		GetHRTF (1, data->ch[1].h, azimuth, elevation);
+
+		// From the FMOD documentation:
+		//   A spread angle of 0 makes the stereo sound mono at the point of the 3D emitter.
+		//   A spread angle of 90 makes the left part of the stereo sound place itself at 45 degrees to the left and the right part 45 degrees to the right.
+		//   A spread angle of 180 makes the left part of the stero sound place itself at 90 degrees to the left and the right part 90 degrees to the right.
+		//   A spread angle of 360 makes the stereo sound mono at the opposite speaker location to where the 3D emitter should be located (by moving the left part 180 degrees left and the right part 180 degrees right). So in this case, behind you when the sound should be in front of you!
+		// Note that FMOD performs the spreading and panning in one go. We can't do this here due to the way that impulse-based spatialization works, so we perform the spread calculations on the left/right source signals before they enter the convolution processing.
+		// That way we can still use it to control how the source signal downmixing takes place.
+		float spread = cosf(state->spatializerdata->spread * kPI / 360.0f);
+		float spreadmatrix[2] = { 2.0f - spread, spread };
 		
 		float* reverb = reverbmixbuffer;
 		for(int sampleOffset = 0; sampleOffset < length; sampleOffset += HRTFLEN)
 		{
 			for(int c = 0; c < 2; c++)
 			{
+				// stereopan is in the [-1; 1] range, this acts the way fmod does it for stereo
+				float stereopan = 1.0f - ((c == 0) ? FastMax(0.0f, state->spatializerdata->stereopan) : FastMax(0.0f, -state->spatializerdata->stereopan));
+				
 				InstanceChannel& ch = data->ch[c];
 
 				for (int n = 0; n < HRTFLEN; n++)
 				{
+					float left  = inbuffer[n * 2];
+					float right = inbuffer[n * 2 + 1];
 					ch.buffer[n          ] = ch.buffer[n + HRTFLEN];
-					ch.buffer[n + HRTFLEN] = inbuffer[n * 2 + c];
+					ch.buffer[n + HRTFLEN] = left * spreadmatrix[c] + right * spreadmatrix[1 - c];
 				}
 
 				for (int n = 0; n < HRTFLEN * 2; n++)
@@ -238,7 +253,7 @@ namespace Spatializer
 				
 				for (int n = 0; n < HRTFLEN; n++)
 				{
-					float s = inbuffer[n * 2 + c];
+					float s = inbuffer[n * 2 + c] * stereopan;
 					float y = s + (ch.y[n].re * GAINCORRECTION - s) * spatialblend;
 					outbuffer[n * 2 + c] = y;
 					reverb[n * 2 + c] += y * reverbmix;

@@ -9,7 +9,7 @@
     #define SLEEP(t) usleep(t * 1000.0f)
 #else
     #define UNITY_WIN 1
-    #define SLEEP(t) Sleep(t)
+    #define SLEEP(t) //Sleep(t)
 #endif
 
 int main(int argc, char** argv)

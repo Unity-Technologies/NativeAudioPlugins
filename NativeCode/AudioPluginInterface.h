@@ -182,15 +182,16 @@ enum UnityAudioEffectStateFlags
 	UnityAudioEffectStateFlags_IsSideChainTarget       = 1 << 3,   // Does this effect need a side chain buffer and can it be targeted by a Send?
 };
 
-// Note that the spatialization API is still work in progress currently targetted at the 5.2 release.
 struct UnityAudioSpatializerData
 {
-	float listenermatrix[16];       // Matrix that transforms sourcepos into the local space of the listener
-	float sourcematrix[16];         // Transform matrix of audio source
-	float distanceattenuationread;  // Distance attenuation applied by audio source
-	float spatialblend;             // Distance-controlled spatial blend
-	float reverbzonemix;            // Reverb zone mix level parameter (and curve) on audio source
-	float distanceattenuationwrite; // The spatializer may override the distance attenuation in order to influence the voice prioritization (leave this untouched or at a negative value to use distanceattenuationread instead)
+	float listenermatrix[16];          // Matrix that transforms sourcepos into the local space of the listener
+	float sourcematrix[16];            // Transform matrix of audio source
+	float distanceattenuationsource;   // Distance attenuation applied by audio source, unless distanceattenuationoverride is set
+	float spatialblend;                // Distance-controlled spatial blend
+	float reverbzonemix;               // Reverb zone mix level parameter (and curve) on audio source
+	float distanceattenuationoverride; // The spatializer may override the distance attenuation in order to influence the voice prioritization (leave this untouched or at a negative value to use distanceattenuationsource instead)
+	float spread;                      // Spread parameter of the audio source (0..360 degrees)
+	float stereopan;                   // Stereo panning parameter of the audio source (-1 = fully left, 1 = fully right)
 };
 
 struct UnityAudioEffectState
