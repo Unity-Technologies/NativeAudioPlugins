@@ -13,6 +13,7 @@ public class SpatializerUserParams : MonoBehaviour
 	public bool EnableSpatialization = true;
 	public float DistanceAttn = 1.0f;
 	public float FixedVolume = 0.0f;
+	public float CustomRolloff = 0.0f;
 	#endif
 
 	void Start ()
@@ -25,6 +26,7 @@ public class SpatializerUserParams : MonoBehaviour
 		#if ENABLE_SPATIALIZER_API
 		source.SetSpatializerFloat (0, DistanceAttn);
 		source.SetSpatializerFloat (1, FixedVolume);
+		source.SetSpatializerFloat (2, CustomRolloff);
 		source.spatialize = EnableSpatialization;
 		#endif
 	}

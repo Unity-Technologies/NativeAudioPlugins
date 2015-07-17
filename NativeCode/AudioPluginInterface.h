@@ -182,16 +182,22 @@ enum UnityAudioEffectStateFlags
 	UnityAudioEffectStateFlags_IsSideChainTarget       = 1 << 3,   // Does this effect need a side chain buffer and can it be targeted by a Send?
 };
 
+// This callback can be used to override the way distance attenuation is performed on AudioSources.
+// distanceIn is the distance between the source and the listener and attenuationOut is the output volume.
+// attenuationIn is the volume-curve based attenuation that would have been applied by Unity if this callback were not set.
+// A typical attenuation curve may look like this: *attenuationOut = 1.0f / max(1.0f, distanceIn);
+// The callback may also be used to apply a secondary gain on top of the one through attenuationIn by Unity's AudioSource curve.
+typedef UNITY_AUDIODSP_RESULT (UNITY_AUDIODSP_CALLBACK * UnityAudioEffect_DistanceAttenuationCallback)(UnityAudioEffectState* state, float distanceIn, float attenuationIn, float* attenuationOut);
+
 struct UnityAudioSpatializerData
 {
-	float listenermatrix[16];          // Matrix that transforms sourcepos into the local space of the listener
-	float sourcematrix[16];            // Transform matrix of audio source
-	float distanceattenuationsource;   // Distance attenuation applied by audio source, unless distanceattenuationoverride is set
-	float spatialblend;                // Distance-controlled spatial blend
-	float reverbzonemix;               // Reverb zone mix level parameter (and curve) on audio source
-	float distanceattenuationoverride; // The spatializer may override the distance attenuation in order to influence the voice prioritization (leave this untouched or at a negative value to use distanceattenuationsource instead)
-	float spread;                      // Spread parameter of the audio source (0..360 degrees)
-	float stereopan;                   // Stereo panning parameter of the audio source (-1 = fully left, 1 = fully right)
+	float listenermatrix[16];                                                 // Matrix that transforms sourcepos into the local space of the listener
+	float sourcematrix[16];                                                   // Transform matrix of audio source
+	float spatialblend;                                                       // Distance-controlled spatial blend
+	float reverbzonemix;                                                      // Reverb zone mix level parameter (and curve) on audio source
+	float spread;                                                             // Spread parameter of the audio source (0..360 degrees)
+	float stereopan;                                                          // Stereo panning parameter of the audio source (-1 = fully left, 1 = fully right)
+	UnityAudioEffect_DistanceAttenuationCallback distanceattenuationcallback; // The spatializer plugin may override the distance attenuation in order to influence the voice prioritization (leave this callback as NULL to use attenuationIn instead)
 };
 
 struct UnityAudioEffectState

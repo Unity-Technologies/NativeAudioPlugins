@@ -9,8 +9,9 @@ namespace Spatializer
 {
 	enum
 	{
-		P_DISTANCEATTN,
+		P_AUDIOSRCATTN,
 		P_FIXEDVOLUME,
+		P_CUSTOMFALLOFF,
 		P_NUM
 	};
 
@@ -103,17 +104,29 @@ namespace Spatializer
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Distance Attn", "", 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, P_DISTANCEATTN, "AudioSource distance attenuation");
+        RegisterParameter(definition, "AudioSrc Attn", "", 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, P_AUDIOSRCATTN, "AudioSource distance attenuation");
 		RegisterParameter(definition, "Fixed Volume", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_FIXEDVOLUME, "Fixed volume amount");
+		RegisterParameter(definition, "Custom Falloff", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_CUSTOMFALLOFF, "Custom volume falloff amount (logarithmic)");
 		definition.flags |= UnityAudioEffectDefinitionFlags_IsSpatializer;
         return numparams;
     }
+
+	static UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK DistanceAttenuationCallback (UnityAudioEffectState* state, float distanceIn, float attenuationIn, float* attenuationOut)
+	{
+		EffectData* data = state->GetEffectData<EffectData>();
+		*attenuationOut =
+			data->p[P_AUDIOSRCATTN] * attenuationIn +
+			data->p[P_FIXEDVOLUME] +
+			data->p[P_CUSTOMFALLOFF] * (1.0f / FastMax(1.0f, distanceIn));
+		return UNITY_AUDIODSP_OK;
+	}
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK CreateCallback(UnityAudioEffectState* state)
     {
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
+		state->spatializerdata->distanceattenuationcallback = DistanceAttenuationCallback;
         InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->p);
         return UNITY_AUDIODSP_OK;
     }
@@ -186,8 +199,6 @@ namespace Spatializer
 
 		float* m = state->spatializerdata->listenermatrix;
 		float* s = state->spatializerdata->sourcematrix;
-
-		state->spatializerdata->distanceattenuationoverride = state->spatializerdata->distanceattenuationsource * data->p[P_DISTANCEATTN] + data->p[P_FIXEDVOLUME];
 
 		// Currently we ignore source orientation and only use the position
 		float px = s[12];
