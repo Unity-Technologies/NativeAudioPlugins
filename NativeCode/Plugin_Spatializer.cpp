@@ -100,6 +100,14 @@ namespace Spatializer
 		InstanceChannel ch[2];
     };
 
+	inline bool IsHostCompatible(UnityAudioEffectState* state)
+	{
+		// Somewhat convoluted error checking here because hostapiversion is only supported from SDK version 1.03 (i.e. Unity 5.2) and onwards.
+		return
+			state->structsize >= sizeof(UnityAudioEffectState) &&
+			state->hostapiversion >= UNITY_AUDIO_PLUGIN_API_VERSION;
+	}
+
     int InternalRegisterEffectDefinition(UnityAudioEffectDefinition& definition)
     {
         int numparams = P_NUM;
@@ -126,7 +134,8 @@ namespace Spatializer
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-		state->spatializerdata->distanceattenuationcallback = DistanceAttenuationCallback;
+		if(IsHostCompatible(state))
+			state->spatializerdata->distanceattenuationcallback = DistanceAttenuationCallback;
         InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->p);
         return UNITY_AUDIODSP_OK;
     }
@@ -182,12 +191,9 @@ namespace Spatializer
 	
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectState* state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int outchannels)
     {
-		// Somewhat convoluted error checking here because hostapiversion is only supported from SDK version 1.03 and onwards.
-		if(inchannels != 2 ||
-		   outchannels != 2 ||
-		   state->structsize < sizeof(UnityAudioEffectState) ||
-		   state->hostapiversion < UNITY_AUDIO_PLUGIN_API_VERSION ||
-		   state->spatializerdata == NULL)
+		// Check that I/O formats are right and that the host API supports this feature
+		if (inchannels != 2 || outchannels != 2 ||
+			!IsHostCompatible(state) || state->spatializerdata == NULL)
 		{
 			memcpy(outbuffer, inbuffer, length * outchannels * sizeof(float));
 	        return UNITY_AUDIODSP_OK;
