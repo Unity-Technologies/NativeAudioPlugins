@@ -197,7 +197,7 @@ struct UnityAudioSpatializerData
 	float reverbzonemix;                                                      // Reverb zone mix level parameter (and curve) on audio source
 	float spread;                                                             // Spread parameter of the audio source (0..360 degrees)
 	float stereopan;                                                          // Stereo panning parameter of the audio source (-1 = fully left, 1 = fully right)
-	UnityAudioEffect_DistanceAttenuationCallback distanceattenuationcallback; // The spatializer plugin may override the distance attenuation in order to influence the voice prioritization (leave this callback as NULL to use attenuationIn instead)
+	UnityAudioEffect_DistanceAttenuationCallback distanceattenuationcallback; // The spatializer plugin may override the distance attenuation in order to influence the voice prioritization (leave this callback as NULL to use the built-in audio source attenuation curve)
 };
 
 struct UnityAudioEffectState
