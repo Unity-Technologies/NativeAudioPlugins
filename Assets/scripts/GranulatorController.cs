@@ -17,10 +17,9 @@ public class GranulatorController : MonoBehaviour
 
     void Update()
     {
-        Time.timeScale = TimeScale;
-        float t = Time.time - t0, val;
-        mixer.SetFloat("MainVolume", Mathf.Min(t * 3.0f - 80.0f, -20.0f));
-        mixer.SetFloat("WindowLen", Mathf.Clamp(t * 0.001f, 0.005f, 0.1f));
+		float t = (Time.time - t0) * TimeScale, val;
+        mixer.SetFloat("MainVolume", Mathf.Min(t * 7.0f - 80.0f, -20.0f));
+        mixer.SetFloat("WindowLen", Mathf.Clamp(t * 0.001f, 0.005f, 0.01f));
         mixer.SetFloat("Offset", 0.2f - 0.2f * Mathf.Cos(t * 0.03f));
 		float rndOffset = 0.2f * (1.5f - Mathf.Sin (t * 0.05f));
         mixer.SetFloat("RndOffset", rndOffset);

@@ -16,6 +16,6 @@ public class GranulatorDebug : MonoBehaviour
 	void Update ()
 	{
 		var guitext = GetComponent<GUIText>();
-		guitext.text = "Count: " + Granulator_DebugGetGrainCount();
+		guitext.text = "Grain count: " + Granulator_DebugGetGrainCount();
 	}
 }

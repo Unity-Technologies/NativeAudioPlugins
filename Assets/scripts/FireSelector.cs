@@ -7,6 +7,12 @@ public class FireSelector : MonoBehaviour
 	public AudioMixerSnapshot[] fireTypeSnapshots;
 	public AudioMixerSnapshot fireType;
 
+	void Start()
+	{
+		fireType = fireTypeSnapshots [0];
+		fireType.TransitionTo (0);
+	}
+
 	void OnGUI()
 	{
 		GUILayout.Label("Fire type:");
