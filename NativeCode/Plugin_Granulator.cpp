@@ -3,7 +3,7 @@
 namespace Granulator
 {
     const int MAXGRAINS = 500;
-    const int MAXLENGTH = 0x100000;
+    const int MAXDELAYLENGTH = 0x40000;
     const int MAXSAMPLE = 16;
 
     Mutex sampleMutex;
@@ -12,7 +12,7 @@ namespace Granulator
     struct GranulatorSample
     {
         float* data;
-        float* integrated;
+		float* preview;
         int numsamples;
         int numchannels;
         int samplerate;
@@ -55,30 +55,35 @@ namespace Granulator
 
     struct Grain
     {
-        float offset;
+		GranulatorSample* sample;
+		int channel;
         int length;
-        int numsamples;
-        const float* src;
+		int wrapping;
+		float offset;
         float pos;
         float speed;
 		float pan;
 		float shape;
-        inline void Setup(Random& random, const float wavesamplerate, const float samplerate, const float sampletime, const int writepos, const float* params, const float* _src, int _numsamples, float startsample)
+		
+		// Note that the sample pointer stays constant but it's contents may be changed from other threads (hence the need for the mutex).
+        inline void Setup(GranulatorSample* _sample, int _channel, Random& random, const float sampletime, const int delaypos, const float* params, float startsample, int _wrapping)
         {
-            src = _src;
-            numsamples = _numsamples;
-            float maxtime = (float)(numsamples - 1);
+			sample = _sample;
+			channel = _channel;
+			wrapping = _wrapping;
+            float maxtime = sample->numsamples - 1;
             length = (int)(maxtime * random.GetFloat(params[P_WLEN], params[P_WLEN] + params[P_RWLEN]));
             float invlength = 1.0f / (float)length;
-            offset = writepos + maxtime * FastClip(random.GetFloat(params[P_OFFSET] - params[P_ROFS], params[P_OFFSET]), 0.0f, 1.0f);
-            speed = FastMax(0.001f, random.GetFloat(params[P_SPEED], params[P_SPEED] + params[P_RSPEED])) * invlength * wavesamplerate * sampletime;
+            offset = delaypos + maxtime * FastClip(random.GetFloat(params[P_OFFSET] - params[P_ROFS], params[P_OFFSET]), 0.0f, 1.0f);
+            speed = FastMax(0.001f, random.GetFloat(params[P_SPEED], params[P_SPEED] + params[P_RSPEED])) * invlength * sample->samplerate * sampletime;
             pos = -speed * startsample;
 			pan = params[P_PANBASE] + random.GetFloat(-params[P_PANRANGE], params[P_PANRANGE]);
 			shape = params[P_SHAPE];
         }
 
-        inline float Scan(int numsrcchannels)
+        inline float Scan()
         {
+			const float* src = sample->data + channel;
             float p = FastMax(0.0f, pos);
 			pos += speed;
             float amp = 1.0f - fabsf(p + p - 1.0f);
@@ -86,12 +91,20 @@ namespace Granulator
             p = offset + p * length;
             int i = FastFloor(p);
             p -= i;
-            if (i >= numsamples)
-				return 0.0f;
-            float s = src[numsrcchannels * i++];
-            if (i >= numsamples)
-				return s * amp;
-            return amp * (s + (src[numsrcchannels * i] - s) * p);
+            if (i >= sample->numsamples)
+			{
+				if(!wrapping)
+					return 0.0f;
+				i -= sample->numsamples;
+			}
+            float s = src[sample->numchannels * i++];
+            if (i >= sample->numsamples)
+			{
+				if(!wrapping)
+					return s * amp;
+				i -= sample->numsamples;
+			}
+            return amp * (s + (src[sample->numchannels * i] - s) * p);
         }
     };
 
@@ -99,15 +112,14 @@ namespace Granulator
     {
         float p[P_NUM];
         Random random;
-		int writepos;
-        float env;
-        float previewsum;
+		int delaypos;
+        float env[8];
+		double integrator[8];
 		float samplecounter;
 		float nextrandtime;
 		int activegrains;
         Grain grains[MAXGRAINS];
-        float delay[MAXLENGTH];
-        float preview[MAXLENGTH];
+		GranulatorSample delay;
     };
 
     int InternalRegisterEffectDefinition(UnityAudioEffectDefinition& definition)
@@ -142,6 +154,13 @@ namespace Granulator
         memset(data, 0, sizeof(EffectData));
         ResetGrains(data);
         state->effectdata = data;
+		data->delay.numsamples = MAXDELAYLENGTH;
+		data->delay.numchannels = 1;
+		data->delay.samplerate = state->samplerate;
+		data->delay.data = new float [data->delay.numsamples * 8]; // channel count is dynamic
+		data->delay.preview = new float [data->delay.numsamples * 8];
+		memset(data->delay.data, 0, sizeof(float) * data->delay.numsamples * data->delay.numchannels);
+		memset(data->delay.preview, 0, sizeof(float) * data->delay.numsamples * data->delay.numchannels);
         InitParametersFromDefinitions(InternalRegisterEffectDefinition, data->p);
         return UNITY_AUDIODSP_OK;
     }
@@ -149,6 +168,8 @@ namespace Granulator
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
         EffectData* data = state->GetEffectData<EffectData>();
+		delete[] data->delay.data;
+		delete[] data->delay.preview;
         delete data;
         return UNITY_AUDIODSP_OK;
     }
@@ -179,33 +200,40 @@ namespace Granulator
         EffectData* data = state->GetEffectData<EffectData>();
         if (strncmp(name, "Waveform", 8) == 0)
         {
-            int channel = name[8] - '0';
-            int useSample = (int)data->p[P_USESAMPLE];
-            MutexScopeLock mutexScope(Granulator::sampleMutex, useSample >= 0);
-            GranulatorSample* gs = (useSample >= 0) ? &GetGranulatorSample(useSample) : NULL;
-            if (gs != NULL && gs->numsamples == 0)
-                gs = NULL;
-            int wp = (gs == NULL) ? data->writepos : 0;
-            int numchannels = (gs != NULL) ? gs->numchannels : 1;
-            int numsrcsamples = (gs != NULL) ? gs->numsamples : MAXLENGTH;
-            const float* src = (gs != NULL) ? (gs->data + channel) : data->preview;
-            float scale = (float)(numsrcsamples - 2) / (float)numsamples;
+            int usesample = (int)data->p[P_USESAMPLE];
+            MutexScopeLock mutexScope(Granulator::sampleMutex, usesample >= 0);
+            GranulatorSample* gs = (usesample >= 0) ? &GetGranulatorSample(usesample) : &data->delay;
+			if(gs->numsamples == 0 || gs->numchannels == 0)
+			{
+				memset(buffer, 0, sizeof(float) * numsamples);
+				return UNITY_AUDIODSP_OK;
+			}
+			int channel = name[8] - '0';
+			if(channel >= gs->numchannels)
+				channel = gs->numchannels - 1;
+			int delaypos = (usesample >= 0) ? 0 : data->delaypos;
+            const float* src = gs->preview + channel;
+            float scale = (float)(gs->numsamples - 2) / (float)numsamples;
             float invscale = 1.0f / scale, prev = 0.0f;
             for (int n = 0; n < numsamples; n++)
             {
                 float f = n * scale;
                 int i = FastFloor(f);
                 f -= i;
-                if (gs == NULL)
-                    i += wp;
+                if (gs == &data->delay)
+                    i += delaypos;
 				float s = 0.0f;
-                if (i < numsrcsamples)
+				if(usesample < 0 && i >= gs->numsamples)
+					i -= gs->numsamples;
+                if (i < gs->numsamples)
 				{
-                    s = src[numchannels * i++];
-	                if (i < numsrcsamples)
-		                s += (src[numchannels * i] - s) * f;
+                    s = src[gs->numchannels * i++];
+					if(usesample < 0 && i >= gs->numsamples)
+						i -= gs->numsamples;
+	                if (i < gs->numsamples)
+		                s += (src[gs->numchannels * i] - s) * f;
 				}
-                buffer[n] = (s - prev) * invscale;
+				buffer[n] = (n == 0) ? 0.0f : (s - prev) * invscale;
                 prev = s;
             }
         }
@@ -218,34 +246,42 @@ namespace Granulator
 
         const int samplerate = state->samplerate;
         const float sampletime = 1.0f / (float)samplerate;
-        const float freeze = data->p[P_FREEZE];
-        const int useSample = (int)data->p[P_USESAMPLE];
+        const float freeze = data->p[P_FREEZE] * 2.0f;
+        const int usesample = (int)data->p[P_USESAMPLE];
         const float* params = data->p;
 
-        MutexScopeLock mutexScope(Granulator::sampleMutex, useSample >= 0);
+        MutexScopeLock mutexScope(Granulator::sampleMutex, usesample >= 0);
 
-        GranulatorSample* gs = (useSample >= 0) ? &GetGranulatorSample(useSample) : NULL;
-        if (gs != NULL && gs->numsamples == 0)
-            gs = NULL;
+		data->delay.numchannels = inchannels;
 
-        for (int c = 0; c < inchannels; c++)
-        {
-            const float* src = inbuffer + c;
+        GranulatorSample* gs = (usesample >= 0) ? &GetGranulatorSample(usesample) : &data->delay;
 
-            for (int n = 0; n < length; n++)
-            {
-                float input = *src;
-                src += inchannels;
-
-                data->env += (fabsf(input) - data->env) * 0.01f;
-                if (data->env > freeze)
-                {
-                    data->previewsum = data->previewsum * 0.999f + input;
-                    data->delay[data->writepos] = input;
-                    data->preview[data->writepos] = data->previewsum;
-                    data->writepos = (data->writepos + MAXLENGTH - 1) & (MAXLENGTH - 1);
-                }
-            }
+		// Fill in live data
+		const float* src = inbuffer;
+		for (int n = 0; n < length; n++)
+		{
+			bool record = false;
+			for(int i = 0; i < inchannels; i++)
+			{
+				float input = src[i];
+				float a = fabsf(input) + 1.0e-11f;
+				data->env[i] = (a > data->env[i]) ? a : (data->env[i] * 0.9995f);
+				record |= (data->env[i] > freeze);
+			}
+			if (record)
+			{
+				data->delaypos = (data->delaypos + MAXDELAYLENGTH - 1) & (MAXDELAYLENGTH - 1);
+				for(int i = 0; i < inchannels; i++)
+				{
+					data->delay.data[data->delaypos * inchannels + i] = src[i];
+					
+					// Calculate integrated signal on the fly for better reconstruction in GetFloatBufferCallback.
+					// The small leak of 0.1% prevents build-up of DC.
+					data->integrator[i] = data->integrator[i] * 0.9999f + fabsf(src[i]);
+					data->delay.preview[data->delaypos * inchannels + i] = data->integrator[i];
+				}
+			}
+			src += inchannels;
         }
 
         memset(outbuffer, 0, length * outchannels * sizeof(float));
@@ -261,8 +297,6 @@ namespace Granulator
 
 		debug_graincount = data->activegrains;
 			
-		int numsrcchannels = (gs == NULL) ? 1 : gs->numchannels;
-		
 		// Fill in new grains
 		float rate = data->p[P_RATE] + data->p[P_RRATE] * data->nextrandtime;
 		float nexteventsample = (rate > 0.0f) ? (samplerate / rate) : 100000000;
@@ -275,13 +309,18 @@ namespace Granulator
 				data->nextrandtime = data->random.GetFloat(0.0f, 1.0f);
 				rate = data->p[P_RATE] + data->p[P_RRATE] * data->nextrandtime;
 				nexteventsample = (rate > 0.0f) ? (samplerate / rate) : 100000000;
-				if (data->activegrains >= MAXGRAINS)
+				if (data->activegrains >= MAXGRAINS || gs->numsamples == 0)
 					continue;
-				Grain* g = &data->grains[data->activegrains++];
-				if (gs == NULL)
-					g->Setup(data->random, samplerate, samplerate, sampletime, data->writepos, params, data->delay, MAXLENGTH, n + fracpos);
-				else
-					g->Setup(data->random, gs->samplerate, samplerate, sampletime, 0, params, gs->data + (data->random.Get() % numsrcchannels), gs->numsamples, n + fracpos);
+				data->grains[data->activegrains++].Setup(
+					gs,
+					data->random.Get() % gs->numchannels,
+					data->random,
+					sampletime,
+					(usesample >= 0) ? 0 : data->delaypos,
+					params,
+					n + fracpos,
+					usesample < 0
+					);
 			}
 		}
 		
@@ -293,7 +332,7 @@ namespace Granulator
 			float* dst = outbuffer;
 			for (int n = 0; n < length; n++)
 			{
-				float s = g->Scan(numsrcchannels);
+				float s = g->Scan();
 				dst[0] += s * (1.0f - g->pan);
 				dst[1] += s * g->pan;
 				dst += outchannels;
@@ -313,39 +352,51 @@ extern "C" UNITY_AUDIODSP_EXPORT_API bool Granulator_UploadSample(int index, flo
 {
     if (index < 0 || index >= Granulator::MAXSAMPLE)
         return false;
+	
     MutexScopeLock mutexScope(Granulator::sampleMutex);
-    Granulator::GranulatorSample& s = Granulator::GetGranulatorSample(index);
+    
+	Granulator::GranulatorSample& s = Granulator::GetGranulatorSample(index);
     if (s.allocated)
+	{
         delete[] s.data;
-    int num = numsamples * numchannels;
+		delete[] s.preview;
+	}
+	
+	int num = numsamples * numchannels;
     if (num > 0)
     {
         s.data = new float[num];
-        s.integrated = new float[num];
+		s.preview = new float[num];
         s.allocated = 1;
         strcpy(s.name, name);
         memcpy(s.data, data, num * sizeof(float));
-        for (int c = 0; c < numchannels; c++)
-        {
-            double sum = 0.0;
-            for (int n = 0; n < numsamples; n++)
-            {
-                sum += s.data[n * numchannels + c];
-                s.integrated[n * numchannels + c] = (float)sum;
-            }
-        }
+		double integrator[8]; memset(integrator, 0, sizeof(integrator));
+		float* src = s.data;
+		float* dst = s.preview;
+		for(int n = 0; n < numsamples; n++)
+		{
+			for(int i = 0; i < numchannels; i++)
+			{
+				// Calculate full integrated signal for better reconstruction in GetFloatBufferCallback.
+				// The small leak of 0.1% prevents build-up of DC.
+				integrator[i] = integrator[i] * 0.9999f + fabsf(*src++);
+				*dst++ = integrator[i];
+			}
+		}
     }
     else
     {
         s.data = NULL;
-        s.integrated = NULL;
+		s.preview = NULL;
         s.allocated = 0;
     }
+	
     s.numsamples = numsamples;
     s.numchannels = numchannels;
     s.samplerate = samplerate;
     s.updatecount = ++Granulator::globalupdatecount;
-    return true;
+    
+	return true;
 }
 
 extern "C" UNITY_AUDIODSP_EXPORT_API const char* Granulator_GetSampleName(int index)

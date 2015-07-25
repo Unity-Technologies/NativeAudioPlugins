@@ -379,7 +379,7 @@ public:
         seed = _seed;
     }
 
-    inline int Get()
+    inline unsigned int Get()
     {
         seed = (seed * 1664525 + 1013904223) & 0xFFFFFFFF;
         return seed ^ (seed >> 16);
@@ -391,7 +391,7 @@ public:
     }
 
 protected:
-    unsigned long seed;
+    unsigned int seed;
 };
 
 class NoiseGenerator

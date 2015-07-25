@@ -52,20 +52,21 @@ namespace Multiband
 
         void Setup(float _atk, float _rel, float _thr, float _ratio, float _knee)
         {
+			thr = _thr;
+			ratio = _ratio;
+			knee = _knee;
+			
             float g = 0.05f * ((1.0f / ratio) - 1.0f);
             exp1 = powf(10.0f, g * 0.25f / ((knee > 0.0f) ? knee : 1.0f));
             exp2 = powf(10.0f, g);
-            atk = GetTimeConstant(0.99f, _atk);
-            rel = GetTimeConstant(0.99f, _rel);
-            thr = _thr;
-            ratio = _ratio;
-            knee = _knee;
+            atk = GetTimeConstant(0.99f, atk);
+            rel = GetTimeConstant(0.99f, rel);
         }
 
         inline float Process(float input)
         {
             float g = 1.0f;
-            float s = input * input + 1.0e-11f;
+            float s = FastClip (input * input, 1.0e-11f, 100.0f);
             float timeConst = (s > env) ? atk : rel;
             env += (s - env) * timeConst + 1.0e-16f; // add small constant to always positive number to avoid denormal numbers
             float sideChainLevel = 10.0f * log10f(env); // multiply by 10 (not 20) because duckEnvelope is RMS
