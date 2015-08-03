@@ -24,7 +24,7 @@ public class ModalFilterCustomGUI : FilterCurveUI
         Rect r,
         float[] coeffs,
         Color color,
-		int numModes,
+        int numModes,
         bool useLogScale,
         bool filled,
         double samplerate,
@@ -33,14 +33,14 @@ public class ModalFilterCustomGUI : FilterCurveUI
         double wm = -2.0f * 3.1415926 / samplerate;
 
         ComplexD zero = new ComplexD(0.0f, 0.0f);
-		ComplexD one = new ComplexD(1.0f, 0.0f);
-		AudioCurveRendering.AudioCurveEvaluator d = delegate(float x)
+        ComplexD one = new ComplexD(1.0f, 0.0f);
+        AudioCurveRendering.AudioCurveEvaluator d = delegate(float x)
         {
             ComplexD w = ComplexD.Exp(wm * GUIHelpers.MapNormalizedFrequency((double)x, samplerate, useLogScale, true));
-			ComplexD h = zero;
-			int num = numModes * 3;
-			for(int n = 0; n < num; n += 3)
-				h += coeffs[n] * (one - w * w) / (w * (w * coeffs[n + 2] + coeffs[n + 1]) + 1.0);
+            ComplexD h = zero;
+            int num = numModes * 3;
+            for (int n = 0; n < num; n += 3)
+                h += coeffs[n] * (one - w * w) / (w * (w * coeffs[n + 2] + coeffs[n + 1]) + 1.0);
             double mag = 10.0 * Math.Log10(h.Mag2());
             return (float)(mag * magScale);
         };
@@ -67,49 +67,49 @@ public class ModalFilterCustomGUI : FilterCurveUI
             const float dbRange = 40.0f;
             const float magScale = 1.0f / dbRange;
 
-			float showSpectrum;
-			plugin.GetFloatParameter("ShowSpectrum", out showSpectrum);
-			if (showSpectrum >= 0.5f)
-				blend *= 0.5f;
+            float showSpectrum;
+            plugin.GetFloatParameter("ShowSpectrum", out showSpectrum);
+            if (showSpectrum >= 0.5f)
+                blend *= 0.5f;
 
-			bool useLogScale = false;
+            bool useLogScale = false;
 
-			float numModes = 0;
-			if(plugin.GetFloatParameter("Num modes", out numModes) && numModes > 0 && numModes < 1000)
-			{
-				float[] coeffs;
-				if(plugin.GetFloatBuffer("Coeffs", out coeffs, (int)numModes * 3) && coeffs != null)
-				{
-					// Draw filled curve
-					DrawFilterCurve(
-						r,
-						coeffs,
-						ScaleAlpha(AudioCurveRendering.kAudioOrange, blend),
-						(int)numModes,
-						useLogScale,
-						false,
-						samplerate,
-						magScale);
+            float numModes = 0;
+            if (plugin.GetFloatParameter("Num modes", out numModes) && numModes > 0 && numModes < 1000)
+            {
+                float[] coeffs;
+                if (plugin.GetFloatBuffer("Coeffs", out coeffs, (int)numModes * 3) && coeffs != null)
+                {
+                    // Draw filled curve
+                    DrawFilterCurve(
+                        r,
+                        coeffs,
+                        ScaleAlpha(AudioCurveRendering.kAudioOrange, blend),
+                        (int)numModes,
+                        useLogScale,
+                        false,
+                        samplerate,
+                        magScale);
 
-		            GUIHelpers.DrawFrequencyTickMarks(r, samplerate, useLogScale, new Color(1.0f, 1.0f, 1.0f, 0.3f * blend));
-				}
-			}
+                    GUIHelpers.DrawFrequencyTickMarks(r, samplerate, useLogScale, new Color(1.0f, 1.0f, 1.0f, 0.3f * blend));
+                }
+            }
 
-			if (showSpectrum >= 0.5f)
-			{
-				float spectrumOffset;
-				plugin.GetFloatParameter("SpectrumOffset", out spectrumOffset);
+            if (showSpectrum >= 0.5f)
+            {
+                float spectrumOffset;
+                plugin.GetFloatParameter("SpectrumOffset", out spectrumOffset);
 
-				int specLen = (int)r.width;
-				float[] spec;
+                int specLen = (int)r.width;
+                float[] spec;
 
-				plugin.GetFloatBuffer("InputSpec", out spec, specLen);
-				DrawSpectrum(r, useLogScale, spec, dbRange, samplerate, 0.3f, 1.0f, 0.3f, 0.5f * blend, spectrumOffset);
+                plugin.GetFloatBuffer("InputSpec", out spec, specLen);
+                DrawSpectrum(r, useLogScale, spec, dbRange, samplerate, 0.3f, 1.0f, 0.3f, 0.5f * blend, spectrumOffset);
 
-				plugin.GetFloatBuffer("OutputSpec", out spec, specLen);
-				DrawSpectrum(r, useLogScale, spec, dbRange, samplerate, 1.0f, 0.3f, 0.3f, 0.5f * blend, spectrumOffset);
-			}
-		}
+                plugin.GetFloatBuffer("OutputSpec", out spec, specLen);
+                DrawSpectrum(r, useLogScale, spec, dbRange, samplerate, 1.0f, 0.3f, 0.3f, 0.5f * blend, spectrumOffset);
+            }
+        }
 
         AudioCurveRendering.EndCurveFrame();
         return false;
@@ -119,7 +119,7 @@ public class ModalFilterCustomGUI : FilterCurveUI
     {
         GUILayout.Space(5f);
         Rect r = GUILayoutUtility.GetRect(200, 100, GUILayout.ExpandWidth(true));
-		DrawControl (plugin, r, plugin.GetSampleRate ());
+        DrawControl(plugin, r, plugin.GetSampleRate());
         return true;
     }
 }

@@ -2,8 +2,8 @@
 
 struct MidiEvent
 {
-	UInt64 sample;
-	UInt32 msg;
+    UInt64 sample;
+    UInt32 msg;
 };
 
 // For lack of a ring buffer that supports multiple producers we use two separate ring buffers here ;-)
@@ -12,7 +12,7 @@ static RingBuffer<8192, UInt32> livedata;
 
 namespace MIDI
 {
-	#if UNITY_WIN
+    #if UNITY_WIN
         #include <windows.h>
         #include <mmsystem.h>
     #elif UNITY_OSX
@@ -38,7 +38,7 @@ namespace MIDI
     MidiInput::MidiInput()
     {
     #if UNITY_WIN
-		int numdevs = midiInGetNumDevs();
+        int numdevs = midiInGetNumDevs();
         for (int n = 0; n < numdevs; n++)
         {
             midiInOpen(&m_midihandle, n, (DWORD_PTR)&MidiInCallbackProc, n, CALLBACK_FUNCTION);
@@ -55,7 +55,7 @@ namespace MIDI
             MIDIEndpointRef src = MIDIGetSource(i);
             MIDIPortConnectSource(inPort, src, NULL);
         }
-	#endif
+    #endif
     }
 
     MidiInput::~MidiInput()
@@ -77,6 +77,7 @@ namespace MIDI
         if (wMsg == MIM_DATA)
             livedata.Feed(dwParam1);
     }
+
     #elif UNITY_OSX
     void MidiInput::MidiInCallbackProc(const MIDIPacketList* pktlist, void* refCon, void* connRefCon)
     {
@@ -88,44 +89,45 @@ namespace MIDI
                 int n = 0;
                 while (n < packet->length)
                 {
-                    switch(packet->data[n] & 0xF0)
+                    switch (packet->data[n] & 0xF0)
                     {
-                    case 0x80:
-                    case 0x90:
-                    case 0xA0:
-                    case 0xB0:
-                    case 0xE0:
-                        livedata.Feed(packet->data[n] + packet->data[n + 1] * 0x100 + packet->data[n + 2] * 0x10000);
-                        n += 3;
-                        break;
-                    case 0xC0:
-                    case 0xD0:
-                        livedata.Feed(packet->data[n] + packet->data[n + 1] * 0x100);
-                        n += 2;
-                        break;
-                    case 0xF0:
-                        n = packet->length;
-                        break;
+                        case 0x80:
+                        case 0x90:
+                        case 0xA0:
+                        case 0xB0:
+                        case 0xE0:
+                            livedata.Feed(packet->data[n] + packet->data[n + 1] * 0x100 + packet->data[n + 2] * 0x10000);
+                            n += 3;
+                            break;
+                        case 0xC0:
+                        case 0xD0:
+                            livedata.Feed(packet->data[n] + packet->data[n + 1] * 0x100);
+                            n += 2;
+                            break;
+                        case 0xF0:
+                            n = packet->length;
+                            break;
                     }
                 }
             }
             packet = MIDIPacketNext(packet);
         }
     }
+
     #endif
 }
 
 namespace Synthesizer
 {
-	const int OVERSAMPLING = 8;
+    const int OVERSAMPLING = 8;
     const int MAXVOICES = 32;
     const int MAXCHANNELS = 16;
     const int MAXOSCILLATORS = 8;
-	const int RAMPSAMPLES = 64;
-	
-	static const float OSCSCALE = (const float)(0.5f / (float)(MAXOSCILLATORS * 0x100000000));
-	static const float RAMPSCALE = (const float)(1.0f / (float)RAMPSAMPLES);
-	
+    const int RAMPSAMPLES = 64;
+
+    static const float OSCSCALE = (const float)(0.5f / (float)(MAXOSCILLATORS * 0x100000000));
+    static const float RAMPSCALE = (const float)(1.0f / (float)RAMPSAMPLES);
+
     static const float ONE_OVER_127 = (const float)(1.0f / 127.0f);
     static const float ONE_OVER_12 = (const float)(1.0f / 12.0f);
     static const float ONE_OVER_MAXOSCILLATORS = (const float)(1.0f / (float)MAXOSCILLATORS);
@@ -149,39 +151,39 @@ namespace Synthesizer
         UInt32 phase[MAXOSCILLATORS];
         UInt32 freq;
         UInt32 detune;
-		UInt32 mask;
-		
+        UInt32 mask;
+
         float lpf;
         float bpf;
 
-		inline void Reset()
-		{
-			memset(this, 0, sizeof(*this));
-		}
-		
+        inline void Reset()
+        {
+            memset(this, 0, sizeof(*this));
+        }
+
         inline float Process(float cut, float bw)
         {
             float osc = 0.0f;
-			UInt32 f = freq;
+            UInt32 f = freq;
             for (int i = 0; i < MAXOSCILLATORS; i++)
             {
                 UInt32 p = phase[i];
-				for (int k = 0; k < OVERSAMPLING; k++)
-				{
-					osc += p & mask;
-					p += f;
-				}
+                for (int k = 0; k < OVERSAMPLING; k++)
+                {
+                    osc += p & mask;
+                    p += f;
+                }
                 phase[i] = p;
                 f += detune;
             }
 
             osc = (osc - MAXOSCILLATORS * 0.5f) * OSCSCALE;
-            
+
             lpf += cut * bpf;
             bpf += cut * (osc - lpf - bpf * bw);
             lpf += cut * bpf;
             bpf += cut * (osc - lpf - bpf * bw);
-            
+
             return lpf;
         }
     };
@@ -191,41 +193,41 @@ namespace Synthesizer
         float aenv, aenvdecay;
         float fenv, fenvdecay;
         float amp;
-		float sampletime;
-		float note;
-		float* p;
-		int rampcount;
+        float sampletime;
+        float note;
+        float* p;
+        int rampcount;
         VoiceChannel channels[2];
-		Random random;
+        Random random;
 
-		static inline float FreqFromNote(float note)
-		{
-			return 440.0f * powf(2.0f, (float)(note - 57) * ONE_OVER_12);
-		}
-		
+        static inline float FreqFromNote(float note)
+        {
+            return 440.0f * powf(2.0f, (float)(note - 57) * ONE_OVER_12);
+        }
+
         void NoteOn(int note, int velocity, float* p, float sampletime)
         {
             aenv = 1.0f;
             aenvdecay = 1.0f;
             fenv = 1.0f;
-			fenvdecay = powf(0.0001f, sampletime / p[P_DECAY]);
-			amp = velocity * ONE_OVER_127;
-			rampcount = 0;
-			channels[0].Reset();
-			channels[1].Reset();
-			this->p = p;
-			this->sampletime = sampletime;
-			this->note = note;
-			for (int i = 0; i < MAXOSCILLATORS; i++)
-			{
-				channels[0].phase[i] = random.Get();
-				channels[1].phase[i] = random.Get();
-			}
+            fenvdecay = powf(0.0001f, sampletime / p[P_DECAY]);
+            amp = velocity * ONE_OVER_127;
+            rampcount = 0;
+            channels[0].Reset();
+            channels[1].Reset();
+            this->p = p;
+            this->sampletime = sampletime;
+            this->note = note;
+            for (int i = 0; i < MAXOSCILLATORS; i++)
+            {
+                channels[0].phase[i] = random.Get();
+                channels[1].phase[i] = random.Get();
+            }
         }
 
         void NoteOff(int note, int velocity)
         {
-			aenvdecay = powf(0.0001f, sampletime / p[P_RELEASE]);
+            aenvdecay = powf(0.0001f, sampletime / p[P_RELEASE]);
             fenvdecay = aenvdecay;
         }
 
@@ -239,32 +241,32 @@ namespace Synthesizer
             return aenv < 0.001f;
         }
 
-		inline void FrameSetup()
-		{
-			float st = sampletime * (const float)(0x100000000 / OVERSAMPLING);
-			float dt1 = p[P_DETUNE1] + 0.5f * p[P_DETUNE2];
-			float dt2 = p[P_DETUNE1] - 0.5f * p[P_DETUNE2];
+        inline void FrameSetup()
+        {
+            float st = sampletime * (const float)(0x100000000 / OVERSAMPLING);
+            float dt1 = p[P_DETUNE1] + 0.5f * p[P_DETUNE2];
+            float dt2 = p[P_DETUNE1] - 0.5f * p[P_DETUNE2];
             channels[0].freq = FreqFromNote(note - dt1) * st;
             channels[1].freq = FreqFromNote(note - dt2) * st;
             channels[0].detune = (FreqFromNote(note + dt1) * st - channels[0].freq) * ONE_OVER_MAXOSCILLATORS;
             channels[1].detune = (FreqFromNote(note + dt2) * st - channels[1].freq) * ONE_OVER_MAXOSCILLATORS;
-			channels[0].mask = ((UInt32)FastFloor(p[P_TYPE] * 127) + 128) << 24;
-			channels[1].mask = ((UInt32)FastFloor(p[P_TYPE] * 127) + 128) << 24;
-		}
+            channels[0].mask = ((UInt32)FastFloor(p[P_TYPE] * 127) + 128) << 24;
+            channels[1].mask = ((UInt32)FastFloor(p[P_TYPE] * 127) + 128) << 24;
+        }
 
         inline void Process(float& l, float& r)
         {
             float cut = FastClip(p[P_CUTOFF] + p[P_CUTENV] * fenv, 0.0001f, 0.99f); cut = cut * cut * 0.707f;
             float bw = 1.0f - p[P_RESONANCE]; bw *= bw;
-			float ramped_amp = aenv * amp;
-			if (rampcount < RAMPSAMPLES)
-				ramped_amp *= (++rampcount) * RAMPSCALE;
+            float ramped_amp = aenv * amp;
+            if (rampcount < RAMPSAMPLES)
+                ramped_amp *= (++rampcount) * RAMPSCALE;
             l += channels[0].Process(cut, bw) * ramped_amp;
             r += channels[1].Process(cut, bw) * ramped_amp;
             aenv = aenv * aenvdecay + 1.0e-11f;
             fenv = fenv * fenvdecay + 1.0e-11f;
         }
-	};
+    };
 
     struct SynthesizerChannel
     {
@@ -273,42 +275,42 @@ namespace Synthesizer
         float ctrl[128];
         int numvoices;
 
-		void Init()
-		{
-			memset(this, 0, sizeof(*this));
-			for (int n = 0; n < MAXVOICES; n++)
-				voicepool[n] = new Voice();
-		}
+        void Init()
+        {
+            memset(this, 0, sizeof(*this));
+            for (int n = 0; n < MAXVOICES; n++)
+                voicepool[n] = new Voice();
+        }
 
-		~SynthesizerChannel()
-		{
-			for (int n = 0; n < MAXVOICES; n++)
-				delete voicepool[n];
-		}
+        ~SynthesizerChannel()
+        {
+            for (int n = 0; n < MAXVOICES; n++)
+                delete voicepool[n];
+        }
 
         Voice* AllocateVoice(int key)
         {
-			Voice* v = keys[key];
+            Voice* v = keys[key];
             if (v != NULL)
                 return v;
 
             if (numvoices < MAXVOICES)
                 v = voicepool[numvoices++];
-			else
-			{
-				v = voicepool[0];
-				for (int i = 1; i < numvoices; i++)
-				{
-					Voice* q = voicepool[i];
-					if (q->GetImportance() < v->GetImportance())
-						v = q;
-				}
-				for (int n = 0; n < 128; n++)
-					if (keys[n] == v)
-						keys[n] = NULL;
-			}
-						
-			keys[key] = v;
+            else
+            {
+                v = voicepool[0];
+                for (int i = 1; i < numvoices; i++)
+                {
+                    Voice* q = voicepool[i];
+                    if (q->GetImportance() < v->GetImportance())
+                        v = q;
+                }
+                for (int n = 0; n < 128; n++)
+                    if (keys[n] == v)
+                        keys[n] = NULL;
+            }
+
+            keys[key] = v;
             return v;
         }
 
@@ -324,8 +326,8 @@ namespace Synthesizer
             if (v == NULL)
                 return;
             v->NoteOff(note, velocity);
-			if (keys[note] == v)
-				keys[note] = NULL;
+            if (keys[note] == v)
+                keys[note] = NULL;
         }
 
         void Control(int index, int value, float* p, float sampletime)
@@ -338,7 +340,7 @@ namespace Synthesizer
             for (int k = 0; k < numvoices; k++)
             {
                 Voice* v = voicepool[k];
-				v->FrameSetup();
+                v->FrameSetup();
                 float* dst = outbuffer;
                 for (unsigned int n = 0; n < length; n++)
                 {
@@ -347,33 +349,33 @@ namespace Synthesizer
                 }
             }
 
-			int i = 0;
-			while(i < numvoices)
-			{
+            int i = 0;
+            while (i < numvoices)
+            {
                 if (voicepool[i]->IsDonePlaying())
-				{
-					for (int n = 0; n < 128; n++)
-						if (keys[n] == voicepool[i])
-							keys[n] = NULL;
-					Voice* t = voicepool[i];
+                {
+                    for (int n = 0; n < 128; n++)
+                        if (keys[n] == voicepool[i])
+                            keys[n] = NULL;
+                    Voice* t = voicepool[i];
                     voicepool[i] = voicepool[--numvoices];
-					voicepool[numvoices] = t;
-				}
-				else
-					++i;
-			}
+                    voicepool[numvoices] = t;
+                }
+                else
+                    ++i;
+            }
         }
     };
 
-	const int MAXPENDING = 8192;
-	
+    const int MAXPENDING = 8192;
+
     struct EffectData
     {
         float p[P_NUM];
-		int arpkeys[128];
-		int numpending;
-		MidiEvent pending[MAXPENDING];
-		SynthesizerChannel synthchannel[MAXCHANNELS];
+        int arpkeys[128];
+        int numpending;
+        MidiEvent pending[MAXPENDING];
+        SynthesizerChannel synthchannel[MAXCHANNELS];
     };
 
     int InternalRegisterEffectDefinition(UnityAudioEffectDefinition& definition)
@@ -394,11 +396,11 @@ namespace Synthesizer
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK CreateCallback(UnityAudioEffectState* state)
     {
-		static MIDI::MidiInput midiinput;
-		EffectData* effectdata = new EffectData;
+        static MIDI::MidiInput midiinput;
+        EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
-		for(int n = 0; n < MAXCHANNELS; n++)
-			effectdata->synthchannel[n].Init();
+        for (int n = 0; n < MAXCHANNELS; n++)
+            effectdata->synthchannel[n].Init();
         state->effectdata = effectdata;
         InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->p);
         return UNITY_AUDIODSP_OK;
@@ -436,47 +438,47 @@ namespace Synthesizer
     {
         return UNITY_AUDIODSP_OK;
     }
-	
-	static void HandleEvent(EffectData* data, UInt32 msg, float sampletime)
-	{
-		int channel = msg & 15;
-		int command = msg & 0xF0;
-		int data1 = (msg >> 8) & 255;
-		int data2 = (msg >> 16) & 255;
-		SynthesizerChannel* synthchannel = &data->synthchannel[channel];
-		switch(command)
-		{
-			case 0x90:
-				if (data2 > 0)
-				{
-					data->arpkeys[data1] = 1;
-					synthchannel->NoteOn(data1, data2, data->p, sampletime);
-					break;
-				}
-			case 0x80:
-				data->arpkeys[data1] = 0;
-				synthchannel->NoteOff(data1, data2, data->p, sampletime);
-				break;
-			case 0xB0:
-				synthchannel->Control(data1, data2, data->p, sampletime);
-				break;
-			case 0xF0:
-				if(channel == 8)
-				{
-					// All sound off
-					scheduledata.Clear();
-					data->numpending = 0;
-					memset(data->arpkeys, 0, sizeof(data->arpkeys));
-					for(int c = 0; c < 16; c++)
-					{
-						SynthesizerChannel* synthchannel = &data->synthchannel[c];
-						memset(synthchannel->keys, 0, sizeof(synthchannel->keys));
-						synthchannel->numvoices = 0;
-					}
-				}
-				break;
-		}
-	}
+
+    static void HandleEvent(EffectData* data, UInt32 msg, float sampletime)
+    {
+        int channel = msg & 15;
+        int command = msg & 0xF0;
+        int data1 = (msg >> 8) & 255;
+        int data2 = (msg >> 16) & 255;
+        SynthesizerChannel* synthchannel = &data->synthchannel[channel];
+        switch (command)
+        {
+            case 0x90:
+                if (data2 > 0)
+                {
+                    data->arpkeys[data1] = 1;
+                    synthchannel->NoteOn(data1, data2, data->p, sampletime);
+                    break;
+                }
+            case 0x80:
+                data->arpkeys[data1] = 0;
+                synthchannel->NoteOff(data1, data2, data->p, sampletime);
+                break;
+            case 0xB0:
+                synthchannel->Control(data1, data2, data->p, sampletime);
+                break;
+            case 0xF0:
+                if (channel == 8)
+                {
+                    // All sound off
+                    scheduledata.Clear();
+                    data->numpending = 0;
+                    memset(data->arpkeys, 0, sizeof(data->arpkeys));
+                    for (int c = 0; c < 16; c++)
+                    {
+                        SynthesizerChannel* synthchannel = &data->synthchannel[c];
+                        memset(synthchannel->keys, 0, sizeof(synthchannel->keys));
+                        synthchannel->numvoices = 0;
+                    }
+                }
+                break;
+        }
+    }
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectState* state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int outchannels)
     {
@@ -484,73 +486,73 @@ namespace Synthesizer
 
         memset(outbuffer, 0, sizeof(float) * length * outchannels);
 
-		float sampletime = 1.0f / (float)state->samplerate;
-		
-		MidiEvent ev;
+        float sampletime = 1.0f / (float)state->samplerate;
+
+        MidiEvent ev;
         while (scheduledata.Read(ev))
         {
-			if(ev.sample > state->currdsptick)
-			{
-				data->pending[data->numpending++] = ev;
-				continue;
-			}
-			HandleEvent(data, ev.msg, sampletime);
+            if (ev.sample > state->currdsptick)
+            {
+                data->pending[data->numpending++] = ev;
+                continue;
+            }
+            HandleEvent(data, ev.msg, sampletime);
         }
 
-		while (livedata.Read(ev.msg))
-			HandleEvent(data, ev.msg, sampletime);
+        while (livedata.Read(ev.msg))
+            HandleEvent(data, ev.msg, sampletime);
 
-		UInt64 currtick = state->currdsptick;
-		int samplesleft = length;
-		while(samplesleft > 0)
-		{
-			UInt64 frameend = currtick + samplesleft;
-			UInt64 nextevent = frameend;
-			for(int n = 0; n < data->numpending; n++)
-				if(data->pending[n].sample < nextevent)
-					nextevent = data->pending[n].sample;
-			if(nextevent < currtick)
-				nextevent = currtick;
-			if(nextevent < frameend)
-			{
-				int i = 0, j = 0;
-				while(i < data->numpending)
-				{
-					MidiEvent& ev = data->pending[i++];
-					if(ev.sample <= nextevent)
-						HandleEvent(data, ev.msg, sampletime);
-					else
-						data->pending[j++] = ev;
-				}
-				data->numpending = j;
-			}
-			int block = nextevent - currtick;
-			if(block == 0)
-				continue;
-			if(block > samplesleft)
-				block = samplesleft;
-			for (int n = 0; n < MAXCHANNELS; n++)
-			{
-				SynthesizerChannel* synthchannel = &data->synthchannel[n];
-				synthchannel->Process(outbuffer, block, outchannels, data->p);
-			}
-			outbuffer += block * outchannels;
-			samplesleft -= block;
-		}
-		
+        UInt64 currtick = state->currdsptick;
+        int samplesleft = length;
+        while (samplesleft > 0)
+        {
+            UInt64 frameend = currtick + samplesleft;
+            UInt64 nextevent = frameend;
+            for (int n = 0; n < data->numpending; n++)
+                if (data->pending[n].sample < nextevent)
+                    nextevent = data->pending[n].sample;
+            if (nextevent < currtick)
+                nextevent = currtick;
+            if (nextevent < frameend)
+            {
+                int i = 0, j = 0;
+                while (i < data->numpending)
+                {
+                    MidiEvent& ev = data->pending[i++];
+                    if (ev.sample <= nextevent)
+                        HandleEvent(data, ev.msg, sampletime);
+                    else
+                        data->pending[j++] = ev;
+                }
+                data->numpending = j;
+            }
+            int block = nextevent - currtick;
+            if (block == 0)
+                continue;
+            if (block > samplesleft)
+                block = samplesleft;
+            for (int n = 0; n < MAXCHANNELS; n++)
+            {
+                SynthesizerChannel* synthchannel = &data->synthchannel[n];
+                synthchannel->Process(outbuffer, block, outchannels, data->p);
+            }
+            outbuffer += block * outchannels;
+            samplesleft -= block;
+        }
+
         return UNITY_AUDIODSP_OK;
     }
 
     extern "C" UNITY_AUDIODSP_EXPORT_API void Synthesizer_AddMessage(UInt64 sample, int msg)
     {
-		MidiEvent ev;
-		ev.sample = sample;
-		ev.msg = msg;
-		scheduledata.Feed(ev);
+        MidiEvent ev;
+        ev.sample = sample;
+        ev.msg = msg;
+        scheduledata.Feed(ev);
     }
 
-	extern "C" UNITY_AUDIODSP_EXPORT_API void Synthesizer_KillAll()
-	{
-		Synthesizer_AddMessage(0, 0xF8);
-	}
+    extern "C" UNITY_AUDIODSP_EXPORT_API void Synthesizer_KillAll()
+    {
+        Synthesizer_AddMessage(0, 0xF8);
+    }
 }

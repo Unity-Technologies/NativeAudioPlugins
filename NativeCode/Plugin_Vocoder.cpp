@@ -27,8 +27,8 @@ namespace Vocoder
     struct Band
     {
         StateVariableFilter analysis1;
-		StateVariableFilter analysis2;
-		StateVariableFilter synthesis1;
+        StateVariableFilter analysis2;
+        StateVariableFilter synthesis1;
         StateVariableFilter synthesis2;
         EnvFollower envfollow;
     };
@@ -148,13 +148,13 @@ namespace Vocoder
             for (int i = 0; i < inchannels; i++)
             {
                 data->bands[i][j].analysis1.cutoff = ca;
-				data->bands[i][j].analysis2.cutoff = ca;
+                data->bands[i][j].analysis2.cutoff = ca;
                 data->bands[i][j].analysis1.bandwidth = ra;
-				data->bands[i][j].analysis2.bandwidth = ra;
-				data->bands[i][j].synthesis1.cutoff = cs;
+                data->bands[i][j].analysis2.bandwidth = ra;
+                data->bands[i][j].synthesis1.cutoff = cs;
                 data->bands[i][j].synthesis2.cutoff = cs;
                 data->bands[i][j].synthesis1.bandwidth = rs;
-				data->bands[i][j].synthesis2.bandwidth = rs;
+                data->bands[i][j].synthesis2.bandwidth = rs;
             }
             gain *= emph;
         }

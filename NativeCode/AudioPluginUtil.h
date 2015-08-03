@@ -197,7 +197,7 @@ public:
             return false;
         r = (r == LENGTH - 1) ? 0 : (r + 1);
         val = buffer[r];
-		readpos = r;
+        readpos = r;
         return true;
     }
 
@@ -336,39 +336,39 @@ void BiquadFilter::SetupHighpass(float cutoff, float samplerate, float Q)
 class StateVariableFilter
 {
 public:
-	float cutoff;
-	float bandwidth;
-	
-public:
-	inline float ProcessHPF(float input)
-	{
-		input += 1.0e-11f; // Kill denormals
+    float cutoff;
+    float bandwidth;
 
-		lpf += cutoff * bpf;
-		float hpf = (input - bpf) * bandwidth - lpf;
-		bpf += cutoff * hpf;
-		
-		lpf += cutoff * bpf;
-		hpf = (input - bpf) * bandwidth - lpf;
-		bpf += cutoff * hpf;
-		
-		return hpf;
-	}
-	
-	inline float ProcessBPF(float input)
-	{
-		ProcessHPF(input);
-		return bpf;
-	}
-	
-	inline float ProcessLPF(float input)
-	{
-		ProcessHPF(input);
-		return lpf;
-	}
-	
 public:
-	float lpf, bpf;
+    inline float ProcessHPF(float input)
+    {
+        input += 1.0e-11f; // Kill denormals
+
+        lpf += cutoff * bpf;
+        float hpf = (input - bpf) * bandwidth - lpf;
+        bpf += cutoff * hpf;
+
+        lpf += cutoff * bpf;
+        hpf = (input - bpf) * bandwidth - lpf;
+        bpf += cutoff * hpf;
+
+        return hpf;
+    }
+
+    inline float ProcessBPF(float input)
+    {
+        ProcessHPF(input);
+        return bpf;
+    }
+
+    inline float ProcessLPF(float input)
+    {
+        ProcessHPF(input);
+        return lpf;
+    }
+
+public:
+    float lpf, bpf;
 };
 
 class Random
@@ -397,49 +397,53 @@ protected:
 class NoiseGenerator
 {
 public:
-	void Init()
-	{
-		level = 0.0f;
-		delta = 0.0f;
-		minval = 0.0f;
-		maxval = 1.0f;
-		period = 100.0f;
-		invperiod = 0.01f;
-		samplesleft = 0;
-		
-	}
-	inline void SetRange(float minval, float maxval)
-	{
-		this->minval = minval;
-		this->maxval = maxval;
-	}
-	inline void SetPeriod(float period)
-	{
-		SetPeriod(period, 1.0f / period);
-	}
-	inline void SetPeriod(float period, float invperiod)
-	{
-		period = period;
-		invperiod = invperiod;
-	}
-	inline float Sample(Random& random)
-	{
-		if(--samplesleft <= 0)
-		{
-			samplesleft = (int)period;
-			delta = (random.GetFloat(minval, maxval) - level) * invperiod;
-		}
-		level += delta;
-		return level;
-	}
+    void Init()
+    {
+        level = 0.0f;
+        delta = 0.0f;
+        minval = 0.0f;
+        maxval = 1.0f;
+        period = 100.0f;
+        invperiod = 0.01f;
+        samplesleft = 0;
+    }
+
+    inline void SetRange(float minval, float maxval)
+    {
+        this->minval = minval;
+        this->maxval = maxval;
+    }
+
+    inline void SetPeriod(float period)
+    {
+        SetPeriod(period, 1.0f / period);
+    }
+
+    inline void SetPeriod(float period, float invperiod)
+    {
+        period = period;
+        invperiod = invperiod;
+    }
+
+    inline float Sample(Random& random)
+    {
+        if (--samplesleft <= 0)
+        {
+            samplesleft = (int)period;
+            delta = (random.GetFloat(minval, maxval) - level) * invperiod;
+        }
+        level += delta;
+        return level;
+    }
+
 public:
-	float level;
-	float delta;
-	float minval;
-	float maxval;
-	float period;
-	float invperiod;
-	int samplesleft;
+    float level;
+    float delta;
+    float minval;
+    float maxval;
+    float period;
+    float invperiod;
+    int samplesleft;
 };
 
 class Mutex

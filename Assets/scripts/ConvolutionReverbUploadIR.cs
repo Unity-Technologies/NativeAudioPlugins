@@ -12,16 +12,16 @@ public class ConvolutionReverbUploadIR : MonoBehaviour
 
     void Start()
     {
-		int currindex = index;
-		foreach(var s in impulse)
-		{
-	        if (s == null)
-	            return;
-	        float[] data = new float[s.samples];
-	        s.GetData(data, 0);
-			ConvolutionReverb_UploadSample(currindex, data, data.Length / s.channels, s.channels, s.frequency, s.name);
-			currindex++;
-		}
+        int currindex = index;
+        foreach (var s in impulse)
+        {
+            if (s == null)
+                return;
+            float[] data = new float[s.samples];
+            s.GetData(data, 0);
+            ConvolutionReverb_UploadSample(currindex, data, data.Length / s.channels, s.channels, s.frequency, s.name);
+            currindex++;
+        }
     }
 
     void Update()

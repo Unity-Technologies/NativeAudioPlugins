@@ -9,7 +9,7 @@
 #endif
 
 // customized for each audio unit
-#define AUTeleport_COMP_SUBTYPE		'AUTP'
-#define AUTeleport_COMP_MANF		'UNIT'
+#define AUTeleport_COMP_SUBTYPE     'AUTP'
+#define AUTeleport_COMP_MANF        'UNIT'
 
 #endif

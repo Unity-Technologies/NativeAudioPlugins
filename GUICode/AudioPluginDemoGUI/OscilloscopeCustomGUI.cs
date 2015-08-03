@@ -18,7 +18,7 @@ public class OscilloscopeCustomGUI : IAudioEffectPluginGUI
         get { return "Unity"; }
     }
 
-	Vector3[] points = new Vector3[65536];
+    Vector3[] points = new Vector3[65536];
 
     public bool DrawControl(IAudioEffectPlugin plugin, Rect r, float samplerate)
     {
@@ -30,27 +30,27 @@ public class OscilloscopeCustomGUI : IAudioEffectPluginGUI
 
             float window, scale;
             plugin.GetFloatParameter("Window", out window);
-			plugin.GetFloatParameter("Scale", out scale);
+            plugin.GetFloatParameter("Scale", out scale);
             window *= samplerate;
             if (window > samplerate)
                 window = samplerate;
 
             float[] buffer;
             int numsamples = (int)window;
-			plugin.GetFloatBuffer("Signal", out buffer, numsamples);
-			numsamples = buffer.Length;
+            plugin.GetFloatBuffer("Signal", out buffer, numsamples);
+            numsamples = buffer.Length;
 
             float cy = r.y + r.height * 0.5f;
-			float sx = (float)r.width / (float)numsamples;
-			float sy = r.height * 0.5f * scale;
-			for(int n = 0; n < numsamples; n++)
-				points[n] = new Vector3(r.x + n * sx, cy - buffer[n] * sy, 0.0f);
+            float sx = (float)r.width / (float)numsamples;
+            float sy = r.height * 0.5f * scale;
+            for (int n = 0; n < numsamples; n++)
+                points[n] = new Vector3(r.x + n * sx, cy - buffer[n] * sy, 0.0f);
 
             float lineTint = 0.5f;
             Handles.color = new Color(lineTint, lineTint, lineTint, 0.75f * blend);
 
             HandleUtilityWrapper.handleWireMaterial.SetPass(0);
-			Handles.DrawAAPolyLine(2.0f, numsamples, points);
+            Handles.DrawAAPolyLine(2.0f, numsamples, points);
         }
         AudioCurveRendering.EndCurveFrame();
         return false;

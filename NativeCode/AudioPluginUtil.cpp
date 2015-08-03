@@ -10,12 +10,12 @@ char* strnew(const char* src)
 
 char* tmpstr(int index, const char* fmtstr, ...)
 {
-	static char buf[4][1024];
-	va_list args;
-	va_start(args, fmtstr);
-	vsprintf(buf[index], fmtstr, args);
-	va_end(args);
-	return buf[index];
+    static char buf[4][1024];
+    va_list args;
+    va_start(args, fmtstr);
+    vsprintf(buf[index], fmtstr, args);
+    va_end(args);
+    return buf[index];
 }
 
 template<typename T> void UnitySwap(T& a, T& b) { T t = a; a = b; b = t; }

@@ -19,13 +19,13 @@ public class VoiceFXModulations : MonoBehaviour
             {
                 currValue = nextValue;
                 nextValue = (float)random.NextDouble() * (maxval - minval) + minval;
-				if(phase == -1)
-				{
-					currValue = nextValue;
-					phase = 0.0f;
-				}
-				else
-					phase = 1.0f;
+                if (phase == -1)
+                {
+                    currValue = nextValue;
+                    phase = 0.0f;
+                }
+                else
+                    phase = 1.0f;
             }
             float value = currValue + (nextValue - currValue) * (1.0f - phase);
             phase -= freq;

@@ -6,46 +6,48 @@ float reverbmixbuffer[65536] = { 0 };
 
 namespace SpatializerReverb
 {
-	const int MAXTAPS = 1024;
+    const int MAXTAPS = 1024;
 
-	enum
-	{
-		P_DELAYTIME,
-		P_DIFFUSION,
-		P_NUM
-	};
+    enum
+    {
+        P_DELAYTIME,
+        P_DIFFUSION,
+        P_NUM
+    };
 
-	struct InstanceChannel
-	{
-		struct Tap
-		{
-			int pos;
-			float amp;
-		};
-		struct Delay
-		{
-			enum { MASK = 0xFFFFF };
-			int writepos;
-			inline void Write(float x)
-			{
-				writepos = (writepos + MASK) & MASK;
-				data[writepos] = x;
-			}
-			inline float Read(int delay) const
-			{
-				return data[(writepos + delay) & MASK];
-			}
-			float data[MASK + 1];
-		};
-		Tap taps[1024];
-		Delay delay;
-	};
+    struct InstanceChannel
+    {
+        struct Tap
+        {
+            int pos;
+            float amp;
+        };
+        struct Delay
+        {
+            enum { MASK = 0xFFFFF };
+            int writepos;
+            inline void Write(float x)
+            {
+                writepos = (writepos + MASK) & MASK;
+                data[writepos] = x;
+            }
+
+            inline float Read(int delay) const
+            {
+                return data[(writepos + delay) & MASK];
+            }
+
+            float data[MASK + 1];
+        };
+        Tap taps[1024];
+        Delay delay;
+    };
 
     struct EffectData
     {
         float p[P_NUM];
-		Random random;
-		InstanceChannel ch[2];
+        Random random;
+        InstanceChannel ch[2];
     };
 
     int InternalRegisterEffectDefinition(UnityAudioEffectDefinition& definition)
@@ -101,61 +103,61 @@ namespace SpatializerReverb
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectState* state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int outchannels)
     {
-		if(inchannels != 2 || outchannels != 2)
-		{
-			memcpy(outbuffer, inbuffer, length * outchannels * sizeof(float));
-	        return UNITY_AUDIODSP_OK;
-		}
+        if (inchannels != 2 || outchannels != 2)
+        {
+            memcpy(outbuffer, inbuffer, length * outchannels * sizeof(float));
+            return UNITY_AUDIODSP_OK;
+        }
 
         EffectData* data = state->GetEffectData<EffectData>();
 
-		const float delaytime = data->p[P_DELAYTIME] * state->samplerate + 1.0f;
-		const int numtaps = (int)(data->p[P_DIFFUSION] * (MAXTAPS - 2) + 1);
+        const float delaytime = data->p[P_DELAYTIME] * state->samplerate + 1.0f;
+        const int numtaps = (int)(data->p[P_DIFFUSION] * (MAXTAPS - 2) + 1);
 
-		data->random.Seed(0);
+        data->random.Seed(0);
 
-		for(int c = 0; c < 2; c++)
-		{
-			InstanceChannel& ch = data->ch[c];
-			const InstanceChannel::Tap* tap_end = ch.taps + numtaps;
+        for (int c = 0; c < 2; c++)
+        {
+            InstanceChannel& ch = data->ch[c];
+            const InstanceChannel::Tap* tap_end = ch.taps + numtaps;
 
-			float decay = powf(0.01f, 1.0f / (float)numtaps);
-			float p = 0.0f, amp = (decay - 1.0f) / (powf(decay, numtaps + 1) - 1.0f);
-			InstanceChannel::Tap* tap = ch.taps;
-			while(tap != tap_end)
-			{
-				p += data->random.GetFloat(0.0f, 100.0f);
-				tap->pos = p;
-				tap->amp = amp;
-				amp *= decay;
-				++tap;
-			}
+            float decay = powf(0.01f, 1.0f / (float)numtaps);
+            float p = 0.0f, amp = (decay - 1.0f) / (powf(decay, numtaps + 1) - 1.0f);
+            InstanceChannel::Tap* tap = ch.taps;
+            while (tap != tap_end)
+            {
+                p += data->random.GetFloat(0.0f, 100.0f);
+                tap->pos = p;
+                tap->amp = amp;
+                amp *= decay;
+                ++tap;
+            }
 
-			float scale = delaytime / p;
-			tap = ch.taps;
-			while(tap != tap_end)
-			{
-				tap->pos *= scale;
-				++tap;
-			}
-			
-			for(int n = 0; n < length; n++)
-			{
-				ch.delay.Write(inbuffer[n * 2 + c] + reverbmixbuffer[n * 2 + c]);
+            float scale = delaytime / p;
+            tap = ch.taps;
+            while (tap != tap_end)
+            {
+                tap->pos *= scale;
+                ++tap;
+            }
 
-				float s = 0.0f;
-				const InstanceChannel::Tap* tap = ch.taps;
-				while(tap != tap_end)
-				{
-					s += ch.delay.Read(tap->pos) * tap->amp;
-					++tap;
-				}
+            for (int n = 0; n < length; n++)
+            {
+                ch.delay.Write(inbuffer[n * 2 + c] + reverbmixbuffer[n * 2 + c]);
 
-				outbuffer[n * 2 + c] = s;
-			}
-		}
+                float s = 0.0f;
+                const InstanceChannel::Tap* tap = ch.taps;
+                while (tap != tap_end)
+                {
+                    s += ch.delay.Read(tap->pos) * tap->amp;
+                    ++tap;
+                }
 
-		memset(reverbmixbuffer, 0, sizeof(reverbmixbuffer));
+                outbuffer[n * 2 + c] = s;
+            }
+        }
+
+        memset(reverbmixbuffer, 0, sizeof(reverbmixbuffer));
 
         return UNITY_AUDIODSP_OK;
     }

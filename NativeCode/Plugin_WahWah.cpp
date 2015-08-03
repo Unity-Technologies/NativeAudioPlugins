@@ -6,12 +6,12 @@ namespace WahWah
     {
         P_ATK,
         P_REL,
-		P_BASE,
+        P_BASE,
         P_SENS,
-		P_RESO,
-		P_TYPE,
-		P_DEPTH,
-		P_SIDECHAIN,
+        P_RESO,
+        P_TYPE,
+        P_DEPTH,
+        P_SIDECHAIN,
         P_NUM
     };
 
@@ -20,12 +20,12 @@ namespace WahWah
         struct Data
         {
             float p[P_NUM];
-			struct Channel
-			{
-				StateVariableFilter filter1;
-				StateVariableFilter filter2;
-				float env;
-			} channels[8];
+            struct Channel
+            {
+                StateVariableFilter filter1;
+                StateVariableFilter filter2;
+                float env;
+            } channels[8];
         };
         union
         {
@@ -42,13 +42,13 @@ namespace WahWah
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
         RegisterParameter(definition, "Attack Time", "s", 0.001f, 2.0f, 0.1f, 1.0f, 3.0f, P_ATK, "Attack time");
         RegisterParameter(definition, "Release Time", "s", 0.001f, 2.0f, 0.5f, 1.0f, 3.0f, P_REL, "Release time");
-		RegisterParameter(definition, "Base Level", "%", 0.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_BASE, "Base filter level");
-		RegisterParameter(definition, "Sensitivity", "%", -1.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_SENS, "Filter sensitivity");
-		RegisterParameter(definition, "Resonance", "%", 0.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_RESO, "Filter resonance");
+        RegisterParameter(definition, "Base Level", "%", 0.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_BASE, "Base filter level");
+        RegisterParameter(definition, "Sensitivity", "%", -1.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_SENS, "Filter sensitivity");
+        RegisterParameter(definition, "Resonance", "%", 0.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_RESO, "Filter resonance");
         RegisterParameter(definition, "Type", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_TYPE, "Filter type (0 = lowpass, 1 = bandpass)");
-		RegisterParameter(definition, "Depth", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_DEPTH, "Filter depth (0 = 12 dB, 1 = 24 dB)");
-		RegisterParameter(definition, "Sidechain Mix", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_SIDECHAIN, "Sidechain mix (0 = use input, 1 = use sidechain)");
-		definition.flags |= UnityAudioEffectDefinitionFlags_IsSideChainTarget;
+        RegisterParameter(definition, "Depth", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_DEPTH, "Filter depth (0 = 12 dB, 1 = 24 dB)");
+        RegisterParameter(definition, "Sidechain Mix", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_SIDECHAIN, "Sidechain mix (0 = use input, 1 = use sidechain)");
+        definition.flags |= UnityAudioEffectDefinitionFlags_IsSideChainTarget;
         return numparams;
     }
 
@@ -111,37 +111,37 @@ namespace WahWah
         data = &g_EffectData.data;
 #endif
 
-		const float atksamples = data->p[P_ATK] * state->samplerate;
-		const float relsamples = data->p[P_REL] * state->samplerate;
-		const float atkconst = (atksamples <= 1.0f) ? 1.0f : (1.0f - powf(0.01f, 1.0f / atksamples));
-		const float relconst = (relsamples <= 1.0f) ? 1.0f : (1.0f - powf(0.01f, 1.0f / relsamples));
-		const float bw = powf(1.0f - 0.999f * data->p[P_RESO], 3.0f);
-		
-		for (int i = 0; i < inchannels; i++)
-		{
-			EffectData::Data::Channel& ch = data->channels[i];
-			ch.filter1.bandwidth = bw;
-			ch.filter2.bandwidth = bw;
-			float* src = inbuffer + i;
-			float* dst = outbuffer + i;
-			float* sc = state->sidechainbuffer + i;
-			for (unsigned int n = 0; n < length; n++)
-			{
-				float s = *src;
-				float a = fabsf(s + (*sc - s) * data->p[P_SIDECHAIN]);
-				ch.env += (a - ch.env) * ((a > ch.env) ? atkconst : relconst);
-				ch.filter1.cutoff = FastClip(data->p[P_BASE] + ch.env * data->p[P_SENS], 0.0f, 1.4f);
-				ch.filter2.cutoff = ch.filter1.cutoff;
-				ch.filter2.ProcessLPF(ch.filter1.ProcessLPF(*src));
-				float lpf = ch.filter1.lpf + (ch.filter2.lpf - ch.filter1.lpf) * data->p[P_DEPTH];
-				float bpf = ch.filter1.bpf + (ch.filter2.bpf - ch.filter1.bpf) * data->p[P_DEPTH];
-				*dst = lpf + (bpf - lpf) * data->p[P_TYPE];
-				src += inchannels;
-				dst += outchannels;
-				sc += inchannels;
-			}
-		}
-		
+        const float atksamples = data->p[P_ATK] * state->samplerate;
+        const float relsamples = data->p[P_REL] * state->samplerate;
+        const float atkconst = (atksamples <= 1.0f) ? 1.0f : (1.0f - powf(0.01f, 1.0f / atksamples));
+        const float relconst = (relsamples <= 1.0f) ? 1.0f : (1.0f - powf(0.01f, 1.0f / relsamples));
+        const float bw = powf(1.0f - 0.999f * data->p[P_RESO], 3.0f);
+
+        for (int i = 0; i < inchannels; i++)
+        {
+            EffectData::Data::Channel& ch = data->channels[i];
+            ch.filter1.bandwidth = bw;
+            ch.filter2.bandwidth = bw;
+            float* src = inbuffer + i;
+            float* dst = outbuffer + i;
+            float* sc = state->sidechainbuffer + i;
+            for (unsigned int n = 0; n < length; n++)
+            {
+                float s = *src;
+                float a = fabsf(s + (*sc - s) * data->p[P_SIDECHAIN]);
+                ch.env += (a - ch.env) * ((a > ch.env) ? atkconst : relconst);
+                ch.filter1.cutoff = FastClip(data->p[P_BASE] + ch.env * data->p[P_SENS], 0.0f, 1.4f);
+                ch.filter2.cutoff = ch.filter1.cutoff;
+                ch.filter2.ProcessLPF(ch.filter1.ProcessLPF(*src));
+                float lpf = ch.filter1.lpf + (ch.filter2.lpf - ch.filter1.lpf) * data->p[P_DEPTH];
+                float bpf = ch.filter1.bpf + (ch.filter2.bpf - ch.filter1.bpf) * data->p[P_DEPTH];
+                *dst = lpf + (bpf - lpf) * data->p[P_TYPE];
+                src += inchannels;
+                dst += outchannels;
+                sc += inchannels;
+            }
+        }
+
 #if UNITY_SPU
         UNITY_PS3_CELLDMA_PUT(&g_EffectData, state->effectdata, sizeof(g_EffectData));
 #endif

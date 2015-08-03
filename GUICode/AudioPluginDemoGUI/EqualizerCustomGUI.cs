@@ -5,7 +5,7 @@ using MathHelpers;
 
 public abstract class FilterCurveUI : IAudioEffectPluginGUI
 {
-	public void DrawSpectrum(Rect r, bool useLogScale, float[] data, float dB_range, float samplerate, float col_r, float col_g, float col_b, float col_a, float gainOffset_dB)
+    public void DrawSpectrum(Rect r, bool useLogScale, float[] data, float dB_range, float samplerate, float col_r, float col_g, float col_b, float col_a, float gainOffset_dB)
     {
         float xscale = (float)(data.Length - 2) * 2.0f / samplerate;
         float yscale = 1.0f / dB_range;
@@ -221,7 +221,7 @@ public class EqualizerCustomGUI : FilterCurveUI
                 DrawSpectrum(r, useLogScale, spec, dbRange, samplerate, 0.3f, 1.0f, 0.3f, 0.5f * blend, 0.0f);
 
                 plugin.GetFloatBuffer("OutputSpec", out spec, specLen);
-				DrawSpectrum(r, useLogScale, spec, dbRange, samplerate, 1.0f, 0.3f, 0.3f, 0.5f * blend, 0.0f);
+                DrawSpectrum(r, useLogScale, spec, dbRange, samplerate, 1.0f, 0.3f, 0.3f, 0.5f * blend, 0.0f);
             }
 
             GUIHelpers.DrawFrequencyTickMarks(r, samplerate, useLogScale, new Color(1.0f, 1.0f, 1.0f, 0.3f * blend));

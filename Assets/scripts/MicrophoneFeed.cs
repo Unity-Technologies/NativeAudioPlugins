@@ -19,11 +19,11 @@ public class MicrophoneFeed : MonoBehaviour
             prevUseMicrophone = useMicrophone;
             if (useMicrophone)
             {
-				foreach (string m in Microphone.devices)
-				{
-					device = m;
-					break;
-				}
+                foreach (string m in Microphone.devices)
+                {
+                    device = m;
+                    break;
+                }
 
                 source = GetComponent<AudioSource>();
                 prevClip = source.clip;

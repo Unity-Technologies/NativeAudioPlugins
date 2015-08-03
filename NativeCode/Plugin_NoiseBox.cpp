@@ -101,11 +101,11 @@ namespace NoiseBox
         data = &g_EffectData.data;
 #endif
 
-		if ((state->flags & UnityAudioEffectStateFlags_IsPlaying) == 0 || (state->flags & (UnityAudioEffectStateFlags_IsMuted | UnityAudioEffectStateFlags_IsPaused)) != 0)
-		{
-			memcpy(outbuffer, inbuffer, sizeof(float) * length * inchannels);
-			return UNITY_AUDIODSP_OK;
-		}
+        if ((state->flags & UnityAudioEffectStateFlags_IsPlaying) == 0 || (state->flags & (UnityAudioEffectStateFlags_IsMuted | UnityAudioEffectStateFlags_IsPaused)) != 0)
+        {
+            memcpy(outbuffer, inbuffer, sizeof(float) * length * inchannels);
+            return UNITY_AUDIODSP_OK;
+        }
 
         const float addperiod = state->samplerate * 0.5f / data->p[P_ADDFREQ];
         const float mulperiod = state->samplerate * 0.5f / data->p[P_MULFREQ];

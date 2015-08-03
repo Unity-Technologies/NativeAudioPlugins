@@ -22,9 +22,9 @@ namespace ModalFilter
         P_BWSCALEVAR,
         P_GAINSCALE,
         P_GAINSCALEVAR,
-		P_SHOWSPECTRUM,
-		P_SPECTRUMDECAY,
-		P_SPECTRUMOFFSET,
+        P_SHOWSPECTRUM,
+        P_SPECTRUMDECAY,
+        P_SPECTRUMOFFSET,
         P_NUM
     };
 
@@ -53,8 +53,8 @@ namespace ModalFilter
 
     protected:
         float d1, d2;
-		
-	public:
+
+    public:
         float a0, a1, a2;
     };
 
@@ -63,15 +63,15 @@ namespace ModalFilter
         struct Data
         {
             float p[P_NUM];
-			float prevp[P_NUM];
+            float prevp[P_NUM];
             Random random;
             Resonator resonators[8][MAXRESONATORS];
 #if !UNITY_PS3 || UNITY_SPU
-			FFTAnalyzer analyzer;
-			float* display1;
-			float* display2;
+            FFTAnalyzer analyzer;
+            float* display1;
+            float* display2;
 #endif
-		};
+        };
         union
         {
             Data data;
@@ -95,9 +95,9 @@ namespace ModalFilter
         RegisterParameter(definition, "BW scale var", "", 0.001f, 10.0f, 0.001f, 1.0f, 1.0f, P_BWSCALEVAR, "Randomized bandwidth scaling factor");
         RegisterParameter(definition, "Gain scale", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_GAINSCALE, "Gain scaling in dB");
         RegisterParameter(definition, "Gain scale var", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_GAINSCALEVAR, "Randomized gain scaling in dB");
-		RegisterParameter(definition, "ShowSpectrum", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_SHOWSPECTRUM, "Overlay input spectrum (green) and output spectrum (red)");
-		RegisterParameter(definition, "SpectrumDecay", "dB/s", -50.0f, 0.0f, -10.0f, 1.0f, 1.0f, P_SPECTRUMDECAY, "Hold time for overlaid spectra");
-		RegisterParameter(definition, "SpectrumOffset", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_SPECTRUMOFFSET, "Spectrum drawing offset in dB");
+        RegisterParameter(definition, "ShowSpectrum", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_SHOWSPECTRUM, "Overlay input spectrum (green) and output spectrum (red)");
+        RegisterParameter(definition, "SpectrumDecay", "dB/s", -50.0f, 0.0f, -10.0f, 1.0f, 1.0f, P_SPECTRUMDECAY, "Hold time for overlaid spectra");
+        RegisterParameter(definition, "SpectrumOffset", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_SPECTRUMOFFSET, "Spectrum drawing offset in dB");
         return numparams;
     }
 
@@ -107,11 +107,11 @@ namespace ModalFilter
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
 #if !UNITY_PS3 || UNITY_SPU
-		effectdata->data.analyzer.spectrumSize = 4096;
-		effectdata->data.display1 = new float [MAXRESONATORS * 3];
-		effectdata->data.display2 = new float [MAXRESONATORS * 3];
+        effectdata->data.analyzer.spectrumSize = 4096;
+        effectdata->data.display1 = new float[MAXRESONATORS * 3];
+        effectdata->data.display2 = new float[MAXRESONATORS * 3];
 #endif
-		InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         return UNITY_AUDIODSP_OK;
     }
 
@@ -119,11 +119,11 @@ namespace ModalFilter
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
 #if !UNITY_PS3 || UNITY_SPU
-		data->analyzer.Cleanup();
-		delete[] data->display1;
-		delete[] data->display2;
+        data->analyzer.Cleanup();
+        delete[] data->display1;
+        delete[] data->display2;
 #endif
-		delete data;
+        delete data;
         return UNITY_AUDIODSP_OK;
     }
 
@@ -151,62 +151,62 @@ namespace ModalFilter
     int UNITY_AUDIODSP_CALLBACK GetFloatBufferCallback(UnityAudioEffectState* state, const char* name, float* buffer, int numsamples)
     {
 #if !UNITY_PS3 || UNITY_SPU
-		EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-		if (strcmp(name, "InputSpec") == 0)
-			data->analyzer.ReadBuffer(buffer, numsamples, true);
-		else if (strcmp(name, "OutputSpec") == 0)
-			data->analyzer.ReadBuffer(buffer, numsamples, false);
-		else if (strcmp(name, "Coeffs") == 0)
-		{
-			int maxsamples = 3 * (int)data->p[P_NUMMODES];
-			if(numsamples > maxsamples)
-				numsamples = maxsamples;
-			memcpy(buffer, data->display1, numsamples * sizeof(float));
-		}
+        EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
+        if (strcmp(name, "InputSpec") == 0)
+            data->analyzer.ReadBuffer(buffer, numsamples, true);
+        else if (strcmp(name, "OutputSpec") == 0)
+            data->analyzer.ReadBuffer(buffer, numsamples, false);
+        else if (strcmp(name, "Coeffs") == 0)
+        {
+            int maxsamples = 3 * (int)data->p[P_NUMMODES];
+            if (numsamples > maxsamples)
+                numsamples = maxsamples;
+            memcpy(buffer, data->display1, numsamples * sizeof(float));
+        }
 #endif
-		return UNITY_AUDIODSP_OK;
-	}
+        return UNITY_AUDIODSP_OK;
+    }
 
 #endif
 
-	static void SetupResonators(EffectData::Data* data, int numchannels, float sampletime)
-	{
-		const int nNumResonators = (int)data->p[P_NUMMODES];
+    static void SetupResonators(EffectData::Data* data, int numchannels, float sampletime)
+    {
+        const int nNumResonators = (int)data->p[P_NUMMODES];
 
-		data->random.Seed((int)data->p[P_SEED]);
-		
+        data->random.Seed((int)data->p[P_SEED]);
+
 #if !UNITY_PS3 || UNITY_SPU
-		float* dst = data->display2;
+        float* dst = data->display2;
 #endif
-		for (int i = 0; i < numchannels; i++)
-		{
-			for (int k = 0; k < nNumResonators; k++)
-			{
-				float fFreq = 0.002f * (k + 1);
-				fFreq *= data->p[P_FREQSCALE] + data->random.GetFloat(-data->p[P_FREQSCALEVAR], data->p[P_FREQSCALEVAR]);
-				fFreq += (data->p[P_FREQSHIFT] + data->random.GetFloat(-data->p[P_FREQSHIFTVAR], data->p[P_FREQSHIFTVAR])) * sampletime;
-				float fBandwidth = powf(0.01f, data->p[P_BWSCALE] + data->random.GetFloat(-data->p[P_BWSCALEVAR], data->p[P_BWSCALEVAR]));
-				float fGain = powf(10.0f, 0.05f * (data->p[P_GAINSCALE] + data->random.GetFloat(-data->p[P_GAINSCALEVAR], data->p[P_GAINSCALEVAR])));
-				Resonator& resonator = data->resonators[i][k];
-				resonator.Setup(fFreq, fBandwidth, fGain);
+        for (int i = 0; i < numchannels; i++)
+        {
+            for (int k = 0; k < nNumResonators; k++)
+            {
+                float fFreq = 0.002f * (k + 1);
+                fFreq *= data->p[P_FREQSCALE] + data->random.GetFloat(-data->p[P_FREQSCALEVAR], data->p[P_FREQSCALEVAR]);
+                fFreq += (data->p[P_FREQSHIFT] + data->random.GetFloat(-data->p[P_FREQSHIFTVAR], data->p[P_FREQSHIFTVAR])) * sampletime;
+                float fBandwidth = powf(0.01f, data->p[P_BWSCALE] + data->random.GetFloat(-data->p[P_BWSCALEVAR], data->p[P_BWSCALEVAR]));
+                float fGain = powf(10.0f, 0.05f * (data->p[P_GAINSCALE] + data->random.GetFloat(-data->p[P_GAINSCALEVAR], data->p[P_GAINSCALEVAR])));
+                Resonator& resonator = data->resonators[i][k];
+                resonator.Setup(fFreq, fBandwidth, fGain);
 #if !UNITY_PS3 || UNITY_SPU
-				if (i == 0)
-				{
-					*dst++ = resonator.a0;
-					*dst++ = resonator.a1;
-					*dst++ = resonator.a2;
-				}
+                if (i == 0)
+                {
+                    *dst++ = resonator.a0;
+                    *dst++ = resonator.a1;
+                    *dst++ = resonator.a2;
+                }
 #endif
-			}
-		}
-		
+            }
+        }
+
 #if !UNITY_PS3 || UNITY_SPU
-		float* tmp = data->display1;
-		data->display1 = data->display2;
-		data->display2 = tmp;
+        float* tmp = data->display1;
+        data->display1 = data->display2;
+        data->display2 = tmp;
 #endif
-	}
-	
+    }
+
 #if !UNITY_PS3 || UNITY_SPU
 
 #if UNITY_SPU
@@ -222,25 +222,25 @@ namespace ModalFilter
         data = &g_EffectData.data;
 #endif
 
-		const float sampletime = 1.0f / state->samplerate;
+        const float sampletime = 1.0f / state->samplerate;
 
 #if !UNITY_PS3 && !UNITY_SPU
-		float specDecay = powf(10.0f, 0.05f * data->p[P_SPECTRUMDECAY] * length * sampletime);
-		bool calcSpectrum = (data->p[P_SHOWSPECTRUM] >= 0.5f);
-		if (calcSpectrum)
-			data->analyzer.AnalyzeInput(inbuffer, inchannels, length, specDecay);
+        float specDecay = powf(10.0f, 0.05f * data->p[P_SPECTRUMDECAY] * length * sampletime);
+        bool calcSpectrum = (data->p[P_SHOWSPECTRUM] >= 0.5f);
+        if (calcSpectrum)
+            data->analyzer.AnalyzeInput(inbuffer, inchannels, length, specDecay);
 #endif
-		
+
         memset(outbuffer, 0, outchannels * length * sizeof(float));
 
         const int nNumResonators = (int)data->p[P_NUMMODES];
 
-		if(memcmp(data->p, data->prevp, sizeof(data->p)) != 0)
-		{
-			memcpy(data->prevp, data->p, sizeof(data->p));
-			SetupResonators(data, inchannels, sampletime);
-		}
-		
+        if (memcmp(data->p, data->prevp, sizeof(data->p)) != 0)
+        {
+            memcpy(data->prevp, data->p, sizeof(data->p));
+            SetupResonators(data, inchannels, sampletime);
+        }
+
         for (int i = 0; i < inchannels; i++)
         {
             float denormalFix = data->random.GetFloat(-1.0f, 1.0f) * 1.0e-9f;
@@ -259,10 +259,10 @@ namespace ModalFilter
         }
 
 #if !UNITY_PS3 && !UNITY_SPU
-		if (calcSpectrum)
-			data->analyzer.AnalyzeOutput(outbuffer, outchannels, length, specDecay);
+        if (calcSpectrum)
+            data->analyzer.AnalyzeOutput(outbuffer, outchannels, length, specDecay);
 #endif
-		
+
 #if UNITY_SPU
         UNITY_PS3_CELLDMA_PUT(&g_EffectData, state->effectdata, sizeof(g_EffectData));
 #endif
