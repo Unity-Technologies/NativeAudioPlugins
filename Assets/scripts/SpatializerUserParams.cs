@@ -1,4 +1,4 @@
-#if UNITY_5_2
+#if UNITY_5_2 || UNITY_5_3 || UNITY_5_4
 // The spatialization API is only supported by the final Unity 5.2 version and newer.
 // If you get script compile errors in this file, comment out the line below.
 #define ENABLE_SPATIALIZER_API
@@ -27,6 +27,9 @@ public class SpatializerUserParams : MonoBehaviour
         source.SetSpatializerFloat(0, DistanceAttn);
         source.SetSpatializerFloat(1, FixedVolume);
         source.SetSpatializerFloat(2, CustomRolloff);
+		source.GetSpatializerFloat(0, out DistanceAttn); // Get back clipped parameters from plugin
+		source.GetSpatializerFloat(1, out FixedVolume);
+		source.GetSpatializerFloat(2, out CustomRolloff);
         source.spatialize = EnableSpatialization;
         #endif
     }
