@@ -38,7 +38,7 @@ static void FFTProcess(UnityComplexNumber* data, int numsamples, bool forward)
             j ^= m;
         }
     }
-    const float k = (forward) ? kPI : -kPI;
+    const float k = (forward) ? -kPI : kPI;
     for (int j = 1; j < numsamples; j <<= 1)
     {
         const float w0 = k / (float)j;
@@ -59,14 +59,14 @@ static void FFTProcess(UnityComplexNumber* data, int numsamples, bool forward)
 
 void FFT::Forward(UnityComplexNumber* data, int numsamples)
 {
-    FFTProcess(data, numsamples, false);
+    FFTProcess(data, numsamples, true);
 }
 
 void FFT::Backward(UnityComplexNumber* data, int numsamples)
 {
     for (int n = 0; n < numsamples; n++)
         data[n].im = -data[n].im;
-    FFTProcess(data, numsamples, true);
+    FFTProcess(data, numsamples, false);
     const float scale = 1.0f / (float)numsamples;
     for (int n = 0; n < numsamples; n++)
     {

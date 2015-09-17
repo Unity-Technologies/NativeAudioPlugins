@@ -347,8 +347,8 @@ namespace ConvolutionReverb
             UnityComplexNumber* x = c.x[data->bufferindex];
             for (int n = 0; n < data->fftsize; n++)
             {
-                writeoffset = (writeoffset + mask) & mask;
                 x[n].Set(s[writeoffset], 0.0f);
+				writeoffset = (writeoffset + mask) & mask;
             }
             FFT::Forward(x, data->fftsize);
 
