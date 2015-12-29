@@ -70,9 +70,9 @@ namespace Spatializer
                     {
                         memset(h, 0, sizeof(h));
                         for (int n = 0; n < HRTFLEN; n++)
-                            h[n].re = p[HRTFLEN - 1 - n];
+                            h[n + HRTFLEN].re = p[n];
                         p += HRTFLEN;
-                        FFT::Forward(h, HRTFLEN * 2);
+                        FFT::Forward(h, HRTFLEN * 2, false);
                         for (int n = 0; n < HRTFLEN * 2; n++)
                         {
                             *dst++ = h[n].re;
@@ -257,16 +257,16 @@ namespace Spatializer
 
                 for (int n = 0; n < HRTFLEN * 2; n++)
                 {
-                    ch.x[n].re = ch.buffer[HRTFLEN * 2 - 1 - n];
+                    ch.x[n].re = ch.buffer[n];
                     ch.x[n].im = 0.0f;
                 }
 
-                FFT::Forward(ch.x, HRTFLEN * 2);
+                FFT::Forward(ch.x, HRTFLEN * 2, false);
 
                 for (int n = 0; n < HRTFLEN * 2; n++)
-                    UnityComplexNumber::Mul(ch.x[n], ch.h[n], ch.y[n]);
+                    UnityComplexNumber::Mul<float, float, float>(ch.x[n], ch.h[n], ch.y[n]);
 
-                FFT::Backward(ch.y, HRTFLEN * 2);
+                FFT::Backward(ch.y, HRTFLEN * 2, false);
 
                 for (int n = 0; n < HRTFLEN; n++)
                 {

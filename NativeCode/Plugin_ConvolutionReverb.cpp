@@ -247,7 +247,7 @@ namespace ConvolutionReverb
                     c.impulse[impulsesamples - 1 - n] = tmp;
                 }
             }
-
+			
             // measure signal power
             float power = 0.0f;
             for (int n = 0; n < impulsesamples; n++)
@@ -269,8 +269,8 @@ namespace ConvolutionReverb
                 memset(c.x[k], 0, sizeof(UnityComplexNumber) * data->fftsize);
                 memset(c.h[k], 0, sizeof(UnityComplexNumber) * data->fftsize);
                 for (int n = 0; n < data->hopsize; n++)
-                    c.h[k][data->hopsize - 1 - n].re = *src++;
-                FFT::Forward(c.h[k], data->fftsize);
+                    c.h[k][n].re = *src++;
+                FFT::Forward(c.h[k], data->fftsize, false);
             }
 
             // integrate peak detection filtered impulse for later resampling via box-filtering when GUI requests preview waveform
@@ -344,13 +344,16 @@ namespace ConvolutionReverb
             }
 
             // calculate X=FFT(s)
+			writeoffset = data->writeoffset;
             UnityComplexNumber* x = c.x[data->bufferindex];
             for (int n = 0; n < data->fftsize; n++)
             {
                 x[n].Set(s[writeoffset], 0.0f);
-				writeoffset = (writeoffset + mask) & mask;
+				writeoffset = (writeoffset + 1) & mask;
             }
-            FFT::Forward(x, data->fftsize);
+            FFT::Forward(x, data->fftsize, false);
+
+			writeoffset = (writeoffset + data->hopsize) & mask;
 
             // calculate y=IFFT(sum(convolve(H_k, X_k), k=1..numpartitions))
             UnityComplexNumber* y = data->tmpoutput;
@@ -360,9 +363,9 @@ namespace ConvolutionReverb
                 UnityComplexNumber* h = c.h[k];
                 UnityComplexNumber* x = c.x[(k + data->bufferindex) % data->numpartitions];
                 for (int n = 0; n < data->fftsize; n++)
-                    y[n] = y[n] + h[n] * x[n];
+					UnityComplexNumber::MulAdd(h[n], x[n], y[n], y[n]);
             }
-            FFT::Backward(y, data->fftsize);
+            FFT::Backward(y, data->fftsize, false);
 
             // overlap-save readout
             for (int n = 0; n < data->hopsize; n++)

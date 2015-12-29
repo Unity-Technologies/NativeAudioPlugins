@@ -75,7 +75,7 @@ namespace PitchDetector
         }
 
         // Window correction
-        FFT::Forward(data->spec, FFTSIZE);
+        FFT::Forward(data->spec, FFTSIZE, true);
         for (int i = 0; i < FFTSIZE; i++)
             data->acnf[i] = 1.0f / data->spec[i].Magnitude2();
 
@@ -166,7 +166,7 @@ namespace PitchDetector
                     data->spec[i].im = 0.0f;
                 }
 
-                FFT::Forward(data->spec, FFTSIZE);
+                FFT::Forward(data->spec, FFTSIZE, true);
 
                 int locut = (int)data->p[P_LOCUT];
                 int hicut = (int)data->p[P_HICUT];
@@ -181,7 +181,7 @@ namespace PitchDetector
                     data->spec[i].im = 0.0f;
                     debugdata[i] = data->spec[i].re;
                 }
-                FFT::Backward(data->spec, FFTSIZE);
+                FFT::Backward(data->spec, FFTSIZE, true);
 
                 int startbin = (int)data->p[P_LOBIN];
                 int endbin = (int)data->p[P_HIBIN];
