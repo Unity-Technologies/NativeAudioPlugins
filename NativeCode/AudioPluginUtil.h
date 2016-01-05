@@ -158,6 +158,18 @@ public:
         data[w] = sample;
         writeindex = w;
     }
+	
+	inline void Feed(float* buf, int numsamples, int stride)
+	{
+		int w = writeindex;
+		for(int n = 0; n < numsamples; n++)
+		{
+			if(++w == length)
+				w = 0;
+			data[w] = buf[n * stride];
+		}
+		writeindex = w;
+	}
 
 public:
     int length;

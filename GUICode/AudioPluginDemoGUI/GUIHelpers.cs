@@ -59,7 +59,7 @@ public abstract class GUIHelpers
             if (x - px > w)
             {
                 EditorGUI.DrawRect(new Rect(x, r.yMax - 5f, 1f, 5f), col);
-                GUI.Label(new Rect(x, r.yMax - 22f, 1, 15f), (f < 1000.0f) ? string.Format("{0:F0} Hz", f) : string.Format("{0:F0} kHz", f * 0.001f), textStyle10);
+                GUI.Label(new Rect(x, r.yMax - 22f, 1, 15f), (f < 1000.0f) ? string.Format("{0:F0} Hz", f) : string.Format("{0:F1} kHz", f * 0.001f), textStyle10);
                 px = x;
             }
         }
