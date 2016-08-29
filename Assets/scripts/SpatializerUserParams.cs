@@ -1,8 +1,6 @@
-#if UNITY_5_2 || UNITY_5_3 || UNITY_5_4
 // The spatialization API is only supported by the final Unity 5.2 version and newer.
 // If you get script compile errors in this file, comment out the line below.
 #define ENABLE_SPATIALIZER_API
-#endif
 
 using UnityEngine;
 using System.Collections;
