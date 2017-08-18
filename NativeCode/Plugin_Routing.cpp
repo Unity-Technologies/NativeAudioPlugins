@@ -18,8 +18,6 @@ namespace Routing
         float p[P_NUM];
     };
 
-#if !UNITY_SPU
-
     int InternalRegisterEffectDefinition(UnityAudioEffectDefinition& definition)
     {
         int numparams = P_NUM;
@@ -72,14 +70,6 @@ namespace Routing
         return UNITY_AUDIODSP_OK;
     }
 
-#endif
-
-#if !UNITY_PS3 || UNITY_SPU
-
-#if UNITY_SPU
-    EffectData  g_EffectData __attribute__((aligned(16)));
-    extern "C"
-#endif
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectState* state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int outchannels)
     {
         EffectData* data = state->GetEffectData<EffectData>();
@@ -99,7 +89,6 @@ namespace Routing
         return UNITY_AUDIODSP_OK;
     }
 
-#endif
 }
 
 extern "C" UNITY_AUDIODSP_EXPORT_API void RoutingDemo_GetData(int target, float* data, int numsamples, int numchannels)

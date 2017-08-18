@@ -1,6 +1,6 @@
 #include "AudioPluginUtil.h"
 
-#if UNITY_OSX | UNITY_LINUX | UNITY_WIN
+#if PLATFORM_OSX | PLATFORM_LINUX | PLATFORM_WIN
 
 #include "TeleportLib.cpp"
 

@@ -28,8 +28,6 @@ namespace LevelMixer
         };
     };
 
-#if !UNITY_SPU
-
     int InternalRegisterEffectDefinition(UnityAudioEffectDefinition& definition)
     {
         int numparams = P_NUM;
@@ -87,22 +85,9 @@ namespace LevelMixer
         return UNITY_AUDIODSP_OK;
     }
 
-#endif
-
-#if !UNITY_PS3 || UNITY_SPU
-
-#if UNITY_SPU
-    EffectData  g_EffectData __attribute__((aligned(16)));
-    extern "C"
-#endif
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectState* state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int outchannels)
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-
-#if UNITY_SPU
-        UNITY_PS3_CELLDMA_GET(&g_EffectData, state->effectdata, sizeof(g_EffectData));
-        data = &g_EffectData.data;
-#endif
 
         float gains[8];
         for (int i = 0; i < inchannels; i++)
@@ -112,12 +97,7 @@ namespace LevelMixer
             for (int i = 0; i < inchannels; i++)
                 outbuffer[n * inchannels + i] = inbuffer[n * inchannels + i] * gains[i];
 
-#if UNITY_SPU
-        UNITY_PS3_CELLDMA_PUT(&g_EffectData, state->effectdata, sizeof(g_EffectData));
-#endif
-
         return UNITY_AUDIODSP_OK;
     }
 
-#endif
 }

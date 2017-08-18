@@ -8,15 +8,10 @@
 #include <string.h>
 #include <assert.h>
 
-#if UNITY_WIN
+#if PLATFORM_WIN
 #   include <windows.h>
 #else
-#   if UNITY_SPU
-#       include <stdint.h>
-#       include "ps3/AudioPluginInterfacePS3.h"
-#   else
-#       include <pthread.h>
-#   endif
+#   include <pthread.h>
 #   define strcpy_s strcpy
 #endif
 
@@ -90,7 +85,7 @@ public:
 		result.re = c.re + a.re * b.re - a.im * b.im;
 		result.im = c.im + t;
 	}
-	
+
     inline T Magnitude() const
     {
         return (T)sqrt(re * re + im * im);
@@ -158,7 +153,7 @@ public:
         data[w] = sample;
         writeindex = w;
     }
-	
+
 	inline void Feed(float* buf, int numsamples, int stride)
 	{
 		int w = writeindex;
@@ -453,12 +448,10 @@ public:
     void Lock();
     void Unlock();
 protected:
-#if UNITY_WIN
+#if PLATFORM_WIN
     CRITICAL_SECTION crit_sec;
 #else
-# if !UNITY_SPU
     pthread_mutex_t mutex;
-# endif
 #endif
 };
 

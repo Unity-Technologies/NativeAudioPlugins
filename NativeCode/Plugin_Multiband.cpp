@@ -94,9 +94,7 @@ namespace Multiband
             BiquadFilter previewBandsplit[4];
             CompressorChannel band[3][8];
             Random random;
-#if !UNITY_PS3 && !UNITY_SPU
             FFTAnalyzer analyzer;
-#endif
         };
         union
         {
@@ -104,8 +102,6 @@ namespace Multiband
             unsigned char pad[(sizeof(Data) + 15) & ~15]; // This entire structure must be a multiple of 16 bytes (and and instance 16 byte aligned) for PS3 SPU DMA requirements
         };
     };
-
-#if !UNITY_SPU
 
     int InternalRegisterEffectDefinition(UnityAudioEffectDefinition& definition)
     {
@@ -138,9 +134,7 @@ namespace Multiband
     {
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
-#if !UNITY_PS3
         effectdata->data.analyzer.spectrumSize = 4096;
-#endif
         InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         state->effectdata = effectdata;
         return UNITY_AUDIODSP_OK;
@@ -149,9 +143,7 @@ namespace Multiband
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-#if !UNITY_PS3
         data->analyzer.Cleanup();
-#endif
         delete data;
         return UNITY_AUDIODSP_OK;
     }
@@ -186,7 +178,6 @@ namespace Multiband
 
     int UNITY_AUDIODSP_CALLBACK GetFloatBufferCallback(UnityAudioEffectState* state, const char* name, float* buffer, int numsamples)
     {
-#if !UNITY_PS3
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
         if (strcmp(name, "InputSpec") == 0)
             data->analyzer.ReadBuffer(buffer, numsamples, true);
@@ -210,36 +201,19 @@ namespace Multiband
             data->previewBandsplit[3].StoreCoeffs(buffer);
         }
         else
-#endif
-        memset(buffer, 0, sizeof(float) * numsamples);
+            memset(buffer, 0, sizeof(float) * numsamples);
+
         return UNITY_AUDIODSP_OK;
     }
 
-#endif
-
-#if !UNITY_PS3 || UNITY_SPU
-
-#if UNITY_SPU
-    EffectData  g_EffectData __attribute__((aligned(16)));
-    extern "C"
-#endif
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectState* state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int outchannels)
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-
-#if UNITY_SPU
-        UNITY_PS3_CELLDMA_GET(&g_EffectData, state->effectdata, sizeof(g_EffectData));
-        data = &g_EffectData.data;
-#endif
-
         const float sr = (float)state->samplerate;
-
-#if !UNITY_PS3 && !UNITY_SPU
         float specDecay = powf(10.0f, 0.05f * data->p[P_SpectrumDecay] * length / sr);
         bool calcSpectrum = (data->p[P_ShowSpectrum] >= 0.5f);
         if (calcSpectrum)
             data->analyzer.AnalyzeInput(inbuffer, inchannels, length, specDecay);
-#endif
 
         for (int i = 0; i < inchannels; i++)
         {
@@ -278,17 +252,10 @@ namespace Multiband
             }
         }
 
-#if !UNITY_PS3 && !UNITY_SPU
         if (calcSpectrum)
             data->analyzer.AnalyzeOutput(outbuffer, outchannels, length, specDecay);
-#endif
-
-#if UNITY_SPU
-        UNITY_PS3_CELLDMA_PUT(&g_EffectData, state->effectdata, sizeof(g_EffectData));
-#endif
 
         return UNITY_AUDIODSP_OK;
     }
 
-#endif
 }

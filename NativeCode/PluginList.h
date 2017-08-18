@@ -14,8 +14,6 @@ DECLARE_EFFECT("Demo TeeDee9o9", TeeDee)
 DECLARE_EFFECT("Demo TubeResonator", TubeResonator)
 DECLARE_EFFECT("Demo Vocoder", Vocoder)
 DECLARE_EFFECT("Demo WahWah", WahWah)
-
-#if !UNITY_PS3
 DECLARE_EFFECT("Demo ConvolutionReverb", ConvolutionReverb)
 DECLARE_EFFECT("Demo CorrelationMeter", CorrelationMeter)
 DECLARE_EFFECT("Demo Granulator", Granulator)
@@ -24,12 +22,11 @@ DECLARE_EFFECT("Demo Oscilloscope", Oscilloscope)
 DECLARE_EFFECT("Demo Routing", Routing)
 DECLARE_EFFECT("Demo Spatializer", Spatializer)
 DECLARE_EFFECT("Demo Spatializer Reverb", SpatializerReverb)
-#endif
 
-#if UNITY_OSX | UNITY_LINUX | UNITY_WIN
+#if PLATFORM_OSX | PLATFORM_LINUX | PLATFORM_WIN
 DECLARE_EFFECT("Demo Teleport", Teleport)
 #endif
 
-#if UNITY_OSX | UNITY_WIN
+#if PLATFORM_OSX | PLATFORM_WIN
 DECLARE_EFFECT("Demo Synthesizer", Synthesizer)
 #endif

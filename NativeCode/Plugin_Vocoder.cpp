@@ -49,8 +49,6 @@ namespace Vocoder
         };
     };
 
-#if !UNITY_SPU
-
     int InternalRegisterEffectDefinition(UnityAudioEffectDefinition& definition)
     {
         int numparams = P_NUM;
@@ -108,25 +106,11 @@ namespace Vocoder
         return UNITY_AUDIODSP_OK;
     }
 
-#endif
-
-#if !UNITY_PS3 || UNITY_SPU
-
     static float freqs[] = { 100, 225, 330, 470, 700, 1030, 1500, 2280, 3300, 4700, 9000 };
 
-#if UNITY_SPU
-    EffectData  g_EffectData __attribute__((aligned(16)));
-    extern "C"
-#endif
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectState* state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int outchannels)
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-
-#if UNITY_SPU
-        UNITY_PS3_CELLDMA_GET(&g_EffectData, state->effectdata, sizeof(g_EffectData));
-        data = &g_EffectData.data;
-#endif
-
         float gain = powf(10.0f, 0.05f * data->p[P_GAIN] + 2.5);
         float maxfreq = 0.25f * state->samplerate;
         float sampletime = 1.0f / (float)state->samplerate;
@@ -181,11 +165,7 @@ namespace Vocoder
             }
         }
 
-#if UNITY_SPU
-        UNITY_PS3_CELLDMA_PUT(&g_EffectData, state->effectdata, sizeof(g_EffectData));
-#endif
         return UNITY_AUDIODSP_OK;
     }
 
-#endif
 }

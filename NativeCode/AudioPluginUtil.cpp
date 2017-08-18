@@ -1,7 +1,7 @@
 #include "AudioPluginUtil.h"
 #include <stdarg.h>
 
-#define ENABLE_TESTS ((UNITY_WIN || UNITY_OSX) && 1)
+#define ENABLE_TESTS ((PLATFORM_WIN || PLATFORM_OSX) && 1)
 
 char* strnew(const char* src)
 {
@@ -31,7 +31,7 @@ static void FFTProcess(UnityComplexNumber* data, int numsamples, bool forward)
 		count += count;
 		++numbits;
 	}
-	
+
 	static unsigned int* reversetable[32] = { NULL };
 	unsigned int* tbl = reversetable[numbits];
 	if (tbl == NULL)
@@ -57,7 +57,7 @@ static void FFTProcess(UnityComplexNumber* data, int numsamples, bool forward)
 #endif
 		reversetable[numbits] = tbl;
 	}
-	
+
 	for (unsigned int i = 0; i < numsamples; i++)
 	{
 		unsigned int j = tbl[i];
@@ -67,7 +67,7 @@ static void FFTProcess(UnityComplexNumber* data, int numsamples, bool forward)
 			UnitySwap(data[i].im, data[j].im);
 		}
 	}
-	
+
 	T w0 = (forward) ? -T(kPI_double) : T(kPI_double);
     for (int j = 1; j < numsamples; j += j)
     {
@@ -104,13 +104,13 @@ void FFT::Backward(UnityComplexNumber* data, int numsamples, bool highprecision)
 		FFTProcess<double>(data, numsamples, false);
 	else
 		FFTProcess<float>(data, numsamples, false);
-    
+
 	const float scale = 1.0f / (float)numsamples;
 	for (int n = 0; n < numsamples; n++)
 	{
 		data[n].re *= scale;
 		data[n].im *= scale;
-	}	
+	}
 }
 
 void FFTAnalyzer::Cleanup()
@@ -259,65 +259,55 @@ void HistoryBuffer::ReadBuffer(float* buffer, int numsamplesTarget, int numsampl
 
 Mutex::Mutex()
 {
-#if UNITY_WIN
-#if UNITY_WINRT
+#if PLATFORM_WIN
+#if PLATFORM_WINRT
     BOOL const result = InitializeCriticalSectionEx(&crit_sec, 0, CRITICAL_SECTION_NO_DEBUG_INFO);
     assert(FALSE != result);
 #else
     InitializeCriticalSection(&crit_sec);
 #endif
 #else
-# if !UNITY_SPU
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
     pthread_mutex_init(&mutex, &attr);
     pthread_mutexattr_destroy(&attr);
-# endif
 #endif
 }
 
 Mutex::~Mutex()
 {
-#if UNITY_WIN
+#if PLATFORM_WIN
     DeleteCriticalSection(&crit_sec);
 #else
-# if !UNITY_SPU
     pthread_mutex_destroy(&mutex);
-# endif
 #endif
 }
 
 bool Mutex::TryLock()
 {
-#if UNITY_WIN
+#if PLATFORM_WIN
     return TryEnterCriticalSection(&crit_sec) != 0;
 #else
-# if !UNITY_SPU
     return pthread_mutex_trylock(&mutex) == 0;
-# endif
 #endif
 }
 
 void Mutex::Lock()
 {
-#if UNITY_WIN
+#if PLATFORM_WIN
     EnterCriticalSection(&crit_sec);
 #else
-# if !UNITY_SPU
     pthread_mutex_lock(&mutex);
-# endif
 #endif
 }
 
 void Mutex::Unlock()
 {
-#if UNITY_WIN
+#if PLATFORM_WIN
     LeaveCriticalSection(&crit_sec);
 #else
-# if !UNITY_SPU
     pthread_mutex_unlock(&mutex);
-# endif
 #endif
 }
 
@@ -392,13 +382,6 @@ void DeclareEffect(
     registereffectdefcallback(definition);
 }
 
-#if UNITY_PS3
-    #define DECLARE_EFFECT(namestr,ns) \
-    extern char _binary_spu_ ## ns ## _spu_elf_start[];
-    #include "PluginList.h"
-    #undef DECLARE_EFFECT
-#endif
-
 #define DECLARE_EFFECT(namestr,ns) \
     namespace ns \
     { \
@@ -413,31 +396,17 @@ void DeclareEffect(
 #include "PluginList.h"
 #undef DECLARE_EFFECT
 
-#if UNITY_PS3
-    #define DECLARE_EFFECT(namestr,ns) \
-    DeclareEffect( \
-    definition[numeffects++], \
-    namestr, \
-    ns::CreateCallback, \
-    ns::ReleaseCallback, \
-    (UnityAudioEffect_ProcessCallback)_binary_spu_ ## ns ## _spu_elf_start, \
-    ns::SetFloatParameterCallback, \
-    ns::GetFloatParameterCallback, \
-    ns::GetFloatBufferCallback, \
-    ns::InternalRegisterEffectDefinition);
-#else
-    #define DECLARE_EFFECT(namestr,ns) \
-    DeclareEffect( \
-    definition[numeffects++], \
-    namestr, \
-    ns::CreateCallback, \
-    ns::ReleaseCallback, \
-    ns::ProcessCallback, \
-    ns::SetFloatParameterCallback, \
-    ns::GetFloatParameterCallback, \
-    ns::GetFloatBufferCallback, \
-    ns::InternalRegisterEffectDefinition);
-#endif
+#define DECLARE_EFFECT(namestr,ns) \
+DeclareEffect( \
+definition[numeffects++], \
+namestr, \
+ns::CreateCallback, \
+ns::ReleaseCallback, \
+ns::ProcessCallback, \
+ns::SetFloatParameterCallback, \
+ns::GetFloatParameterCallback, \
+ns::GetFloatBufferCallback, \
+ns::InternalRegisterEffectDefinition);
 
 extern "C" UNITY_AUDIODSP_EXPORT_API int UnityGetAudioEffectDefinitions(UnityAudioEffectDefinition*** definitionptr)
 {
@@ -485,15 +454,15 @@ NAP_TESTSUITE(FFT)
 		for (int test = 0; test < 2; test++)
 		{
 			bool highprecision = (test == 1);
-			
+
 			Random r;
 			for (int b = 4; b <= 20; b++)
 			{
 				int num = 1 << b;
-				
+
 				UnityComplexNumber* test1 = new UnityComplexNumber [num];
 				UnityComplexNumber* test2 = new UnityComplexNumber [num];
-				
+
 				for (int n = 0; n < num; n++)
 				{
 					test1[n].re = r.GetFloat(-1.0f, 1.0f);
@@ -501,10 +470,10 @@ NAP_TESTSUITE(FFT)
 					test2[n].re = test1[n].re;
 					test2[n].im = test1[n].im;
 				}
-				
+
 				FFT::Forward (test2, num, highprecision);
 				FFT::Backward (test2, num, highprecision);
-				
+
 				double errtol = (highprecision) ? 1.0e-6 : 1.5e-3;
 				double maxerr = 0.0f, errsum = 0.0, rms = 0.0;
 				for (int n = 0; n < num; n++)
@@ -513,13 +482,13 @@ NAP_TESTSUITE(FFT)
 					diff = test1[n].re - test2[n].re; err = fabsf (diff); NAP_CHECK (err < errtol); errsum += err; if (err > maxerr) maxerr = err; rms += diff * diff;
 					diff = test1[n].im - test2[n].im; err = fabsf (diff); NAP_CHECK (err < errtol); errsum += err; if (err > maxerr) maxerr = err; rms += diff * diff;
 				}
-				
+
 				double avgerr = errsum / (double)num;
 				rms = sqrt (rms / (double)num);
-				
+
 				delete[] test1;
 				delete[] test2;
-				
+
 				printf ("%2d bits: MaxErr=%15.8g ErrSum=%15.8g AvgErr=%15.8g ErrRMS=%15.8g [%s precision]\n", b, maxerr, errsum, avgerr, rms, highprecision ? "high" : "low");
 				NAP_CHECK (avgerr < errtol);
 				NAP_CHECK (rms < errtol);

@@ -12,10 +12,10 @@ static RingBuffer<8192, UInt32> livedata;
 
 namespace MIDI
 {
-    #if UNITY_WIN
+    #if PLATFORM_WIN
         #include <windows.h>
         #include <mmsystem.h>
-    #elif UNITY_OSX
+    #elif PLATFORM_OSX
         #include <CoreMIDI/MIDIServices.h>
     #endif
 
@@ -25,10 +25,10 @@ namespace MIDI
         MidiInput();
         ~MidiInput();
     private:
-    #if UNITY_WIN
+    #if PLATFORM_WIN
         HMIDIIN m_midihandle;
         static void CALLBACK MidiInCallbackProc(HMIDIIN hMidiIn, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
-    #elif UNITY_OSX
+    #elif PLATFORM_OSX
         MIDIClientRef client;
         MIDIPortRef inPort;
         static void MidiInCallbackProc(const MIDIPacketList* pktlist, void* refCon, void* connRefCon);
@@ -37,14 +37,14 @@ namespace MIDI
 
     MidiInput::MidiInput()
     {
-    #if UNITY_WIN
+    #if PLATFORM_WIN
         int numdevs = midiInGetNumDevs();
         for (int n = 0; n < numdevs; n++)
         {
             midiInOpen(&m_midihandle, n, (DWORD_PTR)&MidiInCallbackProc, n, CALLBACK_FUNCTION);
             midiInStart(m_midihandle);
         }
-    #elif UNITY_OSX
+    #elif PLATFORM_OSX
         client = NULL;
         MIDIClientCreate(CFSTR("MIDI Echo"), NULL, NULL, &client);
         inPort = NULL;
@@ -60,25 +60,25 @@ namespace MIDI
 
     MidiInput::~MidiInput()
     {
-    #if UNITY_WIN
+    #if PLATFORM_WIN
         if (m_midihandle)
         {
             midiInStop(m_midihandle);
             midiInClose(m_midihandle);
         }
-    #elif UNITY_OSX
+    #elif PLATFORM_OSX
         // TODO
     #endif
     }
 
-    #if UNITY_WIN
+    #if PLATFORM_WIN
     void CALLBACK MidiInput::MidiInCallbackProc(HMIDIIN hMidiIn, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
     {
         if (wMsg == MIM_DATA)
             livedata.Feed(dwParam1);
     }
 
-    #elif UNITY_OSX
+    #elif PLATFORM_OSX
     void MidiInput::MidiInCallbackProc(const MIDIPacketList* pktlist, void* refCon, void* connRefCon)
     {
         MIDIPacket* packet = (MIDIPacket*)pktlist->packet;

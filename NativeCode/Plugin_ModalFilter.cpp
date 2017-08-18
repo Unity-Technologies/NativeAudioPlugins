@@ -66,11 +66,9 @@ namespace ModalFilter
             float prevp[P_NUM];
             Random random;
             Resonator resonators[8][MAXRESONATORS];
-#if !UNITY_PS3 || UNITY_SPU
             FFTAnalyzer analyzer;
             float* display1;
             float* display2;
-#endif
         };
         union
         {
@@ -78,8 +76,6 @@ namespace ModalFilter
             unsigned char pad[(sizeof(Data) + 15) & ~15]; // This entire structure must be a multiple of 16 bytes (and and instance 16 byte aligned) for PS3 SPU DMA requirements
         };
     };
-
-#if !UNITY_SPU
 
     int InternalRegisterEffectDefinition(UnityAudioEffectDefinition& definition)
     {
@@ -106,11 +102,9 @@ namespace ModalFilter
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-#if !UNITY_PS3 || UNITY_SPU
         effectdata->data.analyzer.spectrumSize = 4096;
         effectdata->data.display1 = new float[MAXRESONATORS * 3];
         effectdata->data.display2 = new float[MAXRESONATORS * 3];
-#endif
         InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         return UNITY_AUDIODSP_OK;
     }
@@ -118,11 +112,9 @@ namespace ModalFilter
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-#if !UNITY_PS3 || UNITY_SPU
         data->analyzer.Cleanup();
         delete[] data->display1;
         delete[] data->display2;
-#endif
         delete data;
         return UNITY_AUDIODSP_OK;
     }
@@ -150,7 +142,6 @@ namespace ModalFilter
 
     int UNITY_AUDIODSP_CALLBACK GetFloatBufferCallback(UnityAudioEffectState* state, const char* name, float* buffer, int numsamples)
     {
-#if !UNITY_PS3 || UNITY_SPU
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
         if (strcmp(name, "InputSpec") == 0)
             data->analyzer.ReadBuffer(buffer, numsamples, true);
@@ -163,11 +154,9 @@ namespace ModalFilter
                 numsamples = maxsamples;
             memcpy(buffer, data->display1, numsamples * sizeof(float));
         }
-#endif
+
         return UNITY_AUDIODSP_OK;
     }
-
-#endif
 
     static void SetupResonators(EffectData::Data* data, int numchannels, float sampletime)
     {
@@ -175,9 +164,7 @@ namespace ModalFilter
 
         data->random.Seed((int)data->p[P_SEED]);
 
-#if !UNITY_PS3 || UNITY_SPU
         float* dst = data->display2;
-#endif
         for (int i = 0; i < numchannels; i++)
         {
             for (int k = 0; k < nNumResonators; k++)
@@ -189,47 +176,30 @@ namespace ModalFilter
                 float fGain = powf(10.0f, 0.05f * (data->p[P_GAINSCALE] + data->random.GetFloat(-data->p[P_GAINSCALEVAR], data->p[P_GAINSCALEVAR])));
                 Resonator& resonator = data->resonators[i][k];
                 resonator.Setup(fFreq, fBandwidth, fGain);
-#if !UNITY_PS3 || UNITY_SPU
+
                 if (i == 0)
                 {
                     *dst++ = resonator.a0;
                     *dst++ = resonator.a1;
                     *dst++ = resonator.a2;
                 }
-#endif
             }
         }
 
-#if !UNITY_PS3 || UNITY_SPU
         float* tmp = data->display1;
         data->display1 = data->display2;
         data->display2 = tmp;
-#endif
     }
 
-#if !UNITY_PS3 || UNITY_SPU
-
-#if UNITY_SPU
-    EffectData  g_EffectData __attribute__((aligned(16)));
-    extern "C"
-#endif
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectState* state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int outchannels)
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
 
-#if UNITY_SPU
-        UNITY_PS3_CELLDMA_GET(&g_EffectData, state->effectdata, sizeof(g_EffectData));
-        data = &g_EffectData.data;
-#endif
-
         const float sampletime = 1.0f / state->samplerate;
-
-#if !UNITY_PS3 && !UNITY_SPU
         float specDecay = powf(10.0f, 0.05f * data->p[P_SPECTRUMDECAY] * length * sampletime);
         bool calcSpectrum = (data->p[P_SHOWSPECTRUM] >= 0.5f);
         if (calcSpectrum)
             data->analyzer.AnalyzeInput(inbuffer, inchannels, length, specDecay);
-#endif
 
         memset(outbuffer, 0, outchannels * length * sizeof(float));
 
@@ -258,17 +228,10 @@ namespace ModalFilter
             }
         }
 
-#if !UNITY_PS3 && !UNITY_SPU
         if (calcSpectrum)
             data->analyzer.AnalyzeOutput(outbuffer, outchannels, length, specDecay);
-#endif
-
-#if UNITY_SPU
-        UNITY_PS3_CELLDMA_PUT(&g_EffectData, state->effectdata, sizeof(g_EffectData));
-#endif
 
         return UNITY_AUDIODSP_OK;
     }
 
-#endif
 }
