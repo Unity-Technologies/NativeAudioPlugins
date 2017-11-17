@@ -1,6 +1,6 @@
 #pragma once
 
-#define UNITY_AUDIO_PLUGIN_API_VERSION 0x010400
+#define UNITY_AUDIO_PLUGIN_API_VERSION 0x010401
 
 #ifndef UNITY_PREFIX_CONFIGURE_H
 
@@ -141,7 +141,7 @@ typedef signed long long SInt64;
     #define UNITY_AUDIODSP_CALLBACK __stdcall
 #elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(_WIN64)
     #define UNITY_AUDIODSP_CALLBACK __stdcall
-#elif defined(__MACH__) || defined(__ANDROID__) || defined(__linux__) || defined(__QNX__)
+#elif defined(__MACH__) || defined(__ANDROID__) || defined(__linux__)
     #define UNITY_AUDIODSP_CALLBACK
 #else
     #define UNITY_AUDIODSP_CALLBACK
@@ -200,6 +200,8 @@ struct UnityAudioSpatializerData
     float                                           spread;                         // Spread parameter of the audio source (0..360 degrees)
     float                                           stereopan;                      // Stereo panning parameter of the audio source (-1 = fully left, 1 = fully right)
     UnityAudioEffect_DistanceAttenuationCallback    distanceattenuationcallback;    // The spatializer plugin may override the distance attenuation in order to influence the voice prioritization (leave this callback as NULL to use the built-in audio source attenuation curve)
+    float                                           minDistance;                    // Min distance of the audio source. This value may be helpful to determine when to apply near-field effects. Added in Unity 2018.1, with UNITY_AUDIO_PLUGIN_API_VERSION 0x010401.
+    float                                           maxDistance;                    // Max distance of the audio source. Added in Unity 2018.1, with UNITY_AUDIO_PLUGIN_API_VERSION 0x010401.
 };
 
 struct UnityAudioAmbisonicData
@@ -212,6 +214,7 @@ struct UnityAudioAmbisonicData
     float                                           stereopan;                      // Stereo panning parameter of the audio source (-1 = fully left, 1 = fully right)
     UnityAudioEffect_DistanceAttenuationCallback    distanceattenuationcallback;    // The ambisonic decoder plugin may override the distance attenuation in order to influence the voice prioritization (leave this callback as NULL to use the built-in audio source attenuation curve)
     int                                             ambisonicOutChannels;           // This tells ambisonic decoders how many output channels will actually be used.
+    float                                           volume;                         // Volume/mute of the audio source. If the the source is muted, volume is set to 0.0; otherwise, it is set to the audio source's volume. Volume is applied after the ambisonic decoder, so this is just informational. Added in Unity 2018.1, with UNITY_AUDIO_PLUGIN_API_VERSION 0x010401.
 };
 
 struct UnityAudioEffectState
