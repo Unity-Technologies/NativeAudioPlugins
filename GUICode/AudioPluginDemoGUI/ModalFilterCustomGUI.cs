@@ -35,15 +35,15 @@ public class ModalFilterCustomGUI : FilterCurveUI
         ComplexD zero = new ComplexD(0.0f, 0.0f);
         ComplexD one = new ComplexD(1.0f, 0.0f);
         AudioCurveRendering.AudioCurveEvaluator d = delegate(float x)
-        {
-            ComplexD w = ComplexD.Exp(wm * GUIHelpers.MapNormalizedFrequency((double)x, samplerate, useLogScale, true));
-            ComplexD h = zero;
-            int num = numModes * 3;
-            for (int n = 0; n < num; n += 3)
-                h += coeffs[n] * (one - w * w) / (w * (w * coeffs[n + 2] + coeffs[n + 1]) + 1.0);
-            double mag = 10.0 * Math.Log10(h.Mag2());
-            return (float)(mag * magScale);
-        };
+            {
+                ComplexD w = ComplexD.Exp(wm * GUIHelpers.MapNormalizedFrequency((double)x, samplerate, useLogScale, true));
+                ComplexD h = zero;
+                int num = numModes * 3;
+                for (int n = 0; n < num; n += 3)
+                    h += coeffs[n] * (one - w * w) / (w * (w * coeffs[n + 2] + coeffs[n + 1]) + 1.0);
+                double mag = 10.0 * Math.Log10(h.Mag2());
+                return (float)(mag * magScale);
+            };
 
         if (filled)
             AudioCurveRendering.DrawFilledCurve(r, d, color);

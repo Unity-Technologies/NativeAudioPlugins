@@ -233,5 +233,4 @@ namespace ModalFilter
 
         return UNITY_AUDIODSP_OK;
     }
-
 }

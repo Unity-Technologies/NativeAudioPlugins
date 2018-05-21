@@ -88,15 +88,16 @@ namespace Routing
 
         return UNITY_AUDIODSP_OK;
     }
-
 }
 
 extern "C" UNITY_AUDIODSP_EXPORT_API void RoutingDemo_GetData(int target, float* data, int numsamples, int numchannels)
 {
     if (target < 0 || target >= Routing::MAXINDEX)
         return;
-    int skipchannels = Routing::bufferchannels[target] - numchannels; if (skipchannels < 0) skipchannels = 0;
-    int zerochannels = numchannels - Routing::bufferchannels[target]; if (zerochannels < 0) zerochannels = 0;
+    int skipchannels = Routing::bufferchannels[target] - numchannels; if (skipchannels < 0)
+        skipchannels = 0;
+    int zerochannels = numchannels - Routing::bufferchannels[target]; if (zerochannels < 0)
+        zerochannels = 0;
     for (int n = 0; n < numsamples; n++)
     {
         for (int i = 0; i < numchannels; i++)

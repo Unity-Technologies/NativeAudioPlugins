@@ -170,10 +170,13 @@ namespace TeeDee
             float outval = sinf(data->phase * 2.0f * kPI) * data->p[P_SINE] + data->random.GetFloat(-1.0f, 1.0f) * data->p[P_NOISE];
             outval = atanf(outval * data->p[P_PREDIST]) * (1.0f / kPI) * data->aenv;
             float cut = data->p[P_CUT] + data->fenv;
-            if (cut < 0.0f) cut = 0.0f; else if (cut > sr_half)
+            if (cut < 0.0f)
+                cut = 0.0f;
+            else if (cut > sr_half)
                 cut = sr_half;
             cut = 2.0f * sinf(0.5f * kPI * cut * st);
-            if (cut > 1.4f) cut = 1.4f;
+            if (cut > 1.4f)
+                cut = 1.4f;
             float bw = 1.0f - data->p[P_RES]; bw *= bw;
             data->lpf += cut * data->bpf;
             float hpf = outval - data->lpf - data->bpf * bw;
@@ -190,5 +193,4 @@ namespace TeeDee
 
         return UNITY_AUDIODSP_OK;
     }
-
 }

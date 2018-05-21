@@ -194,7 +194,6 @@ namespace PitchDetector
 
         return UNITY_AUDIODSP_OK;
     }
-
 }
 
 extern "C" UNITY_AUDIODSP_EXPORT_API float PitchDetectorGetFreq(int index)

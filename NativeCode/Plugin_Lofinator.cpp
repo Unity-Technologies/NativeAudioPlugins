@@ -98,5 +98,4 @@ namespace Lofinator
 
         return UNITY_AUDIODSP_OK;
     }
-
 }

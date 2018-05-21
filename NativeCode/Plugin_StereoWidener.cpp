@@ -112,5 +112,4 @@ namespace StereoWidener
 
         return UNITY_AUDIODSP_OK;
     }
-
 }

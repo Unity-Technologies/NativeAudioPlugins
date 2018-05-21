@@ -11,30 +11,21 @@ public class PitchDetectDemo : MonoBehaviour
     [DllImport("AudioPluginDemo")]
     private static extern int PitchDetectorDebug(float[] data);
 
-    Material mat;
     float[] history = new float[1000];
     float[] debug = new float[65536];
 
     string[] noteNames = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
 
+    public Material mat;
     public string frequency = "detected frequency";
     public string note = "detected note";
     public AudioMixer mixer;
 
-    public GUIText guiText;
+    public GUIText text;
 
     // Use this for initialization
     void Start()
     {
-        mat = new Material("Shader \"Lines/Colored Blended\" {" +
-                "SubShader { Pass { " +
-                "    Blend SrcAlpha OneMinusSrcAlpha " +
-                "    ZWrite Off Cull Off Fog { Mode Off } " +
-                "    BindChannels {" +
-                "      Bind \"vertex\", vertex Bind \"color\", color }" +
-                "} } }");
-        mat.hideFlags = HideFlags.HideAndDontSave;
-        mat.shader.hideFlags = HideFlags.HideAndDontSave;
     }
 
     // Update is called once per frame
@@ -57,8 +48,8 @@ public class PitchDetectDemo : MonoBehaviour
             note = "unknown";
         }
 
-        if (guiText != null)
-            guiText.text = "Detected frequency: " + frequency + "\nDetected note: " + note + " (deviation: " + deviation + " cents)";
+        if (text != null)
+            text.text = "Detected frequency: " + frequency + "\nDetected note: " + note + " (deviation: " + deviation + " cents)";
     }
 
     Vector3 Plot(float[] data, int num, float x0, float y0, float w, float h, Color col, float thr)

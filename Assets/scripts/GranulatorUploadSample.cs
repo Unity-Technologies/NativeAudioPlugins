@@ -13,9 +13,9 @@ public class GranulatorUploadSample : MonoBehaviour
     public float highcut = 24000.0f;
     public int order = 3;
 
-    private bool[] uploaded = new bool [64];
-    private AudioClip[] currSample = new AudioClip [64];
-    
+    private bool[] uploaded = new bool[64];
+    private AudioClip[] currSample = new AudioClip[64];
+
     void Start()
     {
         UploadChangedClips();
@@ -33,11 +33,11 @@ public class GranulatorUploadSample : MonoBehaviour
         {
             if (currSample[currindex] != s)
                 uploaded[currindex] = false;
-                
+
             if (s != null && s.loadState == AudioDataLoadState.Loaded && !uploaded[currindex])
             {
-                Debug.Log ("Uploading sample " + s.name + " to slot " + currindex);
-                
+                Debug.Log("Uploading sample " + s.name + " to slot " + currindex);
+
                 int numsamples = s.samples;
                 int numchannels = s.channels;
                 float[] data = new float[numsamples * numchannels];
@@ -97,7 +97,7 @@ public class GranulatorUploadSample : MonoBehaviour
                 uploaded[currindex] = true;
                 currSample[currindex] = s;
             }
-            
+
             currindex++;
         }
     }

@@ -183,7 +183,7 @@ namespace Teleport
 #endif
         }
 
-        inline SharedMemory* operator ->() const { return data; }
+        inline SharedMemory* operator->() const { return data; }
     };
 
     inline SharedMemoryHandle& GetSharedMemory()

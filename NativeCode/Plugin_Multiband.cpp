@@ -257,5 +257,4 @@ namespace Multiband
 
         return UNITY_AUDIODSP_OK;
     }
-
 }

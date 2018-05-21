@@ -33,18 +33,18 @@ public class LoudnessMeterCustomGUI : IAudioEffectPluginGUI
         AudioCurveRendering.DrawFilledCurve(
             r,
             delegate(float x, out Color color)
-        {
-            float f = Mathf.Clamp(x * xscale, 0.0f, xscale);
-            color = col;
-            color.a = col.a * Mathf.Clamp(x - x0, 0, xr);
-            int i = (int)Mathf.Floor(f);
-            float mag = curve[i] + (curve[i + 1] - curve[i]) * (f - i);
-            float mag_dB = (mag < thr_lin) ? thr_dB : (20.0f * Mathf.Log10(mag));
-            float pos = (mag_dB - yoffset) * yscale;
-            peakVal = Mathf.Max(peakVal, mag_dB);
-            peakPos = Mathf.Max(peakPos, pos);
-            return pos;
-        }
+            {
+                float f = Mathf.Clamp(x * xscale, 0.0f, xscale);
+                color = col;
+                color.a = col.a * Mathf.Clamp(x - x0, 0, xr);
+                int i = (int)Mathf.Floor(f);
+                float mag = curve[i] + (curve[i + 1] - curve[i]) * (f - i);
+                float mag_dB = (mag < thr_lin) ? thr_dB : (20.0f * Mathf.Log10(mag));
+                float pos = (mag_dB - yoffset) * yscale;
+                peakVal = Mathf.Max(peakVal, mag_dB);
+                peakPos = Mathf.Max(peakPos, pos);
+                return pos;
+            }
             );
         peakPos = r.y + r.height * (0.5f - 0.5f * peakPos);
         if (peakPos >= r.y && peakPos <= r.y + r.height)

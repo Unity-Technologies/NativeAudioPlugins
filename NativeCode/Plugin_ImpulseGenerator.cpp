@@ -120,5 +120,4 @@ namespace ImpulseGenerator
 
         return UNITY_AUDIODSP_OK;
     }
-
 }

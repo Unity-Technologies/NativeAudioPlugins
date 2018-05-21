@@ -25,9 +25,9 @@ public class SpatializerUserParams : MonoBehaviour
         source.SetSpatializerFloat(0, DistanceAttn);
         source.SetSpatializerFloat(1, FixedVolume);
         source.SetSpatializerFloat(2, CustomRolloff);
-		source.GetSpatializerFloat(0, out DistanceAttn); // Get back clipped parameters from plugin
-		source.GetSpatializerFloat(1, out FixedVolume);
-		source.GetSpatializerFloat(2, out CustomRolloff);
+        source.GetSpatializerFloat(0, out DistanceAttn); // Get back clipped parameters from plugin
+        source.GetSpatializerFloat(1, out FixedVolume);
+        source.GetSpatializerFloat(2, out CustomRolloff);
         source.spatialize = EnableSpatialization;
         #endif
     }

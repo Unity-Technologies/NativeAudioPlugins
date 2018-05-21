@@ -103,11 +103,16 @@ namespace NoiseBox
             {
                 outbuffer[n * outchannels + i] = inbuffer[n * outchannels + i] * (1.0f - mulgain + mulgain * data->mulnoise) + addgain * data->addnoise;
             }
-            data->addcount += 1.0f; if (data->addcount >= addperiod) { data->addcount -= addperiod; data->addnoise = data->random.GetFloat(-1.0, 1.0f); }
-            data->mulcount += 1.0f; if (data->mulcount >= addperiod) { data->mulcount -= mulperiod; data->mulnoise = data->random.GetFloat(0.0, 1.0f); }
+            data->addcount += 1.0f; if (data->addcount >= addperiod)
+            {
+                data->addcount -= addperiod; data->addnoise = data->random.GetFloat(-1.0, 1.0f);
+            }
+            data->mulcount += 1.0f; if (data->mulcount >= addperiod)
+            {
+                data->mulcount -= mulperiod; data->mulnoise = data->random.GetFloat(0.0, 1.0f);
+            }
         }
 
         return UNITY_AUDIODSP_OK;
     }
-
 }

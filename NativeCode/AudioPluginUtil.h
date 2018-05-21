@@ -47,14 +47,14 @@ public:
         im = c.im;
     }
 
-	template<typename T1, typename T2, typename T3>
+    template<typename T1, typename T2, typename T3>
     inline static void Scale(const UnityComplexNumberT<T1>& a, T2 b, UnityComplexNumberT<T3>& result)
     {
         result.re = a.re * b;
         result.im = a.im * b;
     }
 
-	template<typename T1, typename T2, typename T3>
+    template<typename T1, typename T2, typename T3>
     inline static void Mul(const UnityComplexNumberT<T1>& a, const UnityComplexNumberT<T2>& b, UnityComplexNumberT<T3>& result)
     {
         // Store temporarily in case a or b reference the same memory as result
@@ -63,28 +63,28 @@ public:
         result.im = t;
     }
 
-	template<typename T1, typename T2, typename T3>
+    template<typename T1, typename T2, typename T3>
     inline static void Add(const UnityComplexNumberT<T1>& a, const UnityComplexNumberT<T2>& b, UnityComplexNumberT<T3>& result)
     {
         result.re = a.re + b.re;
         result.im = a.im + b.im;
     }
 
-	template<typename T1, typename T2, typename T3>
+    template<typename T1, typename T2, typename T3>
     inline static void Sub(const UnityComplexNumberT<T1>& a, const UnityComplexNumberT<T2>& b, UnityComplexNumberT<T3>& result)
     {
         result.re = a.re - b.re;
         result.im = a.im - b.im;
     }
 
-	template<typename T1, typename T2, typename T3>
-	inline static void MulAdd(const UnityComplexNumberT<T1>& a, const UnityComplexNumberT<T2>& b, const UnityComplexNumberT<T2>& c, UnityComplexNumberT<T3>& result)
-	{
-		// Store temporarily in case a or b reference the same memory as result
-		T3 t = a.re * b.im + a.im * b.re;
-		result.re = c.re + a.re * b.re - a.im * b.im;
-		result.im = c.im + t;
-	}
+    template<typename T1, typename T2, typename T3>
+    inline static void MulAdd(const UnityComplexNumberT<T1>& a, const UnityComplexNumberT<T2>& b, const UnityComplexNumberT<T2>& c, UnityComplexNumberT<T3>& result)
+    {
+        // Store temporarily in case a or b reference the same memory as result
+        T3 t = a.re * b.im + a.im * b.re;
+        result.re = c.re + a.re * b.re - a.im * b.im;
+        result.im = c.im + t;
+    }
 
     inline T Magnitude() const
     {
@@ -154,17 +154,17 @@ public:
         writeindex = w;
     }
 
-	inline void Feed(float* buf, int numsamples, int stride)
-	{
-		int w = writeindex;
-		for(int n = 0; n < numsamples; n++)
-		{
-			if(++w == length)
-				w = 0;
-			data[w] = buf[n * stride];
-		}
-		writeindex = w;
-	}
+    inline void Feed(float* buf, int numsamples, int stride)
+    {
+        int w = writeindex;
+        for (int n = 0; n < numsamples; n++)
+        {
+            if (++w == length)
+                w = 0;
+            data[w] = buf[n * stride];
+        }
+        writeindex = w;
+    }
 
 public:
     int length;

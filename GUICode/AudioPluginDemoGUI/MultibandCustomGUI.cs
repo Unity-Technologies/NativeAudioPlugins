@@ -43,15 +43,15 @@ public class MultibandCustomGUI : FilterCurveUI
         double wm = -2.0 * 3.1415926 / samplerate;
 
         AudioCurveRendering.AudioCurveEvaluator d = delegate(float x) {
-            MathHelpers.ComplexD w = MathHelpers.ComplexD.Exp(wm * GUIHelpers.MapNormalizedFrequency((double)x, samplerate, useLogScale, true));
-            MathHelpers.ComplexD lpf  = MathHelpers.ComplexD.Pow((w * (w * coeffs[0] + coeffs[1]) + coeffs[2]) / (w * (w * coeffs[3] + coeffs[4]) + 1.0f), filterOrder);
-            MathHelpers.ComplexD bpf1 = MathHelpers.ComplexD.Pow((w * (w * coeffs[5] + coeffs[6]) + coeffs[7]) / (w * (w * coeffs[8] + coeffs[9]) + 1.0f), filterOrder);
-            MathHelpers.ComplexD bpf2 = MathHelpers.ComplexD.Pow((w * (w * coeffs[10] + coeffs[11]) + coeffs[12]) / (w * (w * coeffs[13] + coeffs[14]) + 1.0f), filterOrder);
-            MathHelpers.ComplexD hpf  = MathHelpers.ComplexD.Pow((w * (w * coeffs[15] + coeffs[16]) + coeffs[17]) / (w * (w * coeffs[18] + coeffs[19]) + 1.0f), filterOrder);
-            double h = (lpf * lowGain).Mag2() + (bpf1 * bpf2 * midGain).Mag2() + (hpf * highGain).Mag2();
-            double mag = masterGain + 10.0 * Math.Log10(h);
-            return (float)(mag * magScale);
-        };
+                MathHelpers.ComplexD w = MathHelpers.ComplexD.Exp(wm * GUIHelpers.MapNormalizedFrequency((double)x, samplerate, useLogScale, true));
+                MathHelpers.ComplexD lpf  = MathHelpers.ComplexD.Pow((w * (w * coeffs[0] + coeffs[1]) + coeffs[2]) / (w * (w * coeffs[3] + coeffs[4]) + 1.0f), filterOrder);
+                MathHelpers.ComplexD bpf1 = MathHelpers.ComplexD.Pow((w * (w * coeffs[5] + coeffs[6]) + coeffs[7]) / (w * (w * coeffs[8] + coeffs[9]) + 1.0f), filterOrder);
+                MathHelpers.ComplexD bpf2 = MathHelpers.ComplexD.Pow((w * (w * coeffs[10] + coeffs[11]) + coeffs[12]) / (w * (w * coeffs[13] + coeffs[14]) + 1.0f), filterOrder);
+                MathHelpers.ComplexD hpf  = MathHelpers.ComplexD.Pow((w * (w * coeffs[15] + coeffs[16]) + coeffs[17]) / (w * (w * coeffs[18] + coeffs[19]) + 1.0f), filterOrder);
+                double h = (lpf * lowGain).Mag2() + (bpf1 * bpf2 * midGain).Mag2() + (hpf * highGain).Mag2();
+                double mag = masterGain + 10.0 * Math.Log10(h);
+                return (float)(mag * magScale);
+            };
 
         if (filled)
             AudioCurveRendering.DrawFilledCurve(r, d, color);

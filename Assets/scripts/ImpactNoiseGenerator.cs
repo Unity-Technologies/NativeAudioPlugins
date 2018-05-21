@@ -38,7 +38,6 @@ public class ImpactNoiseGenerator : MonoBehaviour
     float lastImpact = 0.0f;
     float impact = 0.0f;
     float impactDecayConst = 0.0f;
-    float impactAmp = 0.0f;
     float impactCutoff = 0.0f;
     float impactBandwidth = 0.0f;
     float impactLPF = 0.0f;
@@ -87,7 +86,7 @@ public class ImpactNoiseGenerator : MonoBehaviour
         //Debug.Log("Collision");
 
         //foreach (ContactPoint contact in col.contacts)
-        //	Debug.DrawRay(contact.point, contact.normal, Color.red, 10.0f);
+        //  Debug.DrawRay(contact.point, contact.normal, Color.red, 10.0f);
     }
 
     void OnCollisionStay(Collision col)

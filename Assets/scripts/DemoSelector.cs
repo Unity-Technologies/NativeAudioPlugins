@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class DemoSelector : MonoBehaviour
@@ -62,7 +63,7 @@ public class DemoSelector : MonoBehaviour
             if (!header)
             {
                 if (GUILayout.Button(demos[i + 1], GUILayout.Width(155)))
-                    Application.LoadLevel(demos[i]);
+                    SceneManager.LoadScene(demos[i]);
                 i += 2;
             }
         }

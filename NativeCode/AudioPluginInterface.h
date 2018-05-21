@@ -1,6 +1,6 @@
 #pragma once
 
-#define UNITY_AUDIO_PLUGIN_API_VERSION 0x010401
+#define UNITY_AUDIO_PLUGIN_API_VERSION 0x010402
 
 #ifndef UNITY_PREFIX_CONFIGURE_H
 
@@ -173,7 +173,8 @@ enum UnityAudioEffectDefinitionFlags
     UnityAudioEffectDefinitionFlags_IsSideChainTarget           = 1 << 0,   // Does this effect need a side chain buffer and can it be targeted by a Send?
     UnityAudioEffectDefinitionFlags_IsSpatializer               = 1 << 1,   // Should this plugin be inserted at sources and take over panning?
     UnityAudioEffectDefinitionFlags_IsAmbisonicDecoder          = 1 << 2,   // Should this plugin be used for ambisonic decoding? Added in Unity 2017.1, with UNITY_AUDIO_PLUGIN_API_VERSION 0x010400.
-    UnityAudioEffectDefinitionFlags_AppliesDistanceAttenuation  = 1 << 3    // Spatializers Only: Does this spatializer apply distance-based attenuation? Added in Unity 2017.1, with UNITY_AUDIO_PLUGIN_API_VERSION 0x010400.
+    UnityAudioEffectDefinitionFlags_AppliesDistanceAttenuation  = 1 << 3,   // Spatializers Only: Does this spatializer apply distance-based attenuation? Added in Unity 2017.1, with UNITY_AUDIO_PLUGIN_API_VERSION 0x010400.
+    UnityAudioEffectDefinitionFlags_NeedsSpatializerData        = 1 << 4    // For effects that are not spatializers or ambisonic decoders, but want access to UnityAudioSpatializerData. AudioSource-related data will be set to default values for mixer effects. Added in Unity 2018.1, with UNITY_AUDIO_PLUGIN_API_VERSION 0x010402.
 };
 
 enum UnityAudioEffectStateFlags

@@ -59,33 +59,33 @@ public class GranulatorCustomGUI : IAudioEffectPluginGUI
         AudioCurveRendering.DrawSymmetricFilledCurve(
             r,
             delegate(float x, out Color color)
-        {
-            color = c0;
-            float f = Mathf.Clamp(x * xscale, 0.0f, xscale);
-            int i = (int)Mathf.Floor(f);
-            float y = (curve[i] + (curve[i + 1] - curve[i]) * (f - i)) * yscale;
-            x -= ofs;
-            if (x >= -rofs)
             {
-                if (x < 0.0f)
-                    color = Color.Lerp(color, c3, mix);
-                if (x + rofs < transition)
-                    y *= (x + rofs) * transitionScale;
-                else if (x < wlen + rwlen && x > wlen + rwlen - transition)
-                    y *= (wlen + rwlen - x) * transitionScale;
-                if (x < wlen)
-                    color = Color.Lerp(color, c1, mix);
-                else if (x < wlen + rwlen)
-                    color = Color.Lerp(color, c2, mix);
+                color = c0;
+                float f = Mathf.Clamp(x * xscale, 0.0f, xscale);
+                int i = (int)Mathf.Floor(f);
+                float y = (curve[i] + (curve[i + 1] - curve[i]) * (f - i)) * yscale;
+                x -= ofs;
+                if (x >= -rofs)
+                {
+                    if (x < 0.0f)
+                        color = Color.Lerp(color, c3, mix);
+                    if (x + rofs < transition)
+                        y *= (x + rofs) * transitionScale;
+                    else if (x < wlen + rwlen && x > wlen + rwlen - transition)
+                        y *= (wlen + rwlen - x) * transitionScale;
+                    if (x < wlen)
+                        color = Color.Lerp(color, c1, mix);
+                    else if (x < wlen + rwlen)
+                        color = Color.Lerp(color, c2, mix);
+                    else
+                        color.a *= 0.4f;
+                }
                 else
+                {
                     color.a *= 0.4f;
+                }
+                return y;
             }
-            else
-            {
-                color.a *= 0.4f;
-            }
-            return y;
-        }
             );
     }
 

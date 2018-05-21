@@ -12,13 +12,13 @@ public abstract class FilterCurveUI : IAudioEffectPluginGUI
         AudioCurveRendering.DrawCurve(
             r,
             delegate(float x)
-        {
-            double f = GUIHelpers.MapNormalizedFrequency((double)x, samplerate, useLogScale, true) * xscale;
-            int i = (int)Math.Floor(f);
-            double h = data[i] + (data[i + 1] - data[i]) * (f - i);
-            double mag = (h > 0.0) ? (20.0f * Math.Log10(h) + gainOffset_dB) : -120.0;
-            return (float)(yscale * mag);
-        },
+            {
+                double f = GUIHelpers.MapNormalizedFrequency((double)x, samplerate, useLogScale, true) * xscale;
+                int i = (int)Math.Floor(f);
+                double h = data[i] + (data[i + 1] - data[i]) * (f - i);
+                double mag = (h > 0.0) ? (20.0f * Math.Log10(h) + gainOffset_dB) : -120.0;
+                return (float)(yscale * mag);
+            },
             new Color(col_r, col_g, col_b, col_a));
     }
 
@@ -84,15 +84,15 @@ public class EqualizerCustomGUI : FilterCurveUI
 
         ComplexD one = new ComplexD(1.0f, 0.0f);
         AudioCurveRendering.AudioCurveEvaluator d = delegate(float x)
-        {
-            ComplexD w = ComplexD.Exp(wm * GUIHelpers.MapNormalizedFrequency((double)x, samplerate, useLogScale, true));
-            ComplexD hl = (!lowGain) ? one : (w * (w * coeffs[0] + coeffs[1]) + coeffs[2]) / (w * (w * coeffs[3] + coeffs[4]) + 1.0f);
-            ComplexD hp = (!midGain) ? one : (w * (w * coeffs[5] + coeffs[6]) + coeffs[7]) / (w * (w * coeffs[8] + coeffs[9]) + 1.0f);
-            ComplexD hh = (!highGain) ? one : (w * (w * coeffs[10] + coeffs[11]) + coeffs[12]) / (w * (w * coeffs[13] + coeffs[14]) + 1.0f);
-            ComplexD h = hh * hp * hl;
-            double mag = masterGain + 10.0 * Math.Log10(h.Mag2());
-            return (float)(mag * magScale);
-        };
+            {
+                ComplexD w = ComplexD.Exp(wm * GUIHelpers.MapNormalizedFrequency((double)x, samplerate, useLogScale, true));
+                ComplexD hl = (!lowGain) ? one : (w * (w * coeffs[0] + coeffs[1]) + coeffs[2]) / (w * (w * coeffs[3] + coeffs[4]) + 1.0f);
+                ComplexD hp = (!midGain) ? one : (w * (w * coeffs[5] + coeffs[6]) + coeffs[7]) / (w * (w * coeffs[8] + coeffs[9]) + 1.0f);
+                ComplexD hh = (!highGain) ? one : (w * (w * coeffs[10] + coeffs[11]) + coeffs[12]) / (w * (w * coeffs[13] + coeffs[14]) + 1.0f);
+                ComplexD h = hh * hp * hl;
+                double mag = masterGain + 10.0 * Math.Log10(h.Mag2());
+                return (float)(mag * magScale);
+            };
 
         if (filled)
             AudioCurveRendering.DrawFilledCurve(r, d, color);

@@ -5,7 +5,6 @@ using System.Collections;
 public class GlottalControl : MonoBehaviour
 {
     public AudioMixer mixer;
-    private float speed = 50.0f;
 
     void Start()
     {

@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 // Small 3D fractal raytracer running in a full-screen pixel shader
 // Distance estimation is used to traverse space from the eye to the intersection point -- for more information on this topic see http://iquilezles.org/www/
 // The basic distance function used is a Sierpinski triangle (see comment below)
@@ -34,7 +36,7 @@ Shader "Custom/fractal"
             vertOut vert(in appdata_base v)
             {
                 vertOut o;
-                o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+                o.pos = UnityObjectToClipPos (v.vertex);
                 o.scrPos = ComputeScreenPos(o.pos);
                 return o;
             }

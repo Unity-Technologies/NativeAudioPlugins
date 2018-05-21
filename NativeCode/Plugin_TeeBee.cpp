@@ -158,10 +158,13 @@ namespace TeeBee
             float outval = data->phase * 2.0f - 1.0f;
             float lfocut = 0.5f + 0.5f * sinf(data->lfophase * 2.0f * kPI);
             float cut = data->p[P_CUT] + data->cutrnd + data->env + lfocut * (data->p[P_LFOCUT] + data->lfoenv * data->p[P_LFOCUTENV]);
-            if (cut < 0.0f) cut = 0.0f; else if (cut > max_cut)
+            if (cut < 0.0f)
+                cut = 0.0f;
+            else if (cut > max_cut)
                 cut = max_cut;
             cut = 2.0f * sinf(0.5f * kPI * cut * st);
-            if (cut > 1.4f) cut = 1.4f;
+            if (cut > 1.4f)
+                cut = 1.4f;
             float bw = 1.0f - data->p[P_RES];
             data->env = data->env * envdecay + 1.0e-11f;
             data->lfoenv = data->lfoenv * envdecay + 1.0e-11f;
@@ -180,5 +183,4 @@ namespace TeeBee
 
         return UNITY_AUDIODSP_OK;
     }
-
 }

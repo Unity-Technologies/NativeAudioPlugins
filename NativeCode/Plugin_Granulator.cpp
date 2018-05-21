@@ -404,7 +404,8 @@ extern "C" UNITY_AUDIODSP_EXPORT_API const char* Granulator_GetSampleName(int in
     if (index < 0)
         return "Input";
 
-    if (index < Granulator::MAXSAMPLE) ;
+    if (index < Granulator::MAXSAMPLE)
+        ;
     {
         MutexScopeLock mutexScope(Granulator::sampleMutex);
         Granulator::GranulatorSample* s = &Granulator::GetGranulatorSample(index);

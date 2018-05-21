@@ -103,9 +103,10 @@ namespace Spatializer
     inline bool IsHostCompatible(UnityAudioEffectState* state)
     {
         // Somewhat convoluted error checking here because hostapiversion is only supported from SDK version 1.03 (i.e. Unity 5.2) and onwards.
+        // Since we are only checking for version 0x010300 here, we can't use newer fields in the UnityAudioSpatializerData struct, such as minDistance and maxDistance.
         return
             state->structsize >= sizeof(UnityAudioEffectState) &&
-            state->hostapiversion >= UNITY_AUDIO_PLUGIN_API_VERSION;
+            state->hostapiversion >= 0x010300;
     }
 
     int InternalRegisterEffectDefinition(UnityAudioEffectDefinition& definition)

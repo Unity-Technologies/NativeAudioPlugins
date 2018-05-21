@@ -35,12 +35,12 @@ public class ConvolutionReverbCustomGUI : IAudioEffectPluginGUI
         AudioCurveRendering.DrawSymmetricFilledCurve(
             r,
             delegate(float x, out Color color)
-        {
-            float f = Mathf.Clamp(x * xscale, 0.0f, xscale);
-            int i = (int)Mathf.Floor(f);
-            color = new Color(col.r, col.g, col.b, col.a * wetLevel);
-            return (curve[i] + (curve[i + 1] - curve[i]) * (f - i)) * yscale;
-        }
+            {
+                float f = Mathf.Clamp(x * xscale, 0.0f, xscale);
+                int i = (int)Mathf.Floor(f);
+                color = new Color(col.r, col.g, col.b, col.a * wetLevel);
+                return (curve[i] + (curve[i + 1] - curve[i]) * (f - i)) * yscale;
+            }
             );
     }
 

@@ -123,17 +123,17 @@ namespace MathHelpers
         public double Mag2() { return real * real + imag * imag; }
         public double Mag() { return Math.Sqrt(Mag2()); }
 
-        public static ComplexD operator +(ComplexD a, ComplexD b) { return Add(a, b); }
-        public static ComplexD operator -(ComplexD a, ComplexD b) { return Sub(a, b); }
-        public static ComplexD operator *(ComplexD a, ComplexD b) { return Mul(a, b); }
-        public static ComplexD operator /(ComplexD a, ComplexD b) { return Div(a, b); }
-        public static ComplexD operator +(ComplexD a, double b) { return Add(a, b); }
-        public static ComplexD operator -(ComplexD a, double b) { return Sub(a, b); }
-        public static ComplexD operator *(ComplexD a, double b) { return Mul(a, b); }
-        public static ComplexD operator /(ComplexD a, double b) { return Div(a, b); }
-        public static ComplexD operator +(double a, ComplexD b) { return Add(a, b); }
-        public static ComplexD operator -(double a, ComplexD b) { return Sub(a, b); }
-        public static ComplexD operator *(double a, ComplexD b) { return Mul(a, b); }
-        public static ComplexD operator /(double a, ComplexD b) { return Div(a, b); }
+        public static ComplexD operator+(ComplexD a, ComplexD b) { return Add(a, b); }
+        public static ComplexD operator-(ComplexD a, ComplexD b) { return Sub(a, b); }
+        public static ComplexD operator*(ComplexD a, ComplexD b) { return Mul(a, b); }
+        public static ComplexD operator/(ComplexD a, ComplexD b) { return Div(a, b); }
+        public static ComplexD operator+(ComplexD a, double b) { return Add(a, b); }
+        public static ComplexD operator-(ComplexD a, double b) { return Sub(a, b); }
+        public static ComplexD operator*(ComplexD a, double b) { return Mul(a, b); }
+        public static ComplexD operator/(ComplexD a, double b) { return Div(a, b); }
+        public static ComplexD operator+(double a, ComplexD b) { return Add(a, b); }
+        public static ComplexD operator-(double a, ComplexD b) { return Sub(a, b); }
+        public static ComplexD operator*(double a, ComplexD b) { return Mul(a, b); }
+        public static ComplexD operator/(double a, ComplexD b) { return Div(a, b); }
     }
 }
