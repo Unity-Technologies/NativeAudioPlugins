@@ -6,6 +6,9 @@
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(_WIN64)
 #   define PLATFORM_WIN 1
+#   if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#       define PLATFORM_WINRT 1
+#   endif
 #elif defined(__MACH__) || defined(__APPLE__)
 #   define PLATFORM_OSX 1
 #elif defined(__ANDROID__)
@@ -14,7 +17,7 @@
 #   define PLATFORM_LINUX 1
 #endif
 
-#if defined(_AMD64_) || defined(__LP64__)
+#if defined(_AMD64_) || defined(__LP64__) || defined(_M_ARM64)
 #   define PLATFORM_ARCH_64 1
 #   define PLATFORM_ARCH_32 0
 #else
@@ -131,7 +134,7 @@ typedef signed long long SInt64;
 #endif
 
 // Attribute to make function be exported from a plugin
-#if PLATFORM_WIN & !PLATFORM_WINRT
+#if PLATFORM_WIN
     #define UNITY_AUDIODSP_EXPORT_API __declspec(dllexport)
 #else
     #define UNITY_AUDIODSP_EXPORT_API

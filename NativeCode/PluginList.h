@@ -27,6 +27,6 @@ DECLARE_EFFECT("Demo Spatializer Reverb", SpatializerReverb)
 DECLARE_EFFECT("Demo Teleport", Teleport)
 #endif
 
-#if PLATFORM_OSX | PLATFORM_WIN
+#if PLATFORM_OSX | (PLATFORM_WIN && !PLATFORM_WINRT)
 DECLARE_EFFECT("Demo Synthesizer", Synthesizer)
 #endif

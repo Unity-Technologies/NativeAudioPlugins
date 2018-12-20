@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\AudioPluginUtil.cpp" />
+    <ClCompile Include="..\hrtftable.cpp" />
+    <ClCompile Include="..\Plugin_ConvolutionReverb.cpp" />
+    <ClCompile Include="..\Plugin_CorrelationMeter.cpp" />
+    <ClCompile Include="..\Plugin_Equalizer.cpp" />
+    <ClCompile Include="..\Plugin_Granulator.cpp" />
+    <ClCompile Include="..\Plugin_ImpactGenerator.cpp" />
+    <ClCompile Include="..\Plugin_ImpulseGenerator.cpp" />
+    <ClCompile Include="..\Plugin_Lofinator.cpp" />
+    <ClCompile Include="..\Plugin_LevelMixer.cpp" />
+    <ClCompile Include="..\Plugin_LoudnessMeter.cpp" />
+    <ClCompile Include="..\Plugin_ModalFilter.cpp" />
+    <ClCompile Include="..\Plugin_Multiband.cpp" />
+    <ClCompile Include="..\Plugin_NoiseBox.cpp" />
+    <ClCompile Include="..\Plugin_Oscilloscope.cpp" />
+    <ClCompile Include="..\Plugin_PitchDetector.cpp" />
+    <ClCompile Include="..\Plugin_RingModulator.cpp" />
+    <ClCompile Include="..\Plugin_Routing.cpp" />
+    <ClCompile Include="..\Plugin_Spatializer.cpp" />
+    <ClCompile Include="..\Plugin_SpatializerReverb.cpp" />
+    <ClCompile Include="..\Plugin_StereoWidener.cpp" />
+    <ClCompile Include="..\Plugin_Synthesizer.cpp" />
+    <ClCompile Include="..\Plugin_TeeBee.cpp" />
+    <ClCompile Include="..\Plugin_TeeDee.cpp" />
+    <ClCompile Include="..\Plugin_Teleport.cpp" />
+    <ClCompile Include="..\Plugin_TubeResonator.cpp" />
+    <ClCompile Include="..\Plugin_Vocoder.cpp" />
+    <ClCompile Include="..\Plugin_WahWah.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\AudioPluginInterface.h" />
+    <ClInclude Include="..\AudioPluginUtil.h" />
+    <ClInclude Include="..\PluginList.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AudioPluginDemo.def" />
+  </ItemGroup>
+</Project>

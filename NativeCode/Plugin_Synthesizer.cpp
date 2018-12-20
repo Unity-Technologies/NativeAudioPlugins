@@ -1,5 +1,7 @@
 #include "AudioPluginUtil.h"
 
+#if !PLATFORM_WINRT
+
 struct MidiEvent
 {
     UInt64 sample;
@@ -556,3 +558,5 @@ namespace Synthesizer
         Synthesizer_AddMessage(0, 0xF8);
     }
 }
+
+#endif

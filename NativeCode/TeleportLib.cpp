@@ -1,11 +1,34 @@
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(_WIN64)
 #define UNITY_WIN 1
+#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#    define UNITY_WINRT 1
+#endif
 #elif defined(__MACH__) || defined(__APPLE__)
 #define UNITY_OSX 1
 #elif defined(__ANDROID__)
 #define UNITY_ANDROID 1
 #elif defined(__linux__)
 #define UNITY_LINUX 1
+#endif
+
+#ifndef UNITY_WIN
+#define UNITY_WIN 0
+#endif
+
+#ifndef UNITY_WINRT
+#define UNITY_WINRT 0
+#endif
+
+#ifndef UNITY_OSX
+#define UNITY_OSX 0
+#endif
+
+#ifndef UNITY_ANDROID
+#define UNITY_ANDROID 0
+#endif
+
+#ifndef UNITY_LINUX
+#define UNITY_LINUX 0
 #endif
 
 #include <stdio.h>
@@ -99,16 +122,31 @@ namespace Teleport
             for (int attempt = 0; attempt < 10; attempt++)
             {
                 bool clearmemory = true;
-                char filename[1024];
 
 #if UNITY_WIN
 
+#if !UNITY_WINRT
+                char filename[1024];
                 sprintf_s(filename, "UnityAudioTeleport%d", attempt);
                 hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(SharedMemory), filename);
+#else
+                wchar_t filePath[MAX_PATH];
+                GetTempPathW(MAX_PATH, filePath);
+
+                wchar_t fileName[30];
+                swprintf_s(fileName, L"UnityAudioTeleport%d", attempt);
+
+                wcscat_s(filePath, fileName);                
+                hMapFile = CreateFileMappingFromApp(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, sizeof(SharedMemory), filePath);
+#endif
                 if (hMapFile == NULL)
                 {
                     clearmemory = false;
+#if !UNITY_WINRT
                     hMapFile = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, filename);
+#else
+                    hMapFile = OpenFileMappingFromApp(FILE_MAP_ALL_ACCESS, FALSE, filePath);
+#endif
                 }
                 if (hMapFile == NULL)
                 {
@@ -125,6 +163,8 @@ namespace Teleport
                 }
 
 #else
+                char filename[1024];
+
 #if UNITY_LINUX
                 // a shared memory object should be identified by a name of the form /somename;
                 // that is, a null-terminated string of up to NAME_MAX (i.e.,  255)  characters consisting of an initial slash,
