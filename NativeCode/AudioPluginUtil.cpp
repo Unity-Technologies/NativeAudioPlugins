@@ -408,7 +408,7 @@ ns::GetFloatParameterCallback, \
 ns::GetFloatBufferCallback, \
 ns::InternalRegisterEffectDefinition);
 
-extern "C" UNITY_AUDIODSP_EXPORT_API int UnityGetAudioEffectDefinitions(UnityAudioEffectDefinition*** definitionptr)
+extern "C" UNITY_AUDIODSP_EXPORT_API int AUDIO_CALLING_CONVENTION UnityGetAudioEffectDefinitions(UnityAudioEffectDefinition*** definitionptr)
 {
     static UnityAudioEffectDefinition definition[256];
     static UnityAudioEffectDefinition* definitionp[256];

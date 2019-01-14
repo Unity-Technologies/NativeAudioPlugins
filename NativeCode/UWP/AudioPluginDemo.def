@@ -1,0 +1,17 @@
+LIBRARY
+EXPORTS
+    ConvolutionReverb_GetSampleName
+    ConvolutionReverb_UploadSample
+    Granulator_DebugGetGrainCount
+    Granulator_GetSampleName
+    Granulator_UploadSample
+    ImpactGenerator_AddImpact
+    PitchDetectorDebug
+    PitchDetectorGetFreq
+    RoutingDemo_GetData
+    TeleportFeed
+    TeleportGetNumBuffered
+    TeleportGetParameter
+    TeleportRead
+    TeleportSetParameter
+    UnityGetAudioEffectDefinitions
