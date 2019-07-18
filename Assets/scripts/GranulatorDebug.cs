@@ -13,9 +13,8 @@ public class GranulatorDebug : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void OnGUI()
     {
-        var guitext = GetComponent<GUIText>();
-        guitext.text = "Grain count: " + Granulator_DebugGetGrainCount();
+        GUILayout.Label("Current grain count: " + Granulator_DebugGetGrainCount() + " grains");
     }
 }

@@ -8,8 +8,8 @@ public class ShowPlayPos : MonoBehaviour
     {
     }
 
-    void Update()
+    void OnGUI()
     {
-        GetComponent<GUIText>().text = GetComponent<AudioSource>().time.ToString();
+        GUILayout.Label(GetComponent<AudioSource>().time.ToString());
     }
 }

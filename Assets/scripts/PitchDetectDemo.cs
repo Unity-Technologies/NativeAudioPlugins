@@ -20,8 +20,7 @@ public class PitchDetectDemo : MonoBehaviour
     public string frequency = "detected frequency";
     public string note = "detected note";
     public AudioMixer mixer;
-
-    public GUIText text;
+    public InfoText pitchText;
 
     // Use this for initialization
     void Start()
@@ -48,8 +47,8 @@ public class PitchDetectDemo : MonoBehaviour
             note = "unknown";
         }
 
-        if (text != null)
-            text.text = "Detected frequency: " + frequency + "\nDetected note: " + note + " (deviation: " + deviation + " cents)";
+        if (pitchText != null)
+            pitchText.text = "Detected frequency: " + frequency + "\nDetected note: " + note + " (deviation: " + deviation + " cents)";
     }
 
     Vector3 Plot(float[] data, int num, float x0, float y0, float w, float h, Color col, float thr)
