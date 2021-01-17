@@ -9,7 +9,7 @@
 *.sublime-workspace
 
 # Xcode
-xcuserdata
+xcuserdata/
 build
 CoreAudioUtilityClasses
 CoreAudioUtilityClasses.zip
