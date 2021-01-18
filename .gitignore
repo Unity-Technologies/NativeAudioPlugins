@@ -1,0 +1,47 @@
+# OS files
+.DS_Store
+*.orig
+*.bak
+*~
+*.tmp
+*.rej
+\#*\#
+*.sublime-workspace
+
+# Xcode
+xcuserdata/
+build
+CoreAudioUtilityClasses
+CoreAudioUtilityClasses.zip
+
+# Unity
+Library
+bin
+obj
+UserSettings/
+Temp/
+Logs/
+*.orig.*
+
+# VS
+*.csproj.user
+!PlatformDependent/WinRT/Tests/VSUnitTests/Assembly-CSharp/Assembly-CSharp.csproj.user
+*.suo
+*.vcxproj.user
+.vs/
+
+# VS intellisense files next to solution file for C++ projects - global configuration should perhaps place it elsewhere
+*.sdf
+
+# temporary locking file for solution access
+*.opensdf
+
+# resharper
+*.sln.DotSettings.user
+
+# MonoDevelop
+*.userprefs
+
+# ctags:
+.tags
+.tags_sorted_by_file
