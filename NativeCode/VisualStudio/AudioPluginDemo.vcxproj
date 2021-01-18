@@ -92,9 +92,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;winmm.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir ..\..\Assets\Plugins\x86
-copy $(TargetPath) ..\..\Assets\Plugins\x86\$(TargetName).dll
-</Command>
+      <Command>xcopy /y "$(TargetPath)" "..\..\Assets\Plugins\x86\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -116,9 +114,7 @@ copy $(TargetPath) ..\..\Assets\Plugins\x86\$(TargetName).dll
       <AdditionalDependencies>kernel32.lib;user32.lib;winmm.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir ..\..\Assets\Plugins\x86_64
-copy /y $(TargetPath) ..\..\Assets\Plugins\x86_64\$(TargetName).dll
-</Command>
+      <Command>xcopy /y "$(TargetPath)" "..\..\Assets\Plugins\x86_64\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -146,9 +142,7 @@ copy /y $(TargetPath) ..\..\Assets\Plugins\x86_64\$(TargetName).dll
       <AdditionalDependencies>kernel32.lib;user32.lib;winmm.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir ..\..\Assets\Plugins\x86
-copy $(TargetPath) ..\..\Assets\Plugins\x86\$(TargetName).dll
-</Command>
+      <Command>xcopy /y "$(TargetPath)" "..\..\Assets\Plugins\x86\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -177,9 +171,7 @@ copy $(TargetPath) ..\..\Assets\Plugins\x86\$(TargetName).dll
       <AdditionalDependencies>kernel32.lib;user32.lib;winmm.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir ..\..\Assets\Plugins\x86_64
-copy /y $(TargetPath) ..\..\Assets\Plugins\x86_64\$(TargetName).dll
-</Command>
+      <Command>xcopy /y "$(TargetPath)" "..\..\Assets\Plugins\x86_64\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
