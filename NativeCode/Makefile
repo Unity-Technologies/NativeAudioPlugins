@@ -11,7 +11,7 @@ Plugin_LoudnessMeter.cpp \
 Plugin_ModalFilter.cpp \
 Plugin_Multiband.cpp \
 Plugin_NoiseBox.cpp \
-Plugin_Oscilloscope.cpp
+Plugin_Oscilloscope.cpp \
 Plugin_PitchDetector.cpp \
 Plugin_RingModulator.cpp \
 Plugin_Routing.cpp \
@@ -26,7 +26,7 @@ Plugin_TubeResonator.cpp \
 Plugin_Vocoder.cpp \
 Plugin_WahWah.cpp \
 hrtftable.cpp
-OBJS=$(SRCS:.cpp=*.o)
+OBJS=$(SRCS:.cpp=.o)
 OUTPUT=libAudioPluginDemo.so
 CXXFLAGS=-I. -O2 -fPIC
 LDFLAGS=-shared -rdynamic -fPIC
