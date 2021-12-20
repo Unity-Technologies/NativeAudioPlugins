@@ -82,7 +82,7 @@ namespace ModalFilter
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
         RegisterParameter(definition, "Random seed", "", 0.0f, 100000.0f, 0.0f, 1.0f, 1.0f, P_SEED, "Random seed, selects locations of modes and their bandwidth randomly");
-        RegisterParameter(definition, "Num modes", "", 1.0f, MAXRESONATORS, 10.0f, 1.0f, 1.0f, P_NUMMODES, "Number of modes or partials");
+        RegisterParameter(definition, "Num modes", "", 1.0f, (float)MAXRESONATORS, 10.0f, 1.0f, 1.0f, P_NUMMODES, "Number of modes or partials");
         RegisterParameter(definition, "Freq shift", "Hz", -3000.0f, 3000.0f, 0.0f, 1.0f, 1.0f, P_FREQSHIFT, "Frequency shift in Hz");
         RegisterParameter(definition, "Freq shift var", "Hz", -3000.0f, 3000.0f, 0.01f, 1.0f, 1.0f, P_FREQSHIFTVAR, "Randomized frequency shift in Hz");
         RegisterParameter(definition, "Freq scale", "", -10.0f, 10.0f, 1.0f, 1.0f, 1.0f, P_FREQSCALE, "Frequency scaling in Hz");

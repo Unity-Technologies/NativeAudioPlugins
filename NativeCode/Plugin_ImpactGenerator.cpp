@@ -64,10 +64,10 @@ namespace ImpactGenerator
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Instance", "", 0.0f, MAXINSTANCES - 1, 0.0f, 1.0f, 1.0f, P_INSTANCE, "Determines the instance from which impacts are received via ImpactGenerator_AddImpact");
+        RegisterParameter(definition, "Instance", "", 0.0f, (float)(MAXINSTANCES - 1), 0.0f, 1.0f, 1.0f, P_INSTANCE, "Determines the instance from which impacts are received via ImpactGenerator_AddImpact");
         RegisterParameter(definition, "Gain", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN, "Overall gain");
         RegisterParameter(definition, "Threshold", "dB", -120.0f, 0.0f, -60.0f, 1.0f, 1.0f, P_THR, "Threshold after which impacts stop playing");
-        RegisterParameter(definition, "MaxImpacts", "", 1.0f, MAXIMPACTS, 200.0f, 1.0f, 1.0f, P_MAXIMPACTS, "Maximum number of impact sounds played simultaneously on this instance");
+        RegisterParameter(definition, "MaxImpacts", "", 1.0f, (float)MAXIMPACTS, 200.0f, 1.0f, 1.0f, P_MAXIMPACTS, "Maximum number of impact sounds played simultaneously on this instance");
         return numparams;
     }
 

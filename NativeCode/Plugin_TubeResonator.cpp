@@ -65,7 +65,7 @@ namespace TubeResonator
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Num sections", "", 1.0f, MAXSECTIONS, 3.0f, 1.0f, 1.0f, P_NUMSECTIONS, "Number of sections");
+        RegisterParameter(definition, "Num sections", "", 1.0f, (float)MAXSECTIONS, 3.0f, 1.0f, 1.0f, P_NUMSECTIONS, "Number of sections");
         RegisterParameter(definition, "Feedback", "%", 0.0f, 1.0f, 0.5f, 100.0f, 1.0f, P_FB, "Feedback");
         RegisterParameter(definition, "Nonlinearity", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_NL, "Amount of nonlinearity at reflection");
         RegisterParameter(definition, "Mike position", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_MIKEPOS, "Microphone position");
