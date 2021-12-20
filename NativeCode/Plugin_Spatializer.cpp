@@ -239,7 +239,7 @@ namespace Spatializer
         float spreadmatrix[2] = { 2.0f - spread, spread };
 
         float* reverb = reverbmixbuffer;
-        for (int sampleOffset = 0; sampleOffset < length; sampleOffset += HRTFLEN)
+        for (unsigned int sampleOffset = 0; sampleOffset < length; sampleOffset += HRTFLEN)
         {
             for (int c = 0; c < 2; c++)
             {

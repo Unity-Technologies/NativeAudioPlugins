@@ -219,7 +219,7 @@ namespace Synthesizer
             channels[1].Reset();
             this->p = p;
             this->sampletime = sampletime;
-            this->note = note;
+            this->note = (float)note;
             for (int i = 0; i < MAXOSCILLATORS; i++)
             {
                 channels[0].phase[i] = random.Get();
@@ -248,10 +248,10 @@ namespace Synthesizer
             float st = sampletime * (const float)(0x100000000 / OVERSAMPLING);
             float dt1 = p[P_DETUNE1] + 0.5f * p[P_DETUNE2];
             float dt2 = p[P_DETUNE1] - 0.5f * p[P_DETUNE2];
-            channels[0].freq = FreqFromNote(note - dt1) * st;
-            channels[1].freq = FreqFromNote(note - dt2) * st;
-            channels[0].detune = (FreqFromNote(note + dt1) * st - channels[0].freq) * ONE_OVER_MAXOSCILLATORS;
-            channels[1].detune = (FreqFromNote(note + dt2) * st - channels[1].freq) * ONE_OVER_MAXOSCILLATORS;
+            channels[0].freq = (UInt32)(FreqFromNote(note - dt1) * st);
+            channels[1].freq = (UInt32)(FreqFromNote(note - dt2) * st);
+            channels[0].detune = (UInt32)((FreqFromNote(note + dt1) * st - channels[0].freq) * ONE_OVER_MAXOSCILLATORS);
+            channels[1].detune = (UInt32)((FreqFromNote(note + dt2) * st - channels[1].freq) * ONE_OVER_MAXOSCILLATORS);
             channels[0].mask = ((UInt32)FastFloor(p[P_TYPE] * 127) + 128) << 24;
             channels[1].mask = ((UInt32)FastFloor(p[P_TYPE] * 127) + 128) << 24;
         }
@@ -344,7 +344,7 @@ namespace Synthesizer
                 Voice* v = voicepool[k];
                 v->FrameSetup();
                 float* dst = outbuffer;
-                for (unsigned int n = 0; n < length; n++)
+                for (int n = 0; n < length; n++)
                 {
                     v->Process(dst[0], dst[1]);
                     dst += outchannels;
@@ -528,7 +528,7 @@ namespace Synthesizer
                 }
                 data->numpending = j;
             }
-            int block = nextevent - currtick;
+            int block = (int)(nextevent - currtick);
             if (block == 0)
                 continue;
             if (block > samplesleft)

@@ -75,8 +75,8 @@ namespace Vocoder
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
-        EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-        delete data;
+        EffectData* effectdata = state->GetEffectData<EffectData>();
+        delete effectdata;
         return UNITY_AUDIODSP_OK;
     }
 
@@ -111,7 +111,7 @@ namespace Vocoder
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectState* state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int outchannels)
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-        float gain = powf(10.0f, 0.05f * data->p[P_GAIN] + 2.5);
+        float gain = powf(10.0f, 0.05f * data->p[P_GAIN] + 2.5f);
         float maxfreq = 0.25f * state->samplerate;
         float sampletime = 1.0f / (float)state->samplerate;
         float w0 = 0.5f * kPI * sampletime;

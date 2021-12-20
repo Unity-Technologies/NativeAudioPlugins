@@ -122,12 +122,12 @@ namespace SpatializerReverb
             const InstanceChannel::Tap* tap_end = ch.taps + numtaps;
 
             float decay = powf(0.01f, 1.0f / (float)numtaps);
-            float p = 0.0f, amp = (decay - 1.0f) / (powf(decay, numtaps + 1) - 1.0f);
+            float p = 0.0f, amp = (decay - 1.0f) / (powf(decay, numtaps + 1.0f) - 1.0f);
             InstanceChannel::Tap* tap = ch.taps;
             while (tap != tap_end)
             {
                 p += data->random.GetFloat(0.0f, 100.0f);
-                tap->pos = p;
+                tap->pos = (int)p;
                 tap->amp = amp;
                 amp *= decay;
                 ++tap;
@@ -137,11 +137,11 @@ namespace SpatializerReverb
             tap = ch.taps;
             while (tap != tap_end)
             {
-                tap->pos *= scale;
+                tap->pos *= (int)scale;
                 ++tap;
             }
 
-            for (int n = 0; n < length; n++)
+            for (unsigned int n = 0; n < length; n++)
             {
                 ch.delay.Write(inbuffer[n * 2 + c] + reverbmixbuffer[n * 2 + c]);
 

@@ -71,7 +71,7 @@ namespace Granulator
             sample = _sample;
             channel = _channel;
             wrapping = _wrapping;
-            float maxtime = sample->numsamples - 1;
+            float maxtime = (float)(sample->numsamples - 1);
             length = (int)(maxtime * random.GetFloat(params[P_WLEN], params[P_WLEN] + params[P_RWLEN]));
             float invlength = 1.0f / (float)length;
             offset = delaypos + maxtime * FastClip(random.GetFloat(params[P_OFFSET] - params[P_ROFS], params[P_OFFSET]), 0.0f, 1.0f);
@@ -258,7 +258,7 @@ namespace Granulator
 
         // Fill in live data
         const float* src = inbuffer;
-        for (int n = 0; n < length; n++)
+        for (unsigned int n = 0; n < length; n++)
         {
             bool record = false;
             for (int i = 0; i < inchannels; i++)
@@ -278,7 +278,7 @@ namespace Granulator
                     // Calculate integrated signal on the fly for better reconstruction in GetFloatBufferCallback.
                     // The small leak of 0.1% prevents build-up of DC.
                     data->integrator[i] = data->integrator[i] * 0.9999f + fabsf(src[i]);
-                    data->delay.preview[data->delaypos * inchannels + i] = data->integrator[i];
+                    data->delay.preview[data->delaypos * inchannels + i] = (float)(data->integrator[i]);
                 }
             }
             src += inchannels;
@@ -300,7 +300,7 @@ namespace Granulator
         // Fill in new grains
         float rate = data->p[P_RATE] + data->p[P_RRATE] * data->nextrandtime;
         float nexteventsample = (rate > 0.0f) ? (samplerate / rate) : 100000000;
-        for (int n = 0; n < length; n++)
+        for (unsigned int n = 0; n < length; n++)
         {
             if (++data->samplecounter >= nexteventsample)
             {
@@ -330,7 +330,7 @@ namespace Granulator
         while (g < g_end)
         {
             float* dst = outbuffer;
-            for (int n = 0; n < length; n++)
+            for (unsigned int n = 0; n < length; n++)
             {
                 float s = g->Scan();
                 dst[0] += s * (1.0f - g->pan);
@@ -342,7 +342,7 @@ namespace Granulator
             else
                 ++g;
         }
-        data->activegrains = g_end - data->grains;
+        data->activegrains = (int)(g_end - data->grains);
 
         return UNITY_AUDIODSP_OK;
     }
@@ -368,7 +368,7 @@ extern "C" UNITY_AUDIODSP_EXPORT_API bool Granulator_UploadSample(int index, flo
         s.data = new float[num];
         s.preview = new float[num];
         s.allocated = 1;
-        strcpy(s.name, name);
+        strcpy_s(s.name, name);
         memcpy(s.data, data, num * sizeof(float));
         double integrator[8]; memset(integrator, 0, sizeof(integrator));
         float* src = s.data;
@@ -380,7 +380,7 @@ extern "C" UNITY_AUDIODSP_EXPORT_API bool Granulator_UploadSample(int index, flo
                 // Calculate full integrated signal for better reconstruction in GetFloatBufferCallback.
                 // The small leak of 0.1% prevents build-up of DC.
                 integrator[i] = integrator[i] * 0.9999f + fabsf(*src++);
-                *dst++ = integrator[i];
+                *dst++ = (float)(integrator[i]);
             }
         }
     }
@@ -405,7 +405,6 @@ extern "C" UNITY_AUDIODSP_EXPORT_API const char* Granulator_GetSampleName(int in
         return "Input";
 
     if (index < Granulator::MAXSAMPLE)
-        ;
     {
         MutexScopeLock mutexScope(Granulator::sampleMutex);
         Granulator::GranulatorSample* s = &Granulator::GetGranulatorSample(index);

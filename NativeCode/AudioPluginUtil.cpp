@@ -1,12 +1,16 @@
 #include "AudioPluginUtil.h"
 #include <stdarg.h>
 
+namespace AudioPluginUtil
+{
+
 #define ENABLE_TESTS ((PLATFORM_WIN || PLATFORM_OSX) && 1)
 
 char* strnew(const char* src)
 {
-    char* newstr = new char[strlen(src) + 1];
-    strcpy(newstr, src);
+    size_t size = strlen(src) + (size_t)1;
+    char* newstr = new char[size];
+    memcpy(newstr, src, size);
     return newstr;
 }
 
@@ -15,7 +19,7 @@ char* tmpstr(int index, const char* fmtstr, ...)
     static char buf[4][1024];
     va_list args;
     va_start(args, fmtstr);
-    vsprintf(buf[index], fmtstr, args);
+    vsprintf_s(buf[index], fmtstr, args);
     va_end(args);
     return buf[index];
 }
@@ -26,7 +30,7 @@ template<typename T>
 static void FFTProcess(UnityComplexNumber* data, int numsamples, bool forward)
 {
     unsigned int count = 1, numbits = 0;
-    while (count < numsamples)
+    while (count < (unsigned)numsamples)
     {
         count += count;
         ++numbits;
@@ -37,7 +41,7 @@ static void FFTProcess(UnityComplexNumber* data, int numsamples, bool forward)
     if (tbl == NULL)
     {
         tbl = new unsigned int[numsamples];
-        for (unsigned int n = 0; n < numsamples; n++)
+        for (unsigned int n = 0; n < (unsigned)numsamples; n++)
         {
             unsigned int j = 1, k = 0, m = numsamples >> 1;
             while (m > 0)
@@ -50,7 +54,7 @@ static void FFTProcess(UnityComplexNumber* data, int numsamples, bool forward)
             tbl[n] = k;
         }
 #if ENABLE_TESTS
-        for (unsigned int n = 0; n < numsamples; n++)
+        for (unsigned int n = 0; n < (unsigned)numsamples; n++)
         {
             assert(tbl[tbl[n]] == n);
         }
@@ -58,7 +62,7 @@ static void FFTProcess(UnityComplexNumber* data, int numsamples, bool forward)
         reversetable[numbits] = tbl;
     }
 
-    for (unsigned int i = 0; i < numsamples; i++)
+    for (unsigned int i = 0; i < (unsigned)numsamples; i++)
     {
         unsigned int j = tbl[i];
         if (i < j)
@@ -257,6 +261,7 @@ void HistoryBuffer::ReadBuffer(float* buffer, int numsamplesTarget, int numsampl
     buffer[numsamplesTarget] = (float)n; // how many samples were written
 }
 
+#ifndef PLATFORM_MUTEX
 Mutex::Mutex()
 {
 #if PLATFORM_WIN
@@ -310,6 +315,7 @@ void Mutex::Unlock()
     pthread_mutex_unlock(&mutex);
 #endif
 }
+#endif
 
 void RegisterParameter(
     UnityAudioEffectDefinition& definition,
@@ -381,6 +387,8 @@ void DeclareEffect(
     definition.getfloatbuffer = getfloatbuffercallback;
     registereffectdefcallback(definition);
 }
+
+} // namespace AudioPluginUtil
 
 #define DECLARE_EFFECT(namestr, ns) \
     namespace ns \

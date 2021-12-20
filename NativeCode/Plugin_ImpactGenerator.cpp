@@ -97,7 +97,7 @@ namespace ImpactGenerator
         {
             ImpactInstance* instance = GetImpactInstance((int)data->p[P_INSTANCE]);
             if (instance != NULL)
-                instance->maximpacts = value;
+                instance->maximpacts = (int)value;
         }
         return UNITY_AUDIODSP_OK;
     }

@@ -6,14 +6,23 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 
 #if PLATFORM_WIN
 #   include <windows.h>
 #else
+#ifndef PLATFORM_MUTEX
 #   include <pthread.h>
-#   define strcpy_s strcpy
 #endif
+#   define strcpy_s strcpy
+#   define vsprintf_s vsprintf
+#endif
+
+#ifdef PLATFORM_MUTEX
+#include "PlatformMutex.h"
+#endif
+
+namespace AudioPluginUtil
+{
 
 typedef int (*InternalEffectDefinitionRegistrationCallback)(UnityAudioEffectDefinition& desc);
 
@@ -66,15 +75,15 @@ public:
     template<typename T1, typename T2, typename T3>
     inline static void Add(const UnityComplexNumberT<T1>& a, const UnityComplexNumberT<T2>& b, UnityComplexNumberT<T3>& result)
     {
-        result.re = a.re + b.re;
-        result.im = a.im + b.im;
+        result.re = static_cast<T1>(a.re + b.re);
+        result.im = static_cast<T1>(a.im + b.im);
     }
 
     template<typename T1, typename T2, typename T3>
     inline static void Sub(const UnityComplexNumberT<T1>& a, const UnityComplexNumberT<T2>& b, UnityComplexNumberT<T3>& result)
     {
-        result.re = a.re - b.re;
-        result.im = a.im - b.im;
+        result.re = static_cast<T1>(a.re - b.re);
+        result.im = static_cast<T1>(a.im - b.im);
     }
 
     template<typename T1, typename T2, typename T3>
@@ -413,8 +422,8 @@ public:
 
     inline void SetPeriod(float period, float invperiod)
     {
-        period = period;
-        invperiod = invperiod;
+        this->period = period;
+        this->invperiod = invperiod;
     }
 
     inline float Sample(Random& random)
@@ -438,6 +447,7 @@ public:
     int samplesleft;
 };
 
+#ifndef PLATFORM_MUTEX
 class Mutex
 {
 public:
@@ -454,6 +464,7 @@ protected:
     pthread_mutex_t mutex;
 #endif
 };
+#endif
 
 class MutexScopeLock
 {
@@ -493,3 +504,7 @@ void DeclareEffect(
     UnityAudioEffect_GetFloatBufferCallback getfloatbuffercallback,
     InternalEffectDefinitionRegistrationCallback registereffectdefcallback
     );
+
+} // namespace AudioPluginUtil
+
+using namespace AudioPluginUtil;

@@ -72,9 +72,10 @@ namespace Equalizer
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
-        EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
+        EffectData* effectdata = state->GetEffectData<EffectData>();
+        EffectData::Data* data = &effectdata->data;
         data->analyzer.Cleanup();
-        delete data;
+        delete effectdata;
         return UNITY_AUDIODSP_OK;
     }
 

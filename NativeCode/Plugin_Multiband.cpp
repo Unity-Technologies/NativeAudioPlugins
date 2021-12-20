@@ -142,9 +142,10 @@ namespace Multiband
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
-        EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
+        EffectData* effectdata = state->GetEffectData<EffectData>();
+        EffectData::Data* data = &effectdata->data;
         data->analyzer.Cleanup();
-        delete data;
+        delete effectdata;
         return UNITY_AUDIODSP_OK;
     }
 
@@ -170,10 +171,10 @@ namespace Multiband
     static void SetupFilterCoeffs(EffectData::Data* data, int samplerate, BiquadFilter* filter0, BiquadFilter* filter1, BiquadFilter* filter2, BiquadFilter* filter3)
     {
         const float qfactor = 0.707f;
-        filter0->SetupLowpass(data->p[P_LowFreq], samplerate, qfactor);
-        filter1->SetupHighpass(data->p[P_LowFreq], samplerate, qfactor);
-        filter2->SetupLowpass(data->p[P_HighFreq], samplerate, qfactor);
-        filter3->SetupHighpass(data->p[P_HighFreq], samplerate, qfactor);
+        filter0->SetupLowpass(data->p[P_LowFreq], (float)samplerate, qfactor);
+        filter1->SetupHighpass(data->p[P_LowFreq], (float)samplerate, qfactor);
+        filter2->SetupLowpass(data->p[P_HighFreq], (float)samplerate, qfactor);
+        filter3->SetupHighpass(data->p[P_HighFreq], (float)samplerate, qfactor);
     }
 
     int UNITY_AUDIODSP_CALLBACK GetFloatBufferCallback(UnityAudioEffectState* state, const char* name, float* buffer, int numsamples)
