@@ -34,7 +34,7 @@ namespace PitchDetector
             float buffer[WINSIZE];
             float window[WINSIZE];
             float acnf[FFTSIZE];
-            UnityComplexNumber spec[FFTSIZE];
+            AudioPluginUtil::UnityComplexNumber spec[FFTSIZE];
         };
         union
         {
@@ -47,14 +47,14 @@ namespace PitchDetector
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Index", "", 0.0f, MAXINDEX - 1, 0.0f, 1.0f, 1.0f, P_INDEX, "Determines where the pitch data is written to for access by scripts via PitchDetectorGetFreq");
-        RegisterParameter(definition, "Low Cut", "", 0.0f, (FFTSIZE / 2) - 1, 20, 1.0f, 1.0f, P_LOCUT, "Low frequency cut-off for input preprocessing");
-        RegisterParameter(definition, "High Cut", "", 0.0f, (FFTSIZE / 2) - 1, 1000, 1.0f, 1.0f, P_HICUT, "High frequency cut-off for input preprocessing");
-        RegisterParameter(definition, "Low Bin", "", 0.0f, (FFTSIZE / 2) - 1, 50, 1.0f, 1.0f, P_LOBIN, "Low detection bin in autocorrelation");
-        RegisterParameter(definition, "High Bin", "", 0.0f, (FFTSIZE / 2) - 1, 1500, 1.0f, 1.0f, P_HIBIN, "High detection bin in autocorrelation");
-        RegisterParameter(definition, "Threshold", "%", 0.0f, 1.0f, 0.05f, 1.0f, 1.0f, P_THR, "Input signal envelope threshold above which pitch detection is attempted");
-        RegisterParameter(definition, "Osc Pitch", "", -48.0f, 48.0f, 0.0f, 1.0f, 1.0f, P_OSCPITCH, "Relative oscillator pitch in semitones");
-        RegisterParameter(definition, "Monitor", "%", 0.0f, 1.0f, 0.5f, 100.0f, 1.0f, P_MONITOR, "Monitor mix for auditioning the pitch tracking");
+        AudioPluginUtil::RegisterParameter(definition, "Index", "", 0.0f, MAXINDEX - 1, 0.0f, 1.0f, 1.0f, P_INDEX, "Determines where the pitch data is written to for access by scripts via PitchDetectorGetFreq");
+        AudioPluginUtil::RegisterParameter(definition, "Low Cut", "", 0.0f, (FFTSIZE / 2) - 1, 20, 1.0f, 1.0f, P_LOCUT, "Low frequency cut-off for input preprocessing");
+        AudioPluginUtil::RegisterParameter(definition, "High Cut", "", 0.0f, (FFTSIZE / 2) - 1, 1000, 1.0f, 1.0f, P_HICUT, "High frequency cut-off for input preprocessing");
+        AudioPluginUtil::RegisterParameter(definition, "Low Bin", "", 0.0f, (FFTSIZE / 2) - 1, 50, 1.0f, 1.0f, P_LOBIN, "Low detection bin in autocorrelation");
+        AudioPluginUtil::RegisterParameter(definition, "High Bin", "", 0.0f, (FFTSIZE / 2) - 1, 1500, 1.0f, 1.0f, P_HIBIN, "High detection bin in autocorrelation");
+        AudioPluginUtil::RegisterParameter(definition, "Threshold", "%", 0.0f, 1.0f, 0.05f, 1.0f, 1.0f, P_THR, "Input signal envelope threshold above which pitch detection is attempted");
+        AudioPluginUtil::RegisterParameter(definition, "Osc Pitch", "", -48.0f, 48.0f, 0.0f, 1.0f, 1.0f, P_OSCPITCH, "Relative oscillator pitch in semitones");
+        AudioPluginUtil::RegisterParameter(definition, "Monitor", "%", 0.0f, 1.0f, 0.5f, 100.0f, 1.0f, P_MONITOR, "Monitor mix for auditioning the pitch tracking");
         return numparams;
     }
 
@@ -67,25 +67,25 @@ namespace PitchDetector
         EffectData::Data* data = &effectdata->data;
         for (int i = 0; i < WINSIZE; i++)
         {
-            float w = 0.5f - 0.5f * cosf(i * kPI / (float)WINSIZE);
+            float w = 0.5f - 0.5f * cosf(i * AudioPluginUtil::kPI / (float)WINSIZE);
             data->window[i] = w;
             data->spec[i].re = w;
         }
 
         // Window correction
-        FFT::Forward(data->spec, FFTSIZE, true);
+        AudioPluginUtil::FFT::Forward(data->spec, FFTSIZE, true);
         for (int i = 0; i < FFTSIZE; i++)
             data->acnf[i] = 1.0f / data->spec[i].Magnitude2();
 
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         return UNITY_AUDIODSP_OK;
     }
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
-        EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-        delete data;
+        EffectData* effectdata = state->GetEffectData<EffectData>();
+        delete effectdata;
         return UNITY_AUDIODSP_OK;
     }
 
@@ -150,13 +150,13 @@ namespace PitchDetector
                     data->spec[i].im = 0.0f;
                 }
 
-                FFT::Forward(data->spec, FFTSIZE, true);
+                AudioPluginUtil::FFT::Forward(data->spec, FFTSIZE, true);
 
                 int locut = (int)data->p[P_LOCUT];
                 int hicut = (int)data->p[P_HICUT];
-                memset(data->spec, 0, sizeof(UnityComplexNumber) * locut);
-                memset(data->spec + hicut, 0, sizeof(UnityComplexNumber) * (FFTSIZE - 2 * hicut));
-                memset(data->spec + FFTSIZE - locut, 0, sizeof(UnityComplexNumber) * locut);
+                memset(data->spec, 0, sizeof(AudioPluginUtil::UnityComplexNumber) * locut);
+                memset(data->spec + hicut, 0, sizeof(AudioPluginUtil::UnityComplexNumber) * (FFTSIZE - 2 * hicut));
+                memset(data->spec + FFTSIZE - locut, 0, sizeof(AudioPluginUtil::UnityComplexNumber) * locut);
 
                 // Fast autocorrelation
                 for (int i = 0; i < FFTSIZE; i++)
@@ -165,7 +165,7 @@ namespace PitchDetector
                     data->spec[i].im = 0.0f;
                     debugdata[i] = data->spec[i].re;
                 }
-                FFT::Backward(data->spec, FFTSIZE, true);
+                AudioPluginUtil::FFT::Backward(data->spec, FFTSIZE, true);
 
                 int startbin = (int)data->p[P_LOBIN];
                 int endbin = (int)data->p[P_HIBIN];
@@ -186,7 +186,7 @@ namespace PitchDetector
             }
 
             data->phase += detected_freqs[(int)data->p[P_INDEX]] * oscpitch;
-            data->phase -= FastFloor(data->phase);
+            data->phase -= AudioPluginUtil::FastFloor(data->phase);
 
             for (int c = 0; c < outchannels; c++)
                 outbuffer[n * outchannels + c] += ((data->phase * 2.0f - 1.0f) * data->env - outbuffer[n * outchannels + c]) * monitor;

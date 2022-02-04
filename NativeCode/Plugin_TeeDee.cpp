@@ -39,7 +39,7 @@ namespace TeeDee
             float wetmix;
             float p[P_NUM];
             int pattern_index;
-            Random random;
+            AudioPluginUtil::Random random;
         };
         union
         {
@@ -52,31 +52,31 @@ namespace TeeDee
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Seed", "", 0.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_SEED, "Random seed of the pattern played. The first 5 patterns are pre-defined typical rhythm patterns.");
-        RegisterParameter(definition, "BPM", "BPM", 10.0f, 300.0f, 120.0f, 1.0f, 1.0f, P_BPM, "Tempo of the played pattern in beats per minute.");
-        RegisterParameter(definition, "Sine", "%", 0.0f, 1.0f, 1.0f, 100.0f, 1.0f, P_SINE, "Amount of sine oscillator.");
-        RegisterParameter(definition, "Noise", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_NOISE, "Amount of noise generator.");
-        RegisterParameter(definition, "Cutoff", "Hz", 0.0f, kMaxSampleRate, 1000.0f, 1.0f, 3.0f, P_CUT, "Base cutoff frequency of resonant lowpass/highpass filter");
-        RegisterParameter(definition, "Resonance", "%", 0.0f, 1.0f, 0.2f, 100.0f, 3.0f, P_RES, "Resonance amount of filter.");
-        RegisterParameter(definition, "Freq", "Hz", 0.0f, 1000.0f, 200.0f, 1.0f, 3.0f, P_FREQ, "Base frequency of sine oscillator.");
-        RegisterParameter(definition, "AmpDecay", "s", 0.0f, 5.0f, 0.5f, 1.0f, 3.0f, P_ADECAY, "Amplitude decay time in seconds.");
-        RegisterParameter(definition, "FilterDecay", "s", 0.0f, 5.0f, 0.5f, 1.0f, 3.0f, P_FDECAY, "Frequency decay time in seconds.");
-        RegisterParameter(definition, "PitchDecay", "s", 0.0f, 5.0f, 0.5f, 1.0f, 3.0f, P_PDECAY, "Pitch decay time in seconds.");
-        RegisterParameter(definition, "FilterType", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_FILTERTYPE, "Mix ratio between lowpass and highpass filters.");
-        RegisterParameter(definition, "Distortion", "%", 0.0f, 100.0f, 3.0f, 100.0f, 1.0f, P_POSTDIST, "Amount of distortion applied after the resonant filter.");
-        RegisterParameter(definition, "AmpEnv", "%", 0.0f, 1.0f, 1.0f, 100.0f, 1.0f, P_AENV, "Amplitude envelope amount.");
-        RegisterParameter(definition, "FilterEnv", "%", 0.0f, kMaxSampleRate, 5000.0f, 1.0f, 3.0f, P_FENV, "Frequency envelope amount.");
-        RegisterParameter(definition, "PitchEnv", "%", 0.0f, 1000.0f, 0.0f, 100.0f, 1.0f, P_PENV, "Pitch envelope amount.");
-        RegisterParameter(definition, "PreDist", "%", 0.0f, 100.0f, 1.0f, 100.0f, 1.0f, P_PREDIST, "Distortion applied before the resonant filter.");
-        RegisterParameter(definition, "InputMix", "%", 0.0f, 100.0f, 100.0f, 1.0f, 1.0f, P_INPUTMIX, "Amount of input signals mixed to the output of the synthesizer.");
-        RegisterParameter(definition, "NumSteps", "", 1.0f, 64.0f, 16.0f, 1.0f, 1.0f, P_NUMSTEPS, "Number of steps in the played pattern.");
+        AudioPluginUtil::RegisterParameter(definition, "Seed", "", 0.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_SEED, "Random seed of the pattern played. The first 5 patterns are pre-defined typical rhythm patterns.");
+        AudioPluginUtil::RegisterParameter(definition, "BPM", "BPM", 10.0f, 300.0f, 120.0f, 1.0f, 1.0f, P_BPM, "Tempo of the played pattern in beats per minute.");
+        AudioPluginUtil::RegisterParameter(definition, "Sine", "%", 0.0f, 1.0f, 1.0f, 100.0f, 1.0f, P_SINE, "Amount of sine oscillator.");
+        AudioPluginUtil::RegisterParameter(definition, "Noise", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_NOISE, "Amount of noise generator.");
+        AudioPluginUtil::RegisterParameter(definition, "Cutoff", "Hz", 0.0f, AudioPluginUtil::kMaxSampleRate, 1000.0f, 1.0f, 3.0f, P_CUT, "Base cutoff frequency of resonant lowpass/highpass filter");
+        AudioPluginUtil::RegisterParameter(definition, "Resonance", "%", 0.0f, 1.0f, 0.2f, 100.0f, 3.0f, P_RES, "Resonance amount of filter.");
+        AudioPluginUtil::RegisterParameter(definition, "Freq", "Hz", 0.0f, 1000.0f, 200.0f, 1.0f, 3.0f, P_FREQ, "Base frequency of sine oscillator.");
+        AudioPluginUtil::RegisterParameter(definition, "AmpDecay", "s", 0.0f, 5.0f, 0.5f, 1.0f, 3.0f, P_ADECAY, "Amplitude decay time in seconds.");
+        AudioPluginUtil::RegisterParameter(definition, "FilterDecay", "s", 0.0f, 5.0f, 0.5f, 1.0f, 3.0f, P_FDECAY, "Frequency decay time in seconds.");
+        AudioPluginUtil::RegisterParameter(definition, "PitchDecay", "s", 0.0f, 5.0f, 0.5f, 1.0f, 3.0f, P_PDECAY, "Pitch decay time in seconds.");
+        AudioPluginUtil::RegisterParameter(definition, "FilterType", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_FILTERTYPE, "Mix ratio between lowpass and highpass filters.");
+        AudioPluginUtil::RegisterParameter(definition, "Distortion", "%", 0.0f, 100.0f, 3.0f, 100.0f, 1.0f, P_POSTDIST, "Amount of distortion applied after the resonant filter.");
+        AudioPluginUtil::RegisterParameter(definition, "AmpEnv", "%", 0.0f, 1.0f, 1.0f, 100.0f, 1.0f, P_AENV, "Amplitude envelope amount.");
+        AudioPluginUtil::RegisterParameter(definition, "FilterEnv", "%", 0.0f, AudioPluginUtil::kMaxSampleRate, 5000.0f, 1.0f, 3.0f, P_FENV, "Frequency envelope amount.");
+        AudioPluginUtil::RegisterParameter(definition, "PitchEnv", "%", 0.0f, 1000.0f, 0.0f, 100.0f, 1.0f, P_PENV, "Pitch envelope amount.");
+        AudioPluginUtil::RegisterParameter(definition, "PreDist", "%", 0.0f, 100.0f, 1.0f, 100.0f, 1.0f, P_PREDIST, "Distortion applied before the resonant filter.");
+        AudioPluginUtil::RegisterParameter(definition, "InputMix", "%", 0.0f, 100.0f, 100.0f, 1.0f, 1.0f, P_INPUTMIX, "Amount of input signals mixed to the output of the synthesizer.");
+        AudioPluginUtil::RegisterParameter(definition, "NumSteps", "", 1.0f, 64.0f, 16.0f, 1.0f, 1.0f, P_NUMSTEPS, "Number of steps in the played pattern.");
         return numparams;
     }
 
     static void CalcPattern(EffectData::Data* data)
     {
         int seed = (int)data->p[P_SEED];
-        Random random;
+        AudioPluginUtil::Random random;
         random.Seed((unsigned long)(seed * 1000));
         for (int i = 0; i < 64; i++)
         {
@@ -97,15 +97,15 @@ namespace TeeDee
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         CalcPattern(&effectdata->data);
         return UNITY_AUDIODSP_OK;
     }
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
-        EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-        delete data;
+        EffectData* effectdata = state->GetEffectData<EffectData>();
+        delete effectdata;
         return UNITY_AUDIODSP_OK;
     }
 
@@ -163,18 +163,18 @@ namespace TeeDee
                 }
             }
             data->phase += (data->p[P_FREQ] + data->penv) * st;
-            data->phase -= FastFloor(data->phase);
+            data->phase -= AudioPluginUtil::FastFloor(data->phase);
             data->aenv = data->aenv * adecay + 1.0e-11f;
             data->fenv = data->fenv * fdecay + 1.0e-11f;
             data->penv = data->penv * pdecay + 1.0e-11f;
-            float outval = sinf(data->phase * 2.0f * kPI) * data->p[P_SINE] + data->random.GetFloat(-1.0f, 1.0f) * data->p[P_NOISE];
-            outval = atanf(outval * data->p[P_PREDIST]) * (1.0f / kPI) * data->aenv;
+            float outval = sinf(data->phase * 2.0f * AudioPluginUtil::kPI) * data->p[P_SINE] + data->random.GetFloat(-1.0f, 1.0f) * data->p[P_NOISE];
+            outval = atanf(outval * data->p[P_PREDIST]) * (1.0f / AudioPluginUtil::kPI) * data->aenv;
             float cut = data->p[P_CUT] + data->fenv;
             if (cut < 0.0f)
                 cut = 0.0f;
             else if (cut > sr_half)
                 cut = sr_half;
-            cut = 2.0f * sinf(0.5f * kPI * cut * st);
+            cut = 2.0f * sinf(0.5f * AudioPluginUtil::kPI * cut * st);
             if (cut > 1.4f)
                 cut = 1.4f;
             float bw = 1.0f - data->p[P_RES]; bw *= bw;
@@ -183,7 +183,7 @@ namespace TeeDee
             data->bpf += cut * hpf;
             data->wetmix += (wetTarget - data->wetmix) * 0.05f + 1.0e-9f;
             outval = data->lpf + (hpf - data->lpf) * data->p[P_FILTERTYPE];
-            outval = atanf(outval * data->p[P_POSTDIST]) * (1.0f / kPI) * data->aenv;
+            outval = atanf(outval * data->p[P_POSTDIST]) * (1.0f / AudioPluginUtil::kPI) * data->aenv;
             for (int i = 0; i < outchannels; i++)
             {
                 float inval = inbuffer[n * inchannels + i];

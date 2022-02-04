@@ -25,13 +25,13 @@ namespace Equalizer
         struct Data
         {
             float p[P_NUM];
-            BiquadFilter FilterH[8];
-            BiquadFilter FilterP[8];
-            BiquadFilter FilterL[8];
-            BiquadFilter DisplayFilterCoeffs[3];
+            AudioPluginUtil::BiquadFilter FilterH[8];
+            AudioPluginUtil::BiquadFilter FilterP[8];
+            AudioPluginUtil::BiquadFilter FilterL[8];
+            AudioPluginUtil::BiquadFilter DisplayFilterCoeffs[3];
             float sr;
-            Random random;
-            FFTAnalyzer analyzer;
+            AudioPluginUtil::Random random;
+            AudioPluginUtil::FFTAnalyzer analyzer;
         };
         union
         {
@@ -44,19 +44,19 @@ namespace Equalizer
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "MasterGain", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_MasterGain, "Overall gain applied");
-        RegisterParameter(definition, "LowGain", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_LowGain, "Gain applied to lower frequency band");
-        RegisterParameter(definition, "MidGain", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_MidGain, "Gain applied to middle frequency band");
-        RegisterParameter(definition, "HighGain", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_HighGain, "Gain applied to high frequency band");
-        RegisterParameter(definition, "LowFreq", "Hz", 0.01f, 24000.0f, 800.0f, 1.0f, 3.0f, P_LowFreq, "Cutoff frequency of lower frequency band");
-        RegisterParameter(definition, "MidFreq", "Hz", 0.01f, 24000.0f, 4000.0f, 1.0f, 3.0f, P_MidFreq, "Center frequency of middle frequency band");
-        RegisterParameter(definition, "HighFreq", "Hz", 0.01f, 24000.0f, 8000.0f, 1.0f, 3.0f, P_HighFreq, "Cutoff frequency of high frequency band");
-        RegisterParameter(definition, "LowQ", "", 0.01f, 10.0f, 0.707f, 1.0f, 3.0f, P_LowQ, "Q-factor of lower frequency band (inversely proportional to resonance)");
-        RegisterParameter(definition, "MidQ", "", 0.01f, 10.0f, 0.707f, 1.0f, 3.0f, P_MidQ, "Q-factor of middle frequency band (inversely proportional to resonance)");
-        RegisterParameter(definition, "HighQ", "", 0.01f, 10.0f, 0.707f, 1.0f, 3.0f, P_HighQ, "Q-factor of high frequency band (inversely proportional to resonance)");
-        RegisterParameter(definition, "UseLogScale", "", 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, P_UseLogScale, "Use logarithmic scale for plotting the filter curve frequency response and input/output spectra");
-        RegisterParameter(definition, "ShowSpectrum", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_ShowSpectrum, "Overlay input spectrum (green) and output spectrum (red)");
-        RegisterParameter(definition, "SpectrumDecay", "dB/s", -50.0f, 0.0f, -10.0f, 1.0f, 1.0f, P_SpectrumDecay, "Hold time for overlaid spectra");
+        AudioPluginUtil::RegisterParameter(definition, "MasterGain", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_MasterGain, "Overall gain applied");
+        AudioPluginUtil::RegisterParameter(definition, "LowGain", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_LowGain, "Gain applied to lower frequency band");
+        AudioPluginUtil::RegisterParameter(definition, "MidGain", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_MidGain, "Gain applied to middle frequency band");
+        AudioPluginUtil::RegisterParameter(definition, "HighGain", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_HighGain, "Gain applied to high frequency band");
+        AudioPluginUtil::RegisterParameter(definition, "LowFreq", "Hz", 0.01f, 24000.0f, 800.0f, 1.0f, 3.0f, P_LowFreq, "Cutoff frequency of lower frequency band");
+        AudioPluginUtil::RegisterParameter(definition, "MidFreq", "Hz", 0.01f, 24000.0f, 4000.0f, 1.0f, 3.0f, P_MidFreq, "Center frequency of middle frequency band");
+        AudioPluginUtil::RegisterParameter(definition, "HighFreq", "Hz", 0.01f, 24000.0f, 8000.0f, 1.0f, 3.0f, P_HighFreq, "Cutoff frequency of high frequency band");
+        AudioPluginUtil::RegisterParameter(definition, "LowQ", "", 0.01f, 10.0f, 0.707f, 1.0f, 3.0f, P_LowQ, "Q-factor of lower frequency band (inversely proportional to resonance)");
+        AudioPluginUtil::RegisterParameter(definition, "MidQ", "", 0.01f, 10.0f, 0.707f, 1.0f, 3.0f, P_MidQ, "Q-factor of middle frequency band (inversely proportional to resonance)");
+        AudioPluginUtil::RegisterParameter(definition, "HighQ", "", 0.01f, 10.0f, 0.707f, 1.0f, 3.0f, P_HighQ, "Q-factor of high frequency band (inversely proportional to resonance)");
+        AudioPluginUtil::RegisterParameter(definition, "UseLogScale", "", 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, P_UseLogScale, "Use logarithmic scale for plotting the filter curve frequency response and input/output spectra");
+        AudioPluginUtil::RegisterParameter(definition, "ShowSpectrum", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_ShowSpectrum, "Overlay input spectrum (green) and output spectrum (red)");
+        AudioPluginUtil::RegisterParameter(definition, "SpectrumDecay", "dB/s", -50.0f, 0.0f, -10.0f, 1.0f, 1.0f, P_SpectrumDecay, "Hold time for overlaid spectra");
         return numparams;
     }
 
@@ -65,16 +65,17 @@ namespace Equalizer
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         effectdata->data.analyzer.spectrumSize = 4096;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         state->effectdata = effectdata;
         return UNITY_AUDIODSP_OK;
     }
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
-        EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
+        EffectData* effectdata = state->GetEffectData<EffectData>();
+        EffectData::Data* data = &effectdata->data;
         data->analyzer.Cleanup();
-        delete data;
+        delete effectdata;
         return UNITY_AUDIODSP_OK;
     }
 
@@ -97,7 +98,7 @@ namespace Equalizer
         return UNITY_AUDIODSP_OK;
     }
 
-    static void SetupFilterCoeffs(EffectData::Data* data, BiquadFilter* filterH, BiquadFilter* filterP, BiquadFilter* filterL, float samplerate)
+    static void SetupFilterCoeffs(EffectData::Data* data, AudioPluginUtil::BiquadFilter* filterH, AudioPluginUtil::BiquadFilter* filterP, AudioPluginUtil::BiquadFilter* filterL, float samplerate)
     {
         filterH->SetupHighShelf(data->p[P_HighFreq], samplerate, data->p[P_HighGain], data->p[P_HighQ]);
         filterP->SetupPeaking(data->p[P_MidFreq], samplerate, data->p[P_MidGain], data->p[P_MidQ]);

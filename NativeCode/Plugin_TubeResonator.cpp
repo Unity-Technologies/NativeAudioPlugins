@@ -27,7 +27,7 @@ namespace TubeResonator
         {
             data[writepos] = input;
             float f = writepos + MASK - delay;
-            int r = FastFloor(f);
+            int r = AudioPluginUtil::FastFloor(f);
             f -= r;
             r &= MASK;
             writepos = (writepos + 1) & MASK;
@@ -65,14 +65,14 @@ namespace TubeResonator
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Num sections", "", 1.0f, MAXSECTIONS, 3.0f, 1.0f, 1.0f, P_NUMSECTIONS, "Number of sections");
-        RegisterParameter(definition, "Feedback", "%", 0.0f, 1.0f, 0.5f, 100.0f, 1.0f, P_FB, "Feedback");
-        RegisterParameter(definition, "Nonlinearity", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_NL, "Amount of nonlinearity at reflection");
-        RegisterParameter(definition, "Mike position", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_MIKEPOS, "Microphone position");
+        AudioPluginUtil::RegisterParameter(definition, "Num sections", "", 1.0f, (float)MAXSECTIONS, 3.0f, 1.0f, 1.0f, P_NUMSECTIONS, "Number of sections");
+        AudioPluginUtil::RegisterParameter(definition, "Feedback", "%", 0.0f, 1.0f, 0.5f, 100.0f, 1.0f, P_FB, "Feedback");
+        AudioPluginUtil::RegisterParameter(definition, "Nonlinearity", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_NL, "Amount of nonlinearity at reflection");
+        AudioPluginUtil::RegisterParameter(definition, "Mike position", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_MIKEPOS, "Microphone position");
         for (int n = 0; n < MAXSECTIONS; n++)
         {
-            RegisterParameter(definition, tmpstr(0, "Length %d", n + 1), "cm", 0.01f, (float)Delay::MASK * (34000.0f / 48000.0f), 7.0f, 1.0f, 3.0f, P_L1 + n * 2, tmpstr(1, "Section %d length", n + 1));
-            RegisterParameter(definition, tmpstr(0, "Radius %d", n + 1), "cm", 0.01f, 100.0f, 3.0f, 1.0f, 3.0f, P_A1 + n * 2, tmpstr(1, "Section %d radius", n + 1));
+            AudioPluginUtil::RegisterParameter(definition, AudioPluginUtil::tmpstr(0, "Length %d", n + 1), "cm", 0.01f, (float)Delay::MASK * (34000.0f / 48000.0f), 7.0f, 1.0f, 3.0f, P_L1 + n * 2, AudioPluginUtil::tmpstr(1, "Section %d length", n + 1));
+            AudioPluginUtil::RegisterParameter(definition, AudioPluginUtil::tmpstr(0, "Radius %d", n + 1), "cm", 0.01f, 100.0f, 3.0f, 1.0f, 3.0f, P_A1 + n * 2, AudioPluginUtil::tmpstr(1, "Section %d radius", n + 1));
         }
         return numparams;
     }
@@ -82,14 +82,14 @@ namespace TubeResonator
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         return UNITY_AUDIODSP_OK;
     }
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
-        EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-        delete data;
+        EffectData* effectdata = state->GetEffectData<EffectData>();
+        delete effectdata;
         return UNITY_AUDIODSP_OK;
     }
 
@@ -151,7 +151,7 @@ namespace TubeResonator
             for (unsigned int n = 0; n < length; n++)
             {
                 float refl = ch.section[numsections - 1].upper.output;
-                float r = FastMin(refl * refl, 1.0f);
+                float r = AudioPluginUtil::FastMin(refl * refl, 1.0f);
                 refl += (r * refl - refl) * nl;
                 ch.section[0].upper.input = ch.section[0].lower.output + *src;
                 ch.section[numsections - 1].lower.input = refl * fb;

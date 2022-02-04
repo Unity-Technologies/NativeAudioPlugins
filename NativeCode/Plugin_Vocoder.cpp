@@ -26,10 +26,10 @@ namespace Vocoder
 
     struct Band
     {
-        StateVariableFilter analysis1;
-        StateVariableFilter analysis2;
-        StateVariableFilter synthesis1;
-        StateVariableFilter synthesis2;
+        AudioPluginUtil::StateVariableFilter analysis1;
+        AudioPluginUtil::StateVariableFilter analysis2;
+        AudioPluginUtil::StateVariableFilter synthesis1;
+        AudioPluginUtil::StateVariableFilter synthesis2;
         EnvFollower envfollow;
     };
 
@@ -53,13 +53,13 @@ namespace Vocoder
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Gain", "dB", -100.0f, 20.0f, -30.0f, 1.0f, 1.0f, P_GAIN, "Overall gain.");
-        RegisterParameter(definition, "Formant Shift", "Hz", -1500.0f, 1500.0f, 0.0f, 1.0f, 3.0f, P_FMTSHIFT, "Relative shifting of filterbank center frequencies.");
-        RegisterParameter(definition, "Formant Scale", "x", 0.05f, 10.0f, 1.0f, 1.0f, 3.0f, P_FMTSCALE, "Scaling of filterbank center frequencies.");
-        RegisterParameter(definition, "Analysis BW", "%", 0.001f, 1.0f, 0.1f, 100.0f, 1.0f, P_ANALYSISBW, "Analysis filterbank bandwidth.");
-        RegisterParameter(definition, "Synthesis BW", "%", 0.001f, 1.0f, 0.1f, 100.0f, 1.0f, P_SYNTHESISBW, "Synthesis filterbank bandwidth.");
-        RegisterParameter(definition, "Envelope Decay", "s", 0.001f, 0.4f, 0.01f, 1.0f, 1.0f, P_ENVDECAY, "Envelope follower decay time. Inversely proportional to the speed at which changes are detected.");
-        RegisterParameter(definition, "Emphasis", "%", 0.5f, 1.5f, 1.2f, 100.0f, 1.0f, P_EMPHASIS, "Emphasis amount. Can be used to tilt the filter bank to improve intelligibility of consonants.");
+        AudioPluginUtil::RegisterParameter(definition, "Gain", "dB", -100.0f, 20.0f, -30.0f, 1.0f, 1.0f, P_GAIN, "Overall gain.");
+        AudioPluginUtil::RegisterParameter(definition, "Formant Shift", "Hz", -1500.0f, 1500.0f, 0.0f, 1.0f, 3.0f, P_FMTSHIFT, "Relative shifting of filterbank center frequencies.");
+        AudioPluginUtil::RegisterParameter(definition, "Formant Scale", "x", 0.05f, 10.0f, 1.0f, 1.0f, 3.0f, P_FMTSCALE, "Scaling of filterbank center frequencies.");
+        AudioPluginUtil::RegisterParameter(definition, "Analysis BW", "%", 0.001f, 1.0f, 0.1f, 100.0f, 1.0f, P_ANALYSISBW, "Analysis filterbank bandwidth.");
+        AudioPluginUtil::RegisterParameter(definition, "Synthesis BW", "%", 0.001f, 1.0f, 0.1f, 100.0f, 1.0f, P_SYNTHESISBW, "Synthesis filterbank bandwidth.");
+        AudioPluginUtil::RegisterParameter(definition, "Envelope Decay", "s", 0.001f, 0.4f, 0.01f, 1.0f, 1.0f, P_ENVDECAY, "Envelope follower decay time. Inversely proportional to the speed at which changes are detected.");
+        AudioPluginUtil::RegisterParameter(definition, "Emphasis", "%", 0.5f, 1.5f, 1.2f, 100.0f, 1.0f, P_EMPHASIS, "Emphasis amount. Can be used to tilt the filter bank to improve intelligibility of consonants.");
         definition.flags |= UnityAudioEffectDefinitionFlags_IsSideChainTarget;
         return numparams;
     }
@@ -69,14 +69,14 @@ namespace Vocoder
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         return UNITY_AUDIODSP_OK;
     }
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
-        EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-        delete data;
+        EffectData* effectdata = state->GetEffectData<EffectData>();
+        delete effectdata;
         return UNITY_AUDIODSP_OK;
     }
 
@@ -111,10 +111,10 @@ namespace Vocoder
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectState* state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int outchannels)
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-        float gain = powf(10.0f, 0.05f * data->p[P_GAIN] + 2.5);
+        float gain = powf(10.0f, 0.05f * data->p[P_GAIN] + 2.5f);
         float maxfreq = 0.25f * state->samplerate;
         float sampletime = 1.0f / (float)state->samplerate;
-        float w0 = 0.5f * kPI * sampletime;
+        float w0 = 0.5f * AudioPluginUtil::kPI * sampletime;
         float envdecay = 1.0f - powf(0.001f, sampletime / data->p[P_ENVDECAY]);
         float emph = data->p[P_EMPHASIS];
         for (int j = 0; j < NUMBANDS; j++)

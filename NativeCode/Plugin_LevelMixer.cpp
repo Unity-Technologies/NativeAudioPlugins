@@ -32,14 +32,14 @@ namespace LevelMixer
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Gain1", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN1, "Gain of input channel 1 (left or mono)");
-        RegisterParameter(definition, "Gain2", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN2, "Gain of input channel 2 (right)");
-        RegisterParameter(definition, "Gain3", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN3, "Gain of input channel 3");
-        RegisterParameter(definition, "Gain4", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN4, "Gain of input channel 4");
-        RegisterParameter(definition, "Gain5", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN5, "Gain of input channel 5");
-        RegisterParameter(definition, "Gain6", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN6, "Gain of input channel 6");
-        RegisterParameter(definition, "Gain7", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN7, "Gain of input channel 7");
-        RegisterParameter(definition, "Gain8", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN8, "Gain of input channel 8");
+        AudioPluginUtil::RegisterParameter(definition, "Gain1", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN1, "Gain of input channel 1 (left or mono)");
+        AudioPluginUtil::RegisterParameter(definition, "Gain2", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN2, "Gain of input channel 2 (right)");
+        AudioPluginUtil::RegisterParameter(definition, "Gain3", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN3, "Gain of input channel 3");
+        AudioPluginUtil::RegisterParameter(definition, "Gain4", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN4, "Gain of input channel 4");
+        AudioPluginUtil::RegisterParameter(definition, "Gain5", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN5, "Gain of input channel 5");
+        AudioPluginUtil::RegisterParameter(definition, "Gain6", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN6, "Gain of input channel 6");
+        AudioPluginUtil::RegisterParameter(definition, "Gain7", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN7, "Gain of input channel 7");
+        AudioPluginUtil::RegisterParameter(definition, "Gain8", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN8, "Gain of input channel 8");
         return numparams;
     }
 
@@ -48,14 +48,14 @@ namespace LevelMixer
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         return UNITY_AUDIODSP_OK;
     }
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
-        EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-        delete data;
+        EffectData* effectdata = state->GetEffectData<EffectData>();
+        delete effectdata;
         return UNITY_AUDIODSP_OK;
     }
 

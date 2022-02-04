@@ -16,10 +16,10 @@ namespace Oscilloscope
     struct EffectData
     {
         float p[P_NUM];
-        HistoryBuffer history[8];
-        HistoryBuffer spectrum[8];
+        AudioPluginUtil::HistoryBuffer history[8];
+        AudioPluginUtil::HistoryBuffer spectrum[8];
         int numchannels;
-        UnityComplexNumber fftbuf[FFTSIZE];
+        AudioPluginUtil::UnityComplexNumber fftbuf[FFTSIZE];
         float smoothspec[8][FFTSIZE];
     };
 
@@ -27,10 +27,10 @@ namespace Oscilloscope
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Window", "s", 0.01f, 2.0f, 0.1f, 1.0f, 3.0f, P_Window, "Length of analysis window");
-        RegisterParameter(definition, "Scale", "%", 0.01f, 10.0f, 1.0f, 100.0f, 3.0f, P_Scale, "Amplitude scaling for monitored signal");
-        RegisterParameter(definition, "Mode", "", 0.0f, 3.0f, 0.0f, 1.0f, 1.0f, P_Mode, "Display mode (0=scope, 1=spectrum, 2=spectrogram)");
-        RegisterParameter(definition, "SpectrumDecay", "dB/s", -100.0f, 0.0f, -10.0f, 1.0f, 1.0f, P_SpectrumDecay, "Hold time for overlaid spectra");
+        AudioPluginUtil::RegisterParameter(definition, "Window", "s", 0.01f, 2.0f, 0.1f, 1.0f, 3.0f, P_Window, "Length of analysis window");
+        AudioPluginUtil::RegisterParameter(definition, "Scale", "%", 0.01f, 10.0f, 1.0f, 100.0f, 3.0f, P_Scale, "Amplitude scaling for monitored signal");
+        AudioPluginUtil::RegisterParameter(definition, "Mode", "", 0.0f, 3.0f, 0.0f, 1.0f, 1.0f, P_Mode, "Display mode (0=scope, 1=spectrum, 2=spectrogram)");
+        AudioPluginUtil::RegisterParameter(definition, "SpectrumDecay", "dB/s", -100.0f, 0.0f, -10.0f, 1.0f, 1.0f, P_SpectrumDecay, "Hold time for overlaid spectra");
         return numparams;
     }
 
@@ -38,7 +38,7 @@ namespace Oscilloscope
     {
         EffectData* data = new EffectData;
         memset(data, 0, sizeof(EffectData));
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, data->p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, data->p);
         state->effectdata = data;
         for (int i = 0; i < 8; i++)
         {
@@ -68,12 +68,12 @@ namespace Oscilloscope
         {
             for (int i = 0; i < inchannels; i++)
             {
-                HistoryBuffer& history = data->history[i];
-                HistoryBuffer& spectrum = data->spectrum[i];
+                AudioPluginUtil::HistoryBuffer& history = data->history[i];
+                AudioPluginUtil::HistoryBuffer& spectrum = data->spectrum[i];
                 int windowsize = FFTSIZE / 2;
                 int w = history.writeindex;
-                float c = 1.0f, s = 0.0f, f = 2.0f * sinf(kPI / (float)windowsize);
-                memset(data->fftbuf, 0, sizeof(UnityComplexNumber) * FFTSIZE);
+                float c = 1.0f, s = 0.0f, f = 2.0f * sinf(AudioPluginUtil::kPI / (float)windowsize);
+                memset(data->fftbuf, 0, sizeof(AudioPluginUtil::UnityComplexNumber) * FFTSIZE);
                 for (int n = 0; n < windowsize; n++)
                 {
                     data->fftbuf[n].re = history.data[w] * (0.5f - 0.5f * c);
@@ -82,7 +82,7 @@ namespace Oscilloscope
                     if (--w < 0)
                         w = history.length - 1;
                 }
-                FFT::Forward(data->fftbuf, FFTSIZE, true);
+                AudioPluginUtil::FFT::Forward(data->fftbuf, FFTSIZE, true);
                 float specdecay = powf(10.0f, 0.05f * data->p[P_SpectrumDecay] * length / (float)state->samplerate);
                 for (int n = 0; n < FFTSIZE / 2; n++)
                 {

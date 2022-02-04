@@ -32,9 +32,9 @@ namespace StereoWidener
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Amount", "%", -10.0f, 10.0f, 1.0f, 100.0f, 1.0f, P_AMOUNT, "Amount of stereo widening applied. The default of 100% corresponds to the original stereo width of the input signal.");
-        RegisterParameter(definition, "Pre-delay", "ms", -0.0025f, 0.0025f, 0.0f, 1000.0f, 3.0f, P_PREDLY, "Pre-delay applied before the stereo widening.");
-        RegisterParameter(definition, "Post-delay", "ms", -0.0025f, 0.0025f, 0.0f, 1000.0f, 3.0f, P_POSTDLY, "Post-delay applied after the stereo widening.");
+        AudioPluginUtil::RegisterParameter(definition, "Amount", "%", -10.0f, 10.0f, 1.0f, 100.0f, 1.0f, P_AMOUNT, "Amount of stereo widening applied. The default of 100% corresponds to the original stereo width of the input signal.");
+        AudioPluginUtil::RegisterParameter(definition, "Pre-delay", "ms", -0.0025f, 0.0025f, 0.0f, 1000.0f, 3.0f, P_PREDLY, "Pre-delay applied before the stereo widening.");
+        AudioPluginUtil::RegisterParameter(definition, "Post-delay", "ms", -0.0025f, 0.0025f, 0.0f, 1000.0f, 3.0f, P_POSTDLY, "Post-delay applied after the stereo widening.");
         return numparams;
     }
 
@@ -43,14 +43,14 @@ namespace StereoWidener
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         return UNITY_AUDIODSP_OK;
     }
 
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
-        EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-        delete data;
+        EffectData* effectdata = state->GetEffectData<EffectData>();
+        delete effectdata;
         return UNITY_AUDIODSP_OK;
     }
 

@@ -11,7 +11,7 @@ namespace Routing
     };
 
     int bufferchannels[MAXINDEX];
-    RingBuffer<65536> buffer[MAXINDEX];
+    AudioPluginUtil::RingBuffer<65536> buffer[MAXINDEX];
 
     struct EffectData
     {
@@ -22,7 +22,7 @@ namespace Routing
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Target", "", 0.0f, MAXINDEX - 1, 0.0f, 1.0f, 1.0f, P_TARGET, "Specifies the output that the input signal is routed to. This can be read by scripts via RoutingDemo_GetData");
+        AudioPluginUtil::RegisterParameter(definition, "Target", "", 0.0f, MAXINDEX - 1, 0.0f, 1.0f, 1.0f, P_TARGET, "Specifies the output that the input signal is routed to. This can be read by scripts via RoutingDemo_GetData");
         for (int i = 0; i < MAXINDEX; i++)
             buffer[i].Clear();
         return numparams;
@@ -33,7 +33,7 @@ namespace Routing
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->p);
         return UNITY_AUDIODSP_OK;
     }
 

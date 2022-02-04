@@ -28,14 +28,14 @@ namespace Teleport
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Stream", "", 0.0f, 7.0f, 0.0f, 1.0f, 1.0f, P_STREAM, "External audio stream to read from or write to.");
-        RegisterParameter(definition, "Send", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_SEND, "Gain of signal sent to the external audio stream.");
-        RegisterParameter(definition, "Input Gain", "", 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, P_INPUTGAIN, "Gain of signal passing through effect.");
-        RegisterParameter(definition, "Teleport Gain", "", 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, P_TELEPORTGAIN, "Gain of the received external audio stream.");
-        RegisterParameter(definition, "Param1", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_PARAM1, "User-defined parameter 1 (read/write)");
-        RegisterParameter(definition, "Param2", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_PARAM2, "User-defined parameter 2 (read/write)");
-        RegisterParameter(definition, "Param3", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_PARAM3, "User-defined parameter 3 (read/write)");
-        RegisterParameter(definition, "Param4", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_PARAM4, "User-defined parameter 4 (read/write)");
+        AudioPluginUtil::RegisterParameter(definition, "Stream", "", 0.0f, 7.0f, 0.0f, 1.0f, 1.0f, P_STREAM, "External audio stream to read from or write to.");
+        AudioPluginUtil::RegisterParameter(definition, "Send", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_SEND, "Gain of signal sent to the external audio stream.");
+        AudioPluginUtil::RegisterParameter(definition, "Input Gain", "", 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, P_INPUTGAIN, "Gain of signal passing through effect.");
+        AudioPluginUtil::RegisterParameter(definition, "Teleport Gain", "", 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, P_TELEPORTGAIN, "Gain of the received external audio stream.");
+        AudioPluginUtil::RegisterParameter(definition, "Param1", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_PARAM1, "User-defined parameter 1 (read/write)");
+        AudioPluginUtil::RegisterParameter(definition, "Param2", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_PARAM2, "User-defined parameter 2 (read/write)");
+        AudioPluginUtil::RegisterParameter(definition, "Param3", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_PARAM3, "User-defined parameter 3 (read/write)");
+        AudioPluginUtil::RegisterParameter(definition, "Param4", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_PARAM4, "User-defined parameter 4 (read/write)");
         return numparams;
     }
 
@@ -44,7 +44,7 @@ namespace Teleport
         EffectData* data = new EffectData;
         memset(data, 0, sizeof(EffectData));
         state->effectdata = data;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, data->p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, data->p);
         return UNITY_AUDIODSP_OK;
     }
 

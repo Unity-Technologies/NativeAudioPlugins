@@ -27,7 +27,7 @@ namespace Spatializer
             float* hrtf;
             float* angles;
 
-            void GetHRTF(UnityComplexNumber* h, float angle, float mix)
+            void GetHRTF(AudioPluginUtil::UnityComplexNumber* h, float angle, float mix)
             {
                 int index1 = 0;
                 while (index1 < numangles && angles[index1] < angle)
@@ -65,14 +65,14 @@ namespace Spatializer
                     p += coeffs.numangles;
                     coeffs.hrtf = new float[coeffs.numangles * HRTFLEN * 4];
                     float* dst = coeffs.hrtf;
-                    UnityComplexNumber h[HRTFLEN * 2];
+                    AudioPluginUtil::UnityComplexNumber h[HRTFLEN * 2];
                     for (int a = 0; a < coeffs.numangles; a++)
                     {
                         memset(h, 0, sizeof(h));
                         for (int n = 0; n < HRTFLEN; n++)
                             h[n + HRTFLEN].re = p[n];
                         p += HRTFLEN;
-                        FFT::Forward(h, HRTFLEN * 2, false);
+                        AudioPluginUtil::FFT::Forward(h, HRTFLEN * 2, false);
                         for (int n = 0; n < HRTFLEN * 2; n++)
                         {
                             *dst++ = h[n].re;
@@ -88,9 +88,9 @@ namespace Spatializer
 
     struct InstanceChannel
     {
-        UnityComplexNumber h[HRTFLEN * 2];
-        UnityComplexNumber x[HRTFLEN * 2];
-        UnityComplexNumber y[HRTFLEN * 2];
+        AudioPluginUtil::UnityComplexNumber h[HRTFLEN * 2];
+        AudioPluginUtil::UnityComplexNumber x[HRTFLEN * 2];
+        AudioPluginUtil::UnityComplexNumber y[HRTFLEN * 2];
         float buffer[HRTFLEN * 2];
     };
 
@@ -113,9 +113,9 @@ namespace Spatializer
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "AudioSrc Attn", "", 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, P_AUDIOSRCATTN, "AudioSource distance attenuation");
-        RegisterParameter(definition, "Fixed Volume", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_FIXEDVOLUME, "Fixed volume amount");
-        RegisterParameter(definition, "Custom Falloff", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_CUSTOMFALLOFF, "Custom volume falloff amount (logarithmic)");
+        AudioPluginUtil::RegisterParameter(definition, "AudioSrc Attn", "", 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, P_AUDIOSRCATTN, "AudioSource distance attenuation");
+        AudioPluginUtil::RegisterParameter(definition, "Fixed Volume", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_FIXEDVOLUME, "Fixed volume amount");
+        AudioPluginUtil::RegisterParameter(definition, "Custom Falloff", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_CUSTOMFALLOFF, "Custom volume falloff amount (logarithmic)");
         definition.flags |= UnityAudioEffectDefinitionFlags_IsSpatializer;
         return numparams;
     }
@@ -126,7 +126,7 @@ namespace Spatializer
         *attenuationOut =
             data->p[P_AUDIOSRCATTN] * attenuationIn +
             data->p[P_FIXEDVOLUME] +
-            data->p[P_CUSTOMFALLOFF] * (1.0f / FastMax(1.0f, distanceIn));
+            data->p[P_CUSTOMFALLOFF] * (1.0f / AudioPluginUtil::FastMax(1.0f, distanceIn));
         return UNITY_AUDIODSP_OK;
     }
 
@@ -137,7 +137,7 @@ namespace Spatializer
         state->effectdata = effectdata;
         if (IsHostCompatible(state))
             state->spatializerdata->distanceattenuationcallback = DistanceAttenuationCallback;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->p);
         return UNITY_AUDIODSP_OK;
     }
 
@@ -174,9 +174,9 @@ namespace Spatializer
         return UNITY_AUDIODSP_OK;
     }
 
-    static void GetHRTF(int channel, UnityComplexNumber* h, float azimuth, float elevation)
+    static void GetHRTF(int channel, AudioPluginUtil::UnityComplexNumber* h, float azimuth, float elevation)
     {
-        float e = FastClip(elevation * 0.1f + 4, 0, 12);
+        float e = AudioPluginUtil::FastClip(elevation * 0.1f + 4, 0, 12);
         float f = floorf(e);
         int index1 = (int)f;
         if (index1 < 0)
@@ -202,7 +202,7 @@ namespace Spatializer
 
         EffectData* data = state->GetEffectData<EffectData>();
 
-        static const float kRad2Deg = 180.0f / kPI;
+        static const float kRad2Deg = 180.0f / AudioPluginUtil::kPI;
 
         float* m = state->spatializerdata->listenermatrix;
         float* s = state->spatializerdata->sourcematrix;
@@ -218,8 +218,8 @@ namespace Spatializer
 
         float azimuth = (fabsf(dir_z) < 0.001f) ? 0.0f : atan2f(dir_x, dir_z);
         if (azimuth < 0.0f)
-            azimuth += 2.0f * kPI;
-        azimuth = FastClip(azimuth * kRad2Deg, 0.0f, 360.0f);
+            azimuth += 2.0f * AudioPluginUtil::kPI;
+        azimuth = AudioPluginUtil::FastClip(azimuth * kRad2Deg, 0.0f, 360.0f);
 
         float elevation = atan2f(dir_y, sqrtf(dir_x * dir_x + dir_z * dir_z) + 0.001f) * kRad2Deg;
         float spatialblend = state->spatializerdata->spatialblend;
@@ -235,16 +235,16 @@ namespace Spatializer
         //   A spread angle of 360 makes the stereo sound mono at the opposite speaker location to where the 3D emitter should be located (by moving the left part 180 degrees left and the right part 180 degrees right). So in this case, behind you when the sound should be in front of you!
         // Note that FMOD performs the spreading and panning in one go. We can't do this here due to the way that impulse-based spatialization works, so we perform the spread calculations on the left/right source signals before they enter the convolution processing.
         // That way we can still use it to control how the source signal downmixing takes place.
-        float spread = cosf(state->spatializerdata->spread * kPI / 360.0f);
+        float spread = cosf(state->spatializerdata->spread * AudioPluginUtil::kPI / 360.0f);
         float spreadmatrix[2] = { 2.0f - spread, spread };
 
         float* reverb = reverbmixbuffer;
-        for (int sampleOffset = 0; sampleOffset < length; sampleOffset += HRTFLEN)
+        for (unsigned int sampleOffset = 0; sampleOffset < length; sampleOffset += HRTFLEN)
         {
             for (int c = 0; c < 2; c++)
             {
                 // stereopan is in the [-1; 1] range, this acts the way fmod does it for stereo
-                float stereopan = 1.0f - ((c == 0) ? FastMax(0.0f, state->spatializerdata->stereopan) : FastMax(0.0f, -state->spatializerdata->stereopan));
+                float stereopan = 1.0f - ((c == 0) ? AudioPluginUtil::FastMax(0.0f, state->spatializerdata->stereopan) : AudioPluginUtil::FastMax(0.0f, -state->spatializerdata->stereopan));
 
                 InstanceChannel& ch = data->ch[c];
 
@@ -262,12 +262,12 @@ namespace Spatializer
                     ch.x[n].im = 0.0f;
                 }
 
-                FFT::Forward(ch.x, HRTFLEN * 2, false);
+                AudioPluginUtil::FFT::Forward(ch.x, HRTFLEN * 2, false);
 
                 for (int n = 0; n < HRTFLEN * 2; n++)
-                    UnityComplexNumber::Mul<float, float, float>(ch.x[n], ch.h[n], ch.y[n]);
+                    AudioPluginUtil::UnityComplexNumber::Mul<float, float, float>(ch.x[n], ch.h[n], ch.y[n]);
 
-                FFT::Backward(ch.y, HRTFLEN * 2, false);
+                AudioPluginUtil::FFT::Backward(ch.y, HRTFLEN * 2, false);
 
                 for (int n = 0; n < HRTFLEN; n++)
                 {

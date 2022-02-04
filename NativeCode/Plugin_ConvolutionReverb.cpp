@@ -5,7 +5,7 @@ namespace ConvolutionReverb
     const float MAXLENGTH = 15.0f;
     const int MAXSAMPLE = 16;
 
-    Mutex sampleMutex;
+    AudioPluginUtil::Mutex sampleMutex;
 
     struct IRSample
     {
@@ -50,15 +50,15 @@ namespace ConvolutionReverb
 
     struct Channel
     {
-        UnityComplexNumber** h;
-        UnityComplexNumber** x;
+        AudioPluginUtil::UnityComplexNumber** h;
+        AudioPluginUtil::UnityComplexNumber** x;
         float* impulse;
         float* s;
     };
 
     struct EffectData
     {
-        Mutex* mutex;
+        AudioPluginUtil::Mutex* mutex;
         float p[P_NUM];
         int numchannels;
         int numpartitions;
@@ -68,7 +68,7 @@ namespace ConvolutionReverb
         int writeoffset;
         int samplerate;
         float lastparams[P_NUM];
-        UnityComplexNumber* tmpoutput;
+        AudioPluginUtil::UnityComplexNumber* tmpoutput;
         Channel* channels;
     };
 
@@ -76,25 +76,25 @@ namespace ConvolutionReverb
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Wet", "%", 0.0f, 100.0f, 30.0f, 1.0f, 1.0f, P_WET, "Wet signal mix amount");
-        RegisterParameter(definition, "Gain", "dB", -50.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN, "Overall impulse response gain");
-        RegisterParameter(definition, "Time", "s", 0.01f, MAXLENGTH, 2.0f, 1.0f, 3.0f, P_TIME, "Length of synthetic impulse response");
-        RegisterParameter(definition, "Decay", "%", 0.01f, 100.0f, 50.0f, 1.0f, 3.0f, P_DECAY, "Decay time of synthetic impulse response and filter curve");
-        RegisterParameter(definition, "Diffusion", "%", 0.0f, 100.0f, 100.0f, 1.0f, 1.0f, P_DIFFUSION, "Diffusiveness of synthetic impulse response");
-        RegisterParameter(definition, "StereoSpread", "%", 0.0f, 100.0f, 30.0f, 1.0f, 1.0f, P_STEREO, "Stereo width of synthetic impulse response");
-        RegisterParameter(definition, "Cut High", "Hz", 1.0f, 20000.0f, 10000.0f, 1.0f, 3.0f, P_CUTHI, "High cutoff of filter decay curve (applied both to synthetic and sample impulse responses)");
-        RegisterParameter(definition, "Cut Low", "Hz", 1.0f, 20000.0f, 8000.0f, 1.0f, 3.0f, P_CUTLO, "Low cutoff of filter decay curve (applied both to synthetic and sample impulse responses)");
-        RegisterParameter(definition, "Resonance", "%", 0.0f, 1.0f, 0.0f, 100.0f, 3.0f, P_RESONANCE, "Resonance amount of filter (applied both to synthetic and sample impulse responses)");
-        RegisterParameter(definition, "Use Sample", "", -1.0f, MAXSAMPLE - 1, -1.0f, 1.0f, 1.0f, P_USESAMPLE, "-1 = use synthetic impulse response, otherwise indicates the slot of a sample uploaded by scripts via ConvolutionReverb_UploadSample");
-        RegisterParameter(definition, "Reverse", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_REVERSE, "Reverse impulse response for scary effects ;-)");
+        AudioPluginUtil::RegisterParameter(definition, "Wet", "%", 0.0f, 100.0f, 30.0f, 1.0f, 1.0f, P_WET, "Wet signal mix amount");
+        AudioPluginUtil::RegisterParameter(definition, "Gain", "dB", -50.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN, "Overall impulse response gain");
+        AudioPluginUtil::RegisterParameter(definition, "Time", "s", 0.01f, MAXLENGTH, 2.0f, 1.0f, 3.0f, P_TIME, "Length of synthetic impulse response");
+        AudioPluginUtil::RegisterParameter(definition, "Decay", "%", 0.01f, 100.0f, 50.0f, 1.0f, 3.0f, P_DECAY, "Decay time of synthetic impulse response and filter curve");
+        AudioPluginUtil::RegisterParameter(definition, "Diffusion", "%", 0.0f, 100.0f, 100.0f, 1.0f, 1.0f, P_DIFFUSION, "Diffusiveness of synthetic impulse response");
+        AudioPluginUtil::RegisterParameter(definition, "StereoSpread", "%", 0.0f, 100.0f, 30.0f, 1.0f, 1.0f, P_STEREO, "Stereo width of synthetic impulse response");
+        AudioPluginUtil::RegisterParameter(definition, "Cut High", "Hz", 1.0f, 20000.0f, 10000.0f, 1.0f, 3.0f, P_CUTHI, "High cutoff of filter decay curve (applied both to synthetic and sample impulse responses)");
+        AudioPluginUtil::RegisterParameter(definition, "Cut Low", "Hz", 1.0f, 20000.0f, 8000.0f, 1.0f, 3.0f, P_CUTLO, "Low cutoff of filter decay curve (applied both to synthetic and sample impulse responses)");
+        AudioPluginUtil::RegisterParameter(definition, "Resonance", "%", 0.0f, 1.0f, 0.0f, 100.0f, 3.0f, P_RESONANCE, "Resonance amount of filter (applied both to synthetic and sample impulse responses)");
+        AudioPluginUtil::RegisterParameter(definition, "Use Sample", "", -1.0f, MAXSAMPLE - 1, -1.0f, 1.0f, 1.0f, P_USESAMPLE, "-1 = use synthetic impulse response, otherwise indicates the slot of a sample uploaded by scripts via ConvolutionReverb_UploadSample");
+        AudioPluginUtil::RegisterParameter(definition, "Reverse", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_REVERSE, "Reverse impulse response for scary effects ;-)");
         return numparams;
     }
 
     static void SetupImpulse(EffectData* data, int numchannels, int blocksize, int samplerate)
     {
-        MutexScopeLock mutexScope1(*data->mutex);
+        AudioPluginUtil::MutexScopeLock mutexScope1(*data->mutex);
 
-        Random random;
+        AudioPluginUtil::Random random;
 
         int usesample = (int)data->p[P_USESAMPLE];
 
@@ -115,7 +115,7 @@ namespace ConvolutionReverb
             )
             return;
 
-        MutexScopeLock mutexScope2(sampleMutex);
+        AudioPluginUtil::MutexScopeLock mutexScope2(sampleMutex);
 
         // delete old buffers (can be avoided if numchannels, numpartitions and hopsize stay the same)
         for (int i = 0; i < data->numchannels; i++)
@@ -142,11 +142,11 @@ namespace ConvolutionReverb
         data->numchannels = numchannels;
         data->hopsize = blocksize;
         data->fftsize = blocksize * 2;
-        data->tmpoutput = new UnityComplexNumber[data->fftsize];
+        data->tmpoutput = new AudioPluginUtil::UnityComplexNumber[data->fftsize];
         data->channels = new Channel[data->numchannels];
         data->samplerate = samplerate;
 
-        memset(data->tmpoutput, 0, sizeof(UnityComplexNumber) * data->fftsize);
+        memset(data->tmpoutput, 0, sizeof(AudioPluginUtil::UnityComplexNumber) * data->fftsize);
 
         // calculate length of impulse in samples
         int reallength = (int)ceilf(samplerate * data->p[P_TIME]);
@@ -174,8 +174,8 @@ namespace ConvolutionReverb
             c.s = new float[data->fftsize];
             memset(c.s, 0, sizeof(float) * data->fftsize);
 
-            float cuthi = 2.0f * sinf(0.25f * kPI * data->p[P_CUTHI] * sampletime);
-            float cutlo = 2.0f * sinf(0.25f * kPI * data->p[P_CUTLO] * sampletime);
+            float cuthi = 2.0f * sinf(0.25f * AudioPluginUtil::kPI * data->p[P_CUTHI] * sampletime);
+            float cutlo = 2.0f * sinf(0.25f * AudioPluginUtil::kPI * data->p[P_CUTLO] * sampletime);
             float bw = 0.9f - 0.89f * data->p[P_RESONANCE]; bw *= bw;
             float decayconst = (data->p[P_STEREO] * random.GetFloat(0.0f, 0.01f) - 1.0f) / (reallength * 0.01f * data->p[P_DECAY]);
 
@@ -260,18 +260,18 @@ namespace ConvolutionReverb
                 c.impulse[n] *= scale;
 
             // partition the impulse response
-            c.h = new UnityComplexNumber*[data->numpartitions];
-            c.x = new UnityComplexNumber*[data->numpartitions];
+            c.h = new AudioPluginUtil::UnityComplexNumber*[data->numpartitions];
+            c.x = new AudioPluginUtil::UnityComplexNumber*[data->numpartitions];
             float* src = c.impulse;
             for (int k = 0; k < data->numpartitions; k++)
             {
-                c.h[k] = new UnityComplexNumber[data->fftsize];
-                c.x[k] = new UnityComplexNumber[data->fftsize];
-                memset(c.x[k], 0, sizeof(UnityComplexNumber) * data->fftsize);
-                memset(c.h[k], 0, sizeof(UnityComplexNumber) * data->fftsize);
+                c.h[k] = new AudioPluginUtil::UnityComplexNumber[data->fftsize];
+                c.x[k] = new AudioPluginUtil::UnityComplexNumber[data->fftsize];
+                memset(c.x[k], 0, sizeof(AudioPluginUtil::UnityComplexNumber) * data->fftsize);
+                memset(c.h[k], 0, sizeof(AudioPluginUtil::UnityComplexNumber) * data->fftsize);
                 for (int n = 0; n < data->hopsize; n++)
                     c.h[k][n].re = *src++;
-                FFT::Forward(c.h[k], data->fftsize, false);
+                AudioPluginUtil::FFT::Forward(c.h[k], data->fftsize, false);
             }
 
             // integrate peak detection filtered impulse for later resampling via box-filtering when GUI requests preview waveform
@@ -300,9 +300,9 @@ namespace ConvolutionReverb
     {
         EffectData* data = new EffectData;
         memset(data, 0, sizeof(EffectData));
-        data->mutex = new Mutex();
+        data->mutex = new AudioPluginUtil::Mutex();
         state->effectdata = data;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, data->p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, data->p);
         SetupImpulse(data, 2, 1024, state->samplerate); // Assuming stereo and 1024 sample block size
         return UNITY_AUDIODSP_OK;
     }
@@ -326,7 +326,7 @@ namespace ConvolutionReverb
         SetupImpulse(data, outchannels, (int)length, state->samplerate);
 
         // Lock data here in case float parameters are changed in pause/stopped mode and cause further calls to SetupImpulse
-        MutexScopeLock mutexScope1(*data->mutex);
+        AudioPluginUtil::MutexScopeLock mutexScope1(*data->mutex);
 
         int writeoffset; // set inside loop
 
@@ -346,27 +346,27 @@ namespace ConvolutionReverb
 
             // calculate X=FFT(s)
             writeoffset = data->writeoffset;
-            UnityComplexNumber* x = c.x[data->bufferindex];
+            AudioPluginUtil::UnityComplexNumber* x = c.x[data->bufferindex];
             for (int n = 0; n < data->fftsize; n++)
             {
                 x[n].Set(s[writeoffset], 0.0f);
                 writeoffset = (writeoffset + 1) & mask;
             }
-            FFT::Forward(x, data->fftsize, false);
+            AudioPluginUtil::FFT::Forward(x, data->fftsize, false);
 
             writeoffset = (writeoffset + data->hopsize) & mask;
 
             // calculate y=IFFT(sum(convolve(H_k, X_k), k=1..numpartitions))
-            UnityComplexNumber* y = data->tmpoutput;
-            memset(y, 0, sizeof(UnityComplexNumber) * data->fftsize);
+            AudioPluginUtil::UnityComplexNumber* y = data->tmpoutput;
+            memset(y, 0, sizeof(AudioPluginUtil::UnityComplexNumber) * data->fftsize);
             for (int k = 0; k < data->numpartitions; k++)
             {
-                UnityComplexNumber* h = c.h[k];
-                UnityComplexNumber* x = c.x[(k + data->bufferindex) % data->numpartitions];
+                AudioPluginUtil::UnityComplexNumber* h = c.h[k];
+                AudioPluginUtil::UnityComplexNumber* x = c.x[(k + data->bufferindex) % data->numpartitions];
                 for (int n = 0; n < data->fftsize; n++)
-                    UnityComplexNumber::MulAdd(h[n], x[n], y[n], y[n]);
+                    AudioPluginUtil::UnityComplexNumber::MulAdd(h[n], x[n], y[n], y[n]);
             }
-            FFT::Backward(y, data->fftsize, false);
+            AudioPluginUtil::FFT::Backward(y, data->fftsize, false);
 
             // overlap-save readout
             for (int n = 0; n < data->hopsize; n++)
@@ -408,7 +408,7 @@ namespace ConvolutionReverb
     int UNITY_AUDIODSP_CALLBACK GetFloatBufferCallback(UnityAudioEffectState* state, const char* name, float* buffer, int numsamples)
     {
         EffectData* data = state->GetEffectData<EffectData>();
-        MutexScopeLock mutexScope(*data->mutex);
+        AudioPluginUtil::MutexScopeLock mutexScope(*data->mutex);
         if (strncmp(name, "Impulse", 7) == 0)
         {
             SetupImpulse(data, data->numchannels, data->hopsize, data->samplerate);
@@ -422,7 +422,7 @@ namespace ConvolutionReverb
             {
                 // resample pre-integrated curve via box-filtering: f(x) = (F(x+dx)-F(x)) / dx
                 float next_time = n * scale;
-                int i = FastFloor(next_time);
+                int i = AudioPluginUtil::FastFloor(next_time);
                 float next_val = src[i] + (src[i + 1] - src[i]) * (next_time - i);
                 buffer[n] = (next_val - prev_val) * time_scale;
                 prev_val = next_val;
@@ -436,7 +436,7 @@ extern "C" UNITY_AUDIODSP_EXPORT_API bool ConvolutionReverb_UploadSample(int ind
 {
     if (index < 0 || index >= ConvolutionReverb::MAXSAMPLE)
         return false;
-    MutexScopeLock mutexScope(ConvolutionReverb::sampleMutex);
+    AudioPluginUtil::MutexScopeLock mutexScope(ConvolutionReverb::sampleMutex);
     ConvolutionReverb::IRSample& s = ConvolutionReverb::GetIRSample(index);
     if (s.allocated)
         delete[] s.data;
@@ -467,7 +467,7 @@ extern "C" UNITY_AUDIODSP_EXPORT_API const char* ConvolutionReverb_GetSampleName
 
     if (index < ConvolutionReverb::MAXSAMPLE)
     {
-        MutexScopeLock mutexScope(ConvolutionReverb::sampleMutex);
+        AudioPluginUtil::MutexScopeLock mutexScope(ConvolutionReverb::sampleMutex);
         ConvolutionReverb::IRSample& s = ConvolutionReverb::GetIRSample(index);
         if (!s.allocated)
             return "Not set";

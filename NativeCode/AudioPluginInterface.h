@@ -97,7 +97,24 @@ typedef unsigned long long UInt64;
 #           define SInt64_defined
 typedef signed long long SInt64;
 #       endif
-    #endif
+#   else // Android, ...
+#       ifndef SInt32_defined
+#           define SInt32_defined
+typedef signed int SInt32;
+#       endif
+#       ifndef UInt32_defined
+#           define UInt32_defined
+typedef unsigned int UInt32;
+#       endif
+#       ifndef UInt64_defined
+#           define UInt64_defined
+typedef unsigned long long UInt64;
+#       endif
+#       ifndef SInt64_defined
+#           define SInt64_defined
+typedef signed long long SInt64;
+#       endif
+#   endif
 #else
 #       ifndef SInt32_defined
 #           define SInt32_defined
