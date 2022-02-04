@@ -2,18 +2,18 @@
 
 #if !PLATFORM_WINRT
 
-struct MidiEvent
-{
-    UInt64 sample;
-    UInt32 msg;
-};
-
-// For lack of a ring buffer that supports multiple producers we use two separate ring buffers here ;-)
-static RingBuffer<8192, MidiEvent> scheduledata;
-static RingBuffer<8192, UInt32> livedata;
-
 namespace MIDI
 {
+    struct MidiEvent
+    {
+        UInt64 sample;
+        UInt32 msg;
+    };
+
+    // For lack of a ring buffer that supports multiple producers we use two separate ring buffers here ;-)
+    static AudioPluginUtil::RingBuffer<8192, MidiEvent> scheduledata;
+    static AudioPluginUtil::RingBuffer<8192, UInt32> livedata;
+
     #if PLATFORM_WIN
         #include <windows.h>
         #include <mmsystem.h>
@@ -200,7 +200,7 @@ namespace Synthesizer
         float* p;
         int rampcount;
         VoiceChannel channels[2];
-        Random random;
+        AudioPluginUtil::Random random;
 
         static inline float FreqFromNote(float note)
         {
@@ -252,13 +252,13 @@ namespace Synthesizer
             channels[1].freq = (UInt32)(FreqFromNote(note - dt2) * st);
             channels[0].detune = (UInt32)((FreqFromNote(note + dt1) * st - channels[0].freq) * ONE_OVER_MAXOSCILLATORS);
             channels[1].detune = (UInt32)((FreqFromNote(note + dt2) * st - channels[1].freq) * ONE_OVER_MAXOSCILLATORS);
-            channels[0].mask = ((UInt32)FastFloor(p[P_TYPE] * 127) + 128) << 24;
-            channels[1].mask = ((UInt32)FastFloor(p[P_TYPE] * 127) + 128) << 24;
+            channels[0].mask = ((UInt32)AudioPluginUtil::FastFloor(p[P_TYPE] * 127) + 128) << 24;
+            channels[1].mask = ((UInt32)AudioPluginUtil::FastFloor(p[P_TYPE] * 127) + 128) << 24;
         }
 
         inline void Process(float& l, float& r)
         {
-            float cut = FastClip(p[P_CUTOFF] + p[P_CUTENV] * fenv, 0.0001f, 0.99f); cut = cut * cut * 0.707f;
+            float cut = AudioPluginUtil::FastClip(p[P_CUTOFF] + p[P_CUTENV] * fenv, 0.0001f, 0.99f); cut = cut * cut * 0.707f;
             float bw = 1.0f - p[P_RESONANCE]; bw *= bw;
             float ramped_amp = aenv * amp;
             if (rampcount < RAMPSAMPLES)
@@ -376,7 +376,7 @@ namespace Synthesizer
         float p[P_NUM];
         int arpkeys[128];
         int numpending;
-        MidiEvent pending[MAXPENDING];
+        MIDI::MidiEvent pending[MAXPENDING];
         SynthesizerChannel synthchannel[MAXCHANNELS];
     };
 
@@ -384,15 +384,15 @@ namespace Synthesizer
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Stream", "", 0.0f, MAXCHANNELS - 1, 0.0f, 100.0f, 1.0f, P_STREAM, "MIDI stream");
-        RegisterParameter(definition, "Cutoff", "%", 0.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_CUTOFF, "Cutoff frequency");
-        RegisterParameter(definition, "Cutoff env", "%", 0.0f, 1.0f, 0.3f, 100.0f, 1.0f, P_CUTENV, "Cutoff envelope");
-        RegisterParameter(definition, "Resonance", "%", 0.0f, 1.0f, 0.3f, 100.0f, 1.0f, P_RESONANCE, "Resonance amount");
-        RegisterParameter(definition, "Decay time", "s", 0.0f, 10.0f, 0.1f, 1.0f, 1.0f, P_DECAY, "Envelope decay time");
-        RegisterParameter(definition, "Release time", "s", 0.0f, 10.0f, 0.01f, 1.0f, 1.0f, P_RELEASE, "Envelope release time");
-        RegisterParameter(definition, "Voice Detuning", "%", 0.0f, 1.0f, 0.03f, 100.0f, 1.0f, P_DETUNE1, "Voice detuning amount");
-        RegisterParameter(definition, "Stereo Detuning", "%", 0.0f, 1.0f, 0.01f, 100.0f, 1.0f, P_DETUNE2, "Stereo detuning amount");
-        RegisterParameter(definition, "Type", "%", 0.0f, 1.0f, 1.0f, 100.0f, 1.0f, P_TYPE, "Pulse wave to sawtooth mix");
+        AudioPluginUtil::RegisterParameter(definition, "Stream", "", 0.0f, MAXCHANNELS - 1, 0.0f, 100.0f, 1.0f, P_STREAM, "MIDI stream");
+        AudioPluginUtil::RegisterParameter(definition, "Cutoff", "%", 0.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_CUTOFF, "Cutoff frequency");
+        AudioPluginUtil::RegisterParameter(definition, "Cutoff env", "%", 0.0f, 1.0f, 0.3f, 100.0f, 1.0f, P_CUTENV, "Cutoff envelope");
+        AudioPluginUtil::RegisterParameter(definition, "Resonance", "%", 0.0f, 1.0f, 0.3f, 100.0f, 1.0f, P_RESONANCE, "Resonance amount");
+        AudioPluginUtil::RegisterParameter(definition, "Decay time", "s", 0.0f, 10.0f, 0.1f, 1.0f, 1.0f, P_DECAY, "Envelope decay time");
+        AudioPluginUtil::RegisterParameter(definition, "Release time", "s", 0.0f, 10.0f, 0.01f, 1.0f, 1.0f, P_RELEASE, "Envelope release time");
+        AudioPluginUtil::RegisterParameter(definition, "Voice Detuning", "%", 0.0f, 1.0f, 0.03f, 100.0f, 1.0f, P_DETUNE1, "Voice detuning amount");
+        AudioPluginUtil::RegisterParameter(definition, "Stereo Detuning", "%", 0.0f, 1.0f, 0.01f, 100.0f, 1.0f, P_DETUNE2, "Stereo detuning amount");
+        AudioPluginUtil::RegisterParameter(definition, "Type", "%", 0.0f, 1.0f, 1.0f, 100.0f, 1.0f, P_TYPE, "Pulse wave to sawtooth mix");
         return numparams;
     }
 
@@ -404,7 +404,7 @@ namespace Synthesizer
         for (int n = 0; n < MAXCHANNELS; n++)
             effectdata->synthchannel[n].Init();
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->p);
         return UNITY_AUDIODSP_OK;
     }
 
@@ -468,7 +468,7 @@ namespace Synthesizer
                 if (channel == 8)
                 {
                     // All sound off
-                    scheduledata.Clear();
+                    MIDI::scheduledata.Clear();
                     data->numpending = 0;
                     memset(data->arpkeys, 0, sizeof(data->arpkeys));
                     for (int c = 0; c < 16; c++)
@@ -490,8 +490,8 @@ namespace Synthesizer
 
         float sampletime = 1.0f / (float)state->samplerate;
 
-        MidiEvent ev;
-        while (scheduledata.Read(ev))
+        MIDI::MidiEvent ev;
+        while (MIDI::scheduledata.Read(ev))
         {
             if (ev.sample > state->currdsptick)
             {
@@ -501,7 +501,7 @@ namespace Synthesizer
             HandleEvent(data, ev.msg, sampletime);
         }
 
-        while (livedata.Read(ev.msg))
+        while (MIDI::livedata.Read(ev.msg))
             HandleEvent(data, ev.msg, sampletime);
 
         UInt64 currtick = state->currdsptick;
@@ -520,7 +520,7 @@ namespace Synthesizer
                 int i = 0, j = 0;
                 while (i < data->numpending)
                 {
-                    MidiEvent& ev = data->pending[i++];
+                    MIDI::MidiEvent& ev = data->pending[i++];
                     if (ev.sample <= nextevent)
                         HandleEvent(data, ev.msg, sampletime);
                     else
@@ -547,10 +547,10 @@ namespace Synthesizer
 
     extern "C" UNITY_AUDIODSP_EXPORT_API void Synthesizer_AddMessage(UInt64 sample, int msg)
     {
-        MidiEvent ev;
+        MIDI::MidiEvent ev;
         ev.sample = sample;
         ev.msg = msg;
-        scheduledata.Feed(ev);
+        MIDI::scheduledata.Feed(ev);
     }
 
     extern "C" UNITY_AUDIODSP_EXPORT_API void Synthesizer_KillAll()

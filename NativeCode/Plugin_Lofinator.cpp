@@ -28,8 +28,8 @@ namespace Lofinator
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Decimation", "Hz", 0.1f, 24000.0f, 24000.0f, 1.0f, 3.0f, P_DECRATE, "Decimation rate. Determines the interval at which new samples are read and held.");
-        RegisterParameter(definition, "Quantization", "", 1.0f, 24.0f, 8.0f, 1.0f, 1.0f, P_QUANT, "Word length in bits by which the signal will be quantized.");
+        AudioPluginUtil::RegisterParameter(definition, "Decimation", "Hz", 0.1f, 24000.0f, 24000.0f, 1.0f, 3.0f, P_DECRATE, "Decimation rate. Determines the interval at which new samples are read and held.");
+        AudioPluginUtil::RegisterParameter(definition, "Quantization", "", 1.0f, 24.0f, 8.0f, 1.0f, 1.0f, P_QUANT, "Word length in bits by which the signal will be quantized.");
         return numparams;
     }
 
@@ -38,7 +38,7 @@ namespace Lofinator
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         return UNITY_AUDIODSP_OK;
     }
 

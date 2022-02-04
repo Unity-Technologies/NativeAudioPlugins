@@ -19,8 +19,8 @@ namespace LoudnessMeter
         float release;
         float updateperiod;
         float updatecount;
-        HistoryBuffer peakbuf;
-        HistoryBuffer rmsbuf;
+        AudioPluginUtil::HistoryBuffer peakbuf;
+        AudioPluginUtil::HistoryBuffer rmsbuf;
     public:
         void Init(float lengthInSeconds, float updateRateInHz, float attackTime, float releaseTime, float samplerate)
         {
@@ -58,7 +58,7 @@ namespace LoudnessMeter
         void ReadBuffer(float* buffer, int numsamplesTarget, float windowLength, float samplerate, bool rms)
         {
             int numsamplesSource = (int)ceilf(samplerate * windowLength / updateperiod);
-            HistoryBuffer& buf = (rms) ? rmsbuf : peakbuf;
+            AudioPluginUtil::HistoryBuffer& buf = (rms) ? rmsbuf : peakbuf;
             buf.ReadBuffer(buffer, numsamplesTarget, numsamplesSource, (float)updatecount / (float)updateperiod);
         }
     };
@@ -77,9 +77,9 @@ namespace LoudnessMeter
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Window", "s", 0.1f, kMaxWindowLength, 1.0f, 1.0f, 1.0f, P_Window, "Length of analysis window");
-        RegisterParameter(definition, "YOffset", "dB", -200.0f, 200.0f, 0.0f, 1.0f, 1.0f, P_YOffset, "Zoom offset on y-axis around which the loudness graphs will be plotted");
-        RegisterParameter(definition, "YScale", "%", 0.001f, 10.0f, 1.0f, 100.0f, 1.0f, P_YScale, "Zoom factor for loudness graph");
+        AudioPluginUtil::RegisterParameter(definition, "Window", "s", 0.1f, kMaxWindowLength, 1.0f, 1.0f, 1.0f, P_Window, "Length of analysis window");
+        AudioPluginUtil::RegisterParameter(definition, "YOffset", "dB", -200.0f, 200.0f, 0.0f, 1.0f, 1.0f, P_YOffset, "Zoom offset on y-axis around which the loudness graphs will be plotted");
+        AudioPluginUtil::RegisterParameter(definition, "YScale", "%", 0.001f, 10.0f, 1.0f, 100.0f, 1.0f, P_YScale, "Zoom factor for loudness graph");
         return numparams;
     }
 
@@ -87,7 +87,7 @@ namespace LoudnessMeter
     {
         EffectData* data = new EffectData;
         memset(data, 0, sizeof(EffectData));
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, data->p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, data->p);
         state->effectdata = data;
         data->momentary.Init(3.0f, (float)state->samplerate, 0.4f, 0.4f, (float)state->samplerate);
         data->shortterm.Init(kMaxWindowLength, 4.0f, 3.0f, 3.0f, (float)state->samplerate);

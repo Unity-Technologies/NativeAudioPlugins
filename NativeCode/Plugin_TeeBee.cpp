@@ -40,7 +40,7 @@ namespace TeeBee
             float wetmix;
             float p[P_NUM];
             int pattern_index;
-            Random random;
+            AudioPluginUtil::Random random;
         };
         union
         {
@@ -53,29 +53,29 @@ namespace TeeBee
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Seed", "", 0.0f, 1000.0f, 0.0f, 1.0f, 1.0f, P_SEED, "Random seed that determines the pattern played.");
-        RegisterParameter(definition, "LowNote", "semitones", 0.0f, 100.0f, 24.0f, 1.0f, 1.0f, P_MINNOTE, "Deepest note in the pattern.");
-        RegisterParameter(definition, "HighNote", "semitones", 0.0f, 100.0f, 48.0f, 1.0f, 1.0f, P_MAXNOTE, "Highest note in the pattern.");
-        RegisterParameter(definition, "Cutoff", "Hz", 0.0f, kMaxSampleRate, 1000.0f, 1.0f, 3.0f, P_CUT, "Base cutoff frequency of resonant lowpass filter.");
-        RegisterParameter(definition, "Envelope", "Hz", 0.0f, kMaxSampleRate, 500.0f, 1.0f, 3.0f, P_ENV, "Amount of decay envelope applied to cutoff frequency.");
-        RegisterParameter(definition, "CutRnd", "Hz", 0.0f, kMaxSampleRate, 0.0f, 1.0f, 3.0f, P_CUTRND, "Amount of cutoff randomization applied at note onset.");
-        RegisterParameter(definition, "EnvRnd", "Hz", 0.0f, kMaxSampleRate, 0.0f, 1.0f, 3.0f, P_ENVRND, "Amount of randomization applied to cutoff envelope at note onset.");
-        RegisterParameter(definition, "Decay", "s", 0.0f, 5.0f, 0.5f, 1.0f, 3.0f, P_DECAY, "Decay time of cutoff envelope.");
-        RegisterParameter(definition, "Resonance", "%", 0.0f, 1.0f, 0.2f, 100.0f, 2.0f, P_RES, "Resonance amount of lowpass filter.");
-        RegisterParameter(definition, "Distortion", "%", 0.0f, 100.0f, 3.0f, 100.0f, 1.0f, P_DIST, "Amount of distortion applied after the resonant lowpass filter.");
-        RegisterParameter(definition, "Glide", "s", 0.001f, 1.0f, 0.01f, 1.0f, 3.0f, P_GLIDE, "Pitch glide time.");
-        RegisterParameter(definition, "BPM", "BPM", 10.0f, 300.0f, 120.0f, 1.0f, 1.0f, P_BPM, "Tempo of pattern in beats per minute.");
-        RegisterParameter(definition, "LFOFreq", "Hz", 0.0f, 50.0f, 0.1f, 1.0f, 3.0f, P_LFOFREQ, "Frequency of the low frequency oscillator that modulates the cutoff frequency of the resonant lowpass filter.");
-        RegisterParameter(definition, "LFOCut", "Hz", 0.0f, kMaxSampleRate, 0.0f, 1.0f, 3.0f, P_LFOCUT, "Modulation amount of the low frequency oscillator that modulates the cutoff frequency of the resonant lowpass filter.");
-        RegisterParameter(definition, "LFOCutEnv", "Hz", 0.0f, kMaxSampleRate, 0.0f, 1.0f, 3.0f, P_LFOCUTENV, "Modulation amount of the low frequency oscillator that modulates the envelope cutoff of the resonant lowpass filter.");
-        RegisterParameter(definition, "InputMix", "%", 0.0f, 100.0f, 100.0f, 1.0f, 1.0f, P_INPUTMIX, "Amount of input signal mixed to the output of the synthesizer.");
-        RegisterParameter(definition, "NumSteps", "", 1.0f, 64.0f, 16.0f, 1.0f, 1.0f, P_NUMSTEPS, "Number of steps in the played pattern.");
+        AudioPluginUtil::RegisterParameter(definition, "Seed", "", 0.0f, 1000.0f, 0.0f, 1.0f, 1.0f, P_SEED, "Random seed that determines the pattern played.");
+        AudioPluginUtil::RegisterParameter(definition, "LowNote", "semitones", 0.0f, 100.0f, 24.0f, 1.0f, 1.0f, P_MINNOTE, "Deepest note in the pattern.");
+        AudioPluginUtil::RegisterParameter(definition, "HighNote", "semitones", 0.0f, 100.0f, 48.0f, 1.0f, 1.0f, P_MAXNOTE, "Highest note in the pattern.");
+        AudioPluginUtil::RegisterParameter(definition, "Cutoff", "Hz", 0.0f, AudioPluginUtil::kMaxSampleRate, 1000.0f, 1.0f, 3.0f, P_CUT, "Base cutoff frequency of resonant lowpass filter.");
+        AudioPluginUtil::RegisterParameter(definition, "Envelope", "Hz", 0.0f, AudioPluginUtil::kMaxSampleRate, 500.0f, 1.0f, 3.0f, P_ENV, "Amount of decay envelope applied to cutoff frequency.");
+        AudioPluginUtil::RegisterParameter(definition, "CutRnd", "Hz", 0.0f, AudioPluginUtil::kMaxSampleRate, 0.0f, 1.0f, 3.0f, P_CUTRND, "Amount of cutoff randomization applied at note onset.");
+        AudioPluginUtil::RegisterParameter(definition, "EnvRnd", "Hz", 0.0f, AudioPluginUtil::kMaxSampleRate, 0.0f, 1.0f, 3.0f, P_ENVRND, "Amount of randomization applied to cutoff envelope at note onset.");
+        AudioPluginUtil::RegisterParameter(definition, "Decay", "s", 0.0f, 5.0f, 0.5f, 1.0f, 3.0f, P_DECAY, "Decay time of cutoff envelope.");
+        AudioPluginUtil::RegisterParameter(definition, "Resonance", "%", 0.0f, 1.0f, 0.2f, 100.0f, 2.0f, P_RES, "Resonance amount of lowpass filter.");
+        AudioPluginUtil::RegisterParameter(definition, "Distortion", "%", 0.0f, 100.0f, 3.0f, 100.0f, 1.0f, P_DIST, "Amount of distortion applied after the resonant lowpass filter.");
+        AudioPluginUtil::RegisterParameter(definition, "Glide", "s", 0.001f, 1.0f, 0.01f, 1.0f, 3.0f, P_GLIDE, "Pitch glide time.");
+        AudioPluginUtil::RegisterParameter(definition, "BPM", "BPM", 10.0f, 300.0f, 120.0f, 1.0f, 1.0f, P_BPM, "Tempo of pattern in beats per minute.");
+        AudioPluginUtil::RegisterParameter(definition, "LFOFreq", "Hz", 0.0f, 50.0f, 0.1f, 1.0f, 3.0f, P_LFOFREQ, "Frequency of the low frequency oscillator that modulates the cutoff frequency of the resonant lowpass filter.");
+        AudioPluginUtil::RegisterParameter(definition, "LFOCut", "Hz", 0.0f, AudioPluginUtil::kMaxSampleRate, 0.0f, 1.0f, 3.0f, P_LFOCUT, "Modulation amount of the low frequency oscillator that modulates the cutoff frequency of the resonant lowpass filter.");
+        AudioPluginUtil::RegisterParameter(definition, "LFOCutEnv", "Hz", 0.0f, AudioPluginUtil::kMaxSampleRate, 0.0f, 1.0f, 3.0f, P_LFOCUTENV, "Modulation amount of the low frequency oscillator that modulates the envelope cutoff of the resonant lowpass filter.");
+        AudioPluginUtil::RegisterParameter(definition, "InputMix", "%", 0.0f, 100.0f, 100.0f, 1.0f, 1.0f, P_INPUTMIX, "Amount of input signal mixed to the output of the synthesizer.");
+        AudioPluginUtil::RegisterParameter(definition, "NumSteps", "", 1.0f, 64.0f, 16.0f, 1.0f, 1.0f, P_NUMSTEPS, "Number of steps in the played pattern.");
         return numparams;
     }
 
     static void CalcPattern(EffectData::Data* data)
     {
-        Random random;
+        AudioPluginUtil::Random random;
         random.Seed((unsigned long)(data->p[P_SEED] * 1000));
         for (int i = 0; i < 64; i++)
         {
@@ -89,7 +89,7 @@ namespace TeeBee
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         CalcPattern(&effectdata->data);
         return UNITY_AUDIODSP_OK;
     }
@@ -151,18 +151,18 @@ namespace TeeBee
                 data->cutrnd = data->random.GetFloat(0.0f, data->p[P_CUTRND]);
             }
             data->phase += data->freq;
-            data->phase -= FastFloor(data->phase);
+            data->phase -= AudioPluginUtil::FastFloor(data->phase);
             data->lfophase += data->p[P_LFOFREQ] * st;
-            data->lfophase -= FastFloor(data->lfophase);
+            data->lfophase -= AudioPluginUtil::FastFloor(data->lfophase);
             data->freq += (data->pattern[data->pattern_index] * st - data->freq) * glide;
             float outval = data->phase * 2.0f - 1.0f;
-            float lfocut = 0.5f + 0.5f * sinf(data->lfophase * 2.0f * kPI);
+            float lfocut = 0.5f + 0.5f * sinf(data->lfophase * 2.0f * AudioPluginUtil::kPI);
             float cut = data->p[P_CUT] + data->cutrnd + data->env + lfocut * (data->p[P_LFOCUT] + data->lfoenv * data->p[P_LFOCUTENV]);
             if (cut < 0.0f)
                 cut = 0.0f;
             else if (cut > max_cut)
                 cut = max_cut;
-            cut = 2.0f * sinf(0.5f * kPI * cut * st);
+            cut = 2.0f * sinf(0.5f * AudioPluginUtil::kPI * cut * st);
             if (cut > 1.4f)
                 cut = 1.4f;
             float bw = 1.0f - data->p[P_RES];
@@ -173,7 +173,7 @@ namespace TeeBee
             tmp = 0.5f * cut * (outval - data->lpf - data->bpf * bw);
             float bpf_out = data->bpf + tmp; data->bpf = bpf_out + tmp;
             data->wetmix += (wetTarget - data->wetmix) * 0.05f + 1.0e-9f;
-            outval = atanf(lpf_out * data->p[P_DIST]) * (1.0f / kPI);
+            outval = atanf(lpf_out * data->p[P_DIST]) * (1.0f / AudioPluginUtil::kPI);
             for (int i = 0; i < outchannels; i++)
             {
                 float inval = inbuffer[n * inchannels + i];

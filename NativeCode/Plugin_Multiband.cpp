@@ -66,7 +66,7 @@ namespace Multiband
         inline float Process(float input)
         {
             float g = 1.0f;
-            float s = FastClip(input * input, 1.0e-11f, 100.0f);
+            float s = AudioPluginUtil::FastClip(input * input, 1.0e-11f, 100.0f);
             float timeConst = (s > env) ? atk : rel;
             env += (s - env) * timeConst + 1.0e-16f; // add small constant to always positive number to avoid denormal numbers
             float sideChainLevel = 10.0f * log10f(env); // multiply by 10 (not 20) because duckEnvelope is RMS
@@ -90,11 +90,11 @@ namespace Multiband
         struct Data
         {
             float p[P_NUM];
-            BiquadFilter bandsplit[8][MAXORDER][4];
-            BiquadFilter previewBandsplit[4];
+            AudioPluginUtil::BiquadFilter bandsplit[8][MAXORDER][4];
+            AudioPluginUtil::BiquadFilter previewBandsplit[4];
             CompressorChannel band[3][8];
-            Random random;
-            FFTAnalyzer analyzer;
+            AudioPluginUtil::Random random;
+            AudioPluginUtil::FFTAnalyzer analyzer;
         };
         union
         {
@@ -108,25 +108,25 @@ namespace Multiband
         static const char* bandname[] = { "Low", "Mid", "High" };
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "MasterGain", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_MasterGain, "Overall gain");
-        RegisterParameter(definition, "LowFreq", "Hz", 0.01f, 24000.0f, 800.0f, 1.0f, 3.0f, P_LowFreq, "Low/Mid cross-over frequency");
-        RegisterParameter(definition, "HighFreq", "Hz", 0.01f, 24000.0f, 5000.0f, 1.0f, 3.0f, P_HighFreq, "Mid/High cross-over frequency");
+        AudioPluginUtil::RegisterParameter(definition, "MasterGain", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_MasterGain, "Overall gain");
+        AudioPluginUtil::RegisterParameter(definition, "LowFreq", "Hz", 0.01f, 24000.0f, 800.0f, 1.0f, 3.0f, P_LowFreq, "Low/Mid cross-over frequency");
+        AudioPluginUtil::RegisterParameter(definition, "HighFreq", "Hz", 0.01f, 24000.0f, 5000.0f, 1.0f, 3.0f, P_HighFreq, "Mid/High cross-over frequency");
         for (int i = 0; i < 3; i++)
-            RegisterParameter(definition, tmpstr(0, "%sGain", bandname[i]), "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_LowGain + i, tmpstr(1, "%s band gain in dB", bandname[i]));
+            AudioPluginUtil::RegisterParameter(definition, AudioPluginUtil::tmpstr(0, "%sGain", bandname[i]), "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_LowGain + i, AudioPluginUtil::tmpstr(1, "%s band gain in dB", bandname[i]));
         for (int i = 0; i < 3; i++)
-            RegisterParameter(definition, tmpstr(0, "%sAttackTime", bandname[i]), "ms", 0.0f, 10.0f, 0.1f, 1000.0f, 4.0f, P_LowAttack + i, tmpstr(1, "%s band attack time in seconds", bandname[i]));
+            AudioPluginUtil::RegisterParameter(definition, AudioPluginUtil::tmpstr(0, "%sAttackTime", bandname[i]), "ms", 0.0f, 10.0f, 0.1f, 1000.0f, 4.0f, P_LowAttack + i, AudioPluginUtil::tmpstr(1, "%s band attack time in seconds", bandname[i]));
         for (int i = 0; i < 3; i++)
-            RegisterParameter(definition, tmpstr(0, "%sReleaseTime", bandname[i]), "ms", 0.0f, 10.0f, 0.5f, 1000.0f, 4.0f, P_LowRelease + i, tmpstr(1, "%s band release time in seconds", bandname[i]));
+            AudioPluginUtil::RegisterParameter(definition, AudioPluginUtil::tmpstr(0, "%sReleaseTime", bandname[i]), "ms", 0.0f, 10.0f, 0.5f, 1000.0f, 4.0f, P_LowRelease + i, AudioPluginUtil::tmpstr(1, "%s band release time in seconds", bandname[i]));
         for (int i = 0; i < 3; i++)
-            RegisterParameter(definition, tmpstr(0, "%sThreshold", bandname[i]), "dB", -50.0f, 0.0f, -10.0f, 1.0f, 1.0f, P_LowThreshold + i, tmpstr(1, "%s band compression level threshold time in dB", bandname[i]));
+            AudioPluginUtil::RegisterParameter(definition, AudioPluginUtil::tmpstr(0, "%sThreshold", bandname[i]), "dB", -50.0f, 0.0f, -10.0f, 1.0f, 1.0f, P_LowThreshold + i, AudioPluginUtil::tmpstr(1, "%s band compression level threshold time in dB", bandname[i]));
         for (int i = 0; i < 3; i++)
-            RegisterParameter(definition, tmpstr(0, "%sRatio", bandname[i]), "%", 1.0f, 30.0f, 1.0f, 100.0f, 1.0f, P_LowRatio + i, tmpstr(1, "%s band compression ratio time in percent", bandname[i]));
+            AudioPluginUtil::RegisterParameter(definition, AudioPluginUtil::tmpstr(0, "%sRatio", bandname[i]), "%", 1.0f, 30.0f, 1.0f, 100.0f, 1.0f, P_LowRatio + i, AudioPluginUtil::tmpstr(1, "%s band compression ratio time in percent", bandname[i]));
         for (int i = 0; i < 3; i++)
-            RegisterParameter(definition, tmpstr(0, "%sKnee", bandname[i]), "dB", 0.0f, 40.0f, 10.0f, 1.0f, 1.0f, P_LowKnee + i, tmpstr(1, "%s band compression curve knee range in dB", bandname[i]));
-        RegisterParameter(definition, "FilterOrder", "", 1.0f, (float)MAXORDER, 1.0f, 1.0f, 1.0f, P_FilterOrder, "Filter order of cross-over filters");
-        RegisterParameter(definition, "UseLogScale", "", 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, P_UseLogScale, "Use logarithmic scale for plotting the filter curve frequency response and input/output spectra");
-        RegisterParameter(definition, "ShowSpectrum", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_ShowSpectrum, "Overlay input spectrum (green) and output spectrum (red)");
-        RegisterParameter(definition, "SpectrumDecay", "dB/s", -50.0f, 0.0f, -10.0f, 1.0f, 1.0f, P_SpectrumDecay, "Hold time for overlaid spectra");
+            AudioPluginUtil::RegisterParameter(definition, AudioPluginUtil::tmpstr(0, "%sKnee", bandname[i]), "dB", 0.0f, 40.0f, 10.0f, 1.0f, 1.0f, P_LowKnee + i, AudioPluginUtil::tmpstr(1, "%s band compression curve knee range in dB", bandname[i]));
+        AudioPluginUtil::RegisterParameter(definition, "FilterOrder", "", 1.0f, (float)MAXORDER, 1.0f, 1.0f, 1.0f, P_FilterOrder, "Filter order of cross-over filters");
+        AudioPluginUtil::RegisterParameter(definition, "UseLogScale", "", 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, P_UseLogScale, "Use logarithmic scale for plotting the filter curve frequency response and input/output spectra");
+        AudioPluginUtil::RegisterParameter(definition, "ShowSpectrum", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_ShowSpectrum, "Overlay input spectrum (green) and output spectrum (red)");
+        AudioPluginUtil::RegisterParameter(definition, "SpectrumDecay", "dB/s", -50.0f, 0.0f, -10.0f, 1.0f, 1.0f, P_SpectrumDecay, "Hold time for overlaid spectra");
         return numparams;
     }
 
@@ -135,7 +135,7 @@ namespace Multiband
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         effectdata->data.analyzer.spectrumSize = 4096;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         state->effectdata = effectdata;
         return UNITY_AUDIODSP_OK;
     }
@@ -168,7 +168,7 @@ namespace Multiband
         return UNITY_AUDIODSP_OK;
     }
 
-    static void SetupFilterCoeffs(EffectData::Data* data, int samplerate, BiquadFilter* filter0, BiquadFilter* filter1, BiquadFilter* filter2, BiquadFilter* filter3)
+    static void SetupFilterCoeffs(EffectData::Data* data, int samplerate, AudioPluginUtil::BiquadFilter* filter0, AudioPluginUtil::BiquadFilter* filter1, AudioPluginUtil::BiquadFilter* filter2, AudioPluginUtil::BiquadFilter* filter3)
     {
         const float qfactor = 0.707f;
         filter0->SetupLowpass(data->p[P_LowFreq], (float)samplerate, qfactor);

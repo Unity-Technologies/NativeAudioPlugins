@@ -22,7 +22,7 @@ namespace ImpactGenerator
         float bpf;
         float cut;
         float bw;
-        inline float Process(Random& random)
+        inline float Process(AudioPluginUtil::Random& random)
         {
             volume *= decay;
             lpf += cut * bpf;
@@ -38,10 +38,10 @@ namespace ImpactGenerator
 
     struct ImpactInstance
     {
-        Random random;
+        AudioPluginUtil::Random random;
         int maximpacts;
         int numimpacts;
-        RingBuffer<MAXIMPACTS, Impact> impactrb;
+        AudioPluginUtil::RingBuffer<MAXIMPACTS, Impact> impactrb;
         Impact impacts[MAXIMPACTS];
     };
 
@@ -64,10 +64,10 @@ namespace ImpactGenerator
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Instance", "", 0.0f, (float)(MAXINSTANCES - 1), 0.0f, 1.0f, 1.0f, P_INSTANCE, "Determines the instance from which impacts are received via ImpactGenerator_AddImpact");
-        RegisterParameter(definition, "Gain", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN, "Overall gain");
-        RegisterParameter(definition, "Threshold", "dB", -120.0f, 0.0f, -60.0f, 1.0f, 1.0f, P_THR, "Threshold after which impacts stop playing");
-        RegisterParameter(definition, "MaxImpacts", "", 1.0f, (float)MAXIMPACTS, 200.0f, 1.0f, 1.0f, P_MAXIMPACTS, "Maximum number of impact sounds played simultaneously on this instance");
+        AudioPluginUtil::RegisterParameter(definition, "Instance", "", 0.0f, (float)(MAXINSTANCES - 1), 0.0f, 1.0f, 1.0f, P_INSTANCE, "Determines the instance from which impacts are received via ImpactGenerator_AddImpact");
+        AudioPluginUtil::RegisterParameter(definition, "Gain", "dB", -120.0f, 50.0f, 0.0f, 1.0f, 1.0f, P_GAIN, "Overall gain");
+        AudioPluginUtil::RegisterParameter(definition, "Threshold", "dB", -120.0f, 0.0f, -60.0f, 1.0f, 1.0f, P_THR, "Threshold after which impacts stop playing");
+        AudioPluginUtil::RegisterParameter(definition, "MaxImpacts", "", 1.0f, (float)MAXIMPACTS, 200.0f, 1.0f, 1.0f, P_MAXIMPACTS, "Maximum number of impact sounds played simultaneously on this instance");
         return numparams;
     }
 
@@ -76,7 +76,7 @@ namespace ImpactGenerator
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->p);
         return UNITY_AUDIODSP_OK;
     }
 

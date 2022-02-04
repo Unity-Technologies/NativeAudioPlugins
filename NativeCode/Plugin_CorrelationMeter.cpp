@@ -12,7 +12,7 @@ namespace CorrelationMeter
     struct EffectData
     {
         float p[P_NUM];
-        HistoryBuffer history[8];
+        AudioPluginUtil::HistoryBuffer history[8];
         int numchannels;
     };
 
@@ -20,8 +20,8 @@ namespace CorrelationMeter
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Window", "s", 0.1f, 2.0f, 0.15f, 1.0f, 1.0f, P_Window, "Length of analysis window (note: longer windows slow down framerate)");
-        RegisterParameter(definition, "Scale", "%", 0.01f, 10.0f, 1.0f, 100.0f, 1.0f, P_Scale, "Amplitude scaling for monitored signal");
+        AudioPluginUtil::RegisterParameter(definition, "Window", "s", 0.1f, 2.0f, 0.15f, 1.0f, 1.0f, P_Window, "Length of analysis window (note: longer windows slow down framerate)");
+        AudioPluginUtil::RegisterParameter(definition, "Scale", "%", 0.01f, 10.0f, 1.0f, 100.0f, 1.0f, P_Scale, "Amplitude scaling for monitored signal");
         return numparams;
     }
 
@@ -29,7 +29,7 @@ namespace CorrelationMeter
     {
         EffectData* data = new EffectData;
         memset(data, 0, sizeof(EffectData));
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, data->p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, data->p);
         state->effectdata = data;
         for (int i = 0; i < 8; i++)
             data->history[i].Init(state->samplerate * 2);
@@ -79,8 +79,8 @@ namespace CorrelationMeter
     int UNITY_AUDIODSP_CALLBACK GetFloatBufferCallback(UnityAudioEffectState* state, const char* name, float* buffer, int numsamples)
     {
         EffectData* data = state->GetEffectData<EffectData>();
-        HistoryBuffer& l = data->history[0];
-        HistoryBuffer& r = data->history[1];
+        AudioPluginUtil::HistoryBuffer& l = data->history[0];
+        AudioPluginUtil::HistoryBuffer& r = data->history[1];
         int w1 = l.writeindex;
         int w2 = r.writeindex;
         for (int n = 0; n < numsamples / 2; n++)

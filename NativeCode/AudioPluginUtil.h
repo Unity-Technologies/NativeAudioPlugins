@@ -11,15 +11,9 @@
 #if PLATFORM_WIN
 #   include <windows.h>
 #else
-#ifndef PLATFORM_MUTEX
 #   include <pthread.h>
-#endif
 #   define strcpy_s strcpy
 #   define vsprintf_s vsprintf
-#endif
-
-#ifdef PLATFORM_MUTEX
-#include "PlatformMutex.h"
 #endif
 
 namespace AudioPluginUtil
@@ -448,7 +442,6 @@ public:
     int samplesleft;
 };
 
-#ifndef PLATFORM_MUTEX
 class Mutex
 {
 public:
@@ -465,7 +458,6 @@ protected:
     pthread_mutex_t mutex;
 #endif
 };
-#endif
 
 class MutexScopeLock
 {
@@ -507,5 +499,3 @@ void DeclareEffect(
     );
 
 } // namespace AudioPluginUtil
-
-using namespace AudioPluginUtil;

@@ -46,7 +46,7 @@ namespace SpatializerReverb
     struct EffectData
     {
         float p[P_NUM];
-        Random random;
+        AudioPluginUtil::Random random;
         InstanceChannel ch[2];
     };
 
@@ -54,8 +54,8 @@ namespace SpatializerReverb
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Delay Time", "", 0.0f, 5.0f, 2.0f, 1.0f, 1.0f, P_DELAYTIME, "Delay time in seconds");
-        RegisterParameter(definition, "Diffusion", "%", 0.0f, 1.0f, 0.5f, 100.0f, 1.0f, P_DIFFUSION, "Diffusion amount");
+        AudioPluginUtil::RegisterParameter(definition, "Delay Time", "", 0.0f, 5.0f, 2.0f, 1.0f, 1.0f, P_DELAYTIME, "Delay time in seconds");
+        AudioPluginUtil::RegisterParameter(definition, "Diffusion", "%", 0.0f, 1.0f, 0.5f, 100.0f, 1.0f, P_DIFFUSION, "Diffusion amount");
         return numparams;
     }
 
@@ -64,7 +64,7 @@ namespace SpatializerReverb
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->p);
         return UNITY_AUDIODSP_OK;
     }
 

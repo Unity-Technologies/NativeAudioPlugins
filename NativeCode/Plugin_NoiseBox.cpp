@@ -20,7 +20,7 @@ namespace NoiseBox
             float addnoise;
             float mulcount;
             float mulnoise;
-            Random random;
+            AudioPluginUtil::Random random;
         };
         union
         {
@@ -33,10 +33,10 @@ namespace NoiseBox
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Add Amount", "dB", -100.0f, 0.0f, -50.0f, 1.0f, 1.0f, P_ADDAMT, "Gain of additive noise in dB");
-        RegisterParameter(definition, "Mul Amount", "dB", -100.0f, 0.0f, -50.0f, 1.0f, 1.0f, P_MULAMT, "Gain of multiplicative noise in dB");
-        RegisterParameter(definition, "Add Frequency", "Hz", 0.001f, 24000.0f, 5000.0f, 1.0f, 3.0f, P_ADDFREQ, "Additive noise frequency cutoff in Hz");
-        RegisterParameter(definition, "Mul Frequency", "Hz", 0.001f, 24000.0f, 50.0f, 1.0f, 3.0f, P_MULFREQ, "Multiplicative noise frequency cutoff in Hz");
+        AudioPluginUtil::RegisterParameter(definition, "Add Amount", "dB", -100.0f, 0.0f, -50.0f, 1.0f, 1.0f, P_ADDAMT, "Gain of additive noise in dB");
+        AudioPluginUtil::RegisterParameter(definition, "Mul Amount", "dB", -100.0f, 0.0f, -50.0f, 1.0f, 1.0f, P_MULAMT, "Gain of multiplicative noise in dB");
+        AudioPluginUtil::RegisterParameter(definition, "Add Frequency", "Hz", 0.001f, 24000.0f, 5000.0f, 1.0f, 3.0f, P_ADDFREQ, "Additive noise frequency cutoff in Hz");
+        AudioPluginUtil::RegisterParameter(definition, "Mul Frequency", "Hz", 0.001f, 24000.0f, 50.0f, 1.0f, 3.0f, P_MULFREQ, "Multiplicative noise frequency cutoff in Hz");
         return numparams;
     }
 
@@ -45,7 +45,7 @@ namespace NoiseBox
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         return UNITY_AUDIODSP_OK;
     }
 

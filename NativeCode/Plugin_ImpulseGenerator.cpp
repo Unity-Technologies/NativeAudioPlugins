@@ -23,7 +23,7 @@ namespace ImpulseGenerator
             float level;
             float decay;
             float samplesleft;
-            Random random;
+            AudioPluginUtil::Random random;
         };
         union
         {
@@ -36,14 +36,14 @@ namespace ImpulseGenerator
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Base Period", "ms", 0.0f, 5000.0f, 200.0f, 1.0f, 3.0f, P_BASEPERIOD, "Base time between impulses");
-        RegisterParameter(definition, "Random Period", "ms", 0.0f, 5000.0f, 100.0f, 1.0f, 3.0f, P_RANDOMPERIOD, "Random time between impulses");
-        RegisterParameter(definition, "Base Amp", "", 0.0f, 1.0f, 0.5f, 1.0f, 1.0f, P_BASEAMP, "Base amplitude of impulses");
-        RegisterParameter(definition, "Random Amp", "", 0.0f, 1.0f, 0.5f, 1.0f, 3.0f, P_RANDOMAMP, "Random amplitude of impulses");
-        RegisterParameter(definition, "Base Decay", "ms", 0.0f, 10000.0f, 10.0f, 1.0f, 3.0f, P_BASEDECAY, "Decay time of impulses");
-        RegisterParameter(definition, "Random Decay", "ms", 0.0f, 10000.0f, 0.0f, 1.0f, 3.0f, P_RANDOMDECAY, "Decay time of impulses");
-        RegisterParameter(definition, "Noise Level", "", 0.0f, 50.0f, 0.0f, 1.0f, 3.0f, P_NOISEADD, "Level of additive white noise");
-        RegisterParameter(definition, "Noise Mix", "", 0.0f, 1.0f, 0.0f, 1.0f, 3.0f, P_NOISEMIX, "Level of white noise multiplied by impulse");
+        AudioPluginUtil::RegisterParameter(definition, "Base Period", "ms", 0.0f, 5000.0f, 200.0f, 1.0f, 3.0f, P_BASEPERIOD, "Base time between impulses");
+        AudioPluginUtil::RegisterParameter(definition, "Random Period", "ms", 0.0f, 5000.0f, 100.0f, 1.0f, 3.0f, P_RANDOMPERIOD, "Random time between impulses");
+        AudioPluginUtil::RegisterParameter(definition, "Base Amp", "", 0.0f, 1.0f, 0.5f, 1.0f, 1.0f, P_BASEAMP, "Base amplitude of impulses");
+        AudioPluginUtil::RegisterParameter(definition, "Random Amp", "", 0.0f, 1.0f, 0.5f, 1.0f, 3.0f, P_RANDOMAMP, "Random amplitude of impulses");
+        AudioPluginUtil::RegisterParameter(definition, "Base Decay", "ms", 0.0f, 10000.0f, 10.0f, 1.0f, 3.0f, P_BASEDECAY, "Decay time of impulses");
+        AudioPluginUtil::RegisterParameter(definition, "Random Decay", "ms", 0.0f, 10000.0f, 0.0f, 1.0f, 3.0f, P_RANDOMDECAY, "Decay time of impulses");
+        AudioPluginUtil::RegisterParameter(definition, "Noise Level", "", 0.0f, 50.0f, 0.0f, 1.0f, 3.0f, P_NOISEADD, "Level of additive white noise");
+        AudioPluginUtil::RegisterParameter(definition, "Noise Mix", "", 0.0f, 1.0f, 0.0f, 1.0f, 3.0f, P_NOISEMIX, "Level of white noise multiplied by impulse");
         return numparams;
     }
 
@@ -52,7 +52,7 @@ namespace ImpulseGenerator
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         return UNITY_AUDIODSP_OK;
     }
 
@@ -107,7 +107,7 @@ namespace ImpulseGenerator
                 float decaytime = data->p[P_BASEDECAY] + data->random.GetFloat(0.0f, data->p[P_RANDOMDECAY]);
                 data->decay = (decaytime <= 0.0f) ? 0.0f : powf(0.001f, 1000.0f / (state->samplerate * decaytime));
                 data->level = data->p[P_BASEAMP] + data->random.GetFloat(0.0f, data->p[P_RANDOMAMP]);
-                data->samplesleft = FastMax(0.0f, data->samplesleft + (data->p[P_BASEPERIOD] + data->random.GetFloat(0.0f, data->p[P_RANDOMPERIOD])) * 0.001f * state->samplerate);
+                data->samplesleft = AudioPluginUtil::FastMax(0.0f, data->samplesleft + (data->p[P_BASEPERIOD] + data->random.GetFloat(0.0f, data->p[P_RANDOMPERIOD])) * 0.001f * state->samplerate);
             }
             float noise = data->random.GetFloat(-1.0f, 1.0f);
             float s = noise * data->p[P_NOISEADD] + data->level + data->p[P_NOISEMIX] * (noise * data->level - data->level);

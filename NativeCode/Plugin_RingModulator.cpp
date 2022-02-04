@@ -28,8 +28,8 @@ namespace RingModulator
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Frequency", "Hz", 0.0f, kMaxSampleRate, 1000.0f, 1.0f, 3.0f, P_FREQ, "Frequency of sine oscillator that is multiplied with the input signal");
-        RegisterParameter(definition, "Mix amount", "", 0.0f, 1.0f, 0.5f, 1.0f, 1.0f, P_MIX, "Ratio between input and ring-modulated signals");
+        AudioPluginUtil::RegisterParameter(definition, "Frequency", "Hz", 0.0f, AudioPluginUtil::kMaxSampleRate, 1000.0f, 1.0f, 3.0f, P_FREQ, "Frequency of sine oscillator that is multiplied with the input signal");
+        AudioPluginUtil::RegisterParameter(definition, "Mix amount", "", 0.0f, 1.0f, 0.5f, 1.0f, 1.0f, P_MIX, "Ratio between input and ring-modulated signals");
         return numparams;
     }
 
@@ -39,7 +39,7 @@ namespace RingModulator
         memset(effectdata, 0, sizeof(EffectData));
         effectdata->data.c = 1.0f;
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         return UNITY_AUDIODSP_OK;
     }
 
@@ -79,7 +79,7 @@ namespace RingModulator
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectState* state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int outchannels)
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
-        float w = 2.0f * sinf(kPI * data->p[P_FREQ] / state->samplerate);
+        float w = 2.0f * sinf(AudioPluginUtil::kPI * data->p[P_FREQ] / state->samplerate);
         for (unsigned int n = 0; n < length; n++)
         {
             for (int i = 0; i < outchannels; i++)

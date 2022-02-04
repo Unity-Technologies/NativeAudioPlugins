@@ -33,10 +33,10 @@ namespace ModalFilter
     public:
         inline void Setup(float fFreq, float fBandwidth, float fGain)
         {
-            float fCutoff = FastClip(fFreq, 0.0001f, 0.9999f);
-            float fRadius = FastClip(1.0f - fBandwidth, 0.0001f, 0.9999f);
+            float fCutoff = AudioPluginUtil::FastClip(fFreq, 0.0001f, 0.9999f);
+            float fRadius = AudioPluginUtil::FastClip(1.0f - fBandwidth, 0.0001f, 0.9999f);
             a0 = fGain * 0.5f * (1.0f - fRadius * fRadius);
-            a1 = -2.0f * fRadius * cosf(fCutoff * kPI);
+            a1 = -2.0f * fRadius * cosf(fCutoff * AudioPluginUtil::kPI);
             a2 = fRadius * fRadius;
         }
 
@@ -64,9 +64,9 @@ namespace ModalFilter
         {
             float p[P_NUM];
             float prevp[P_NUM];
-            Random random;
+            AudioPluginUtil::Random random;
             Resonator resonators[8][MAXRESONATORS];
-            FFTAnalyzer analyzer;
+            AudioPluginUtil::FFTAnalyzer analyzer;
             float* display1;
             float* display2;
         };
@@ -81,19 +81,19 @@ namespace ModalFilter
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Random seed", "", 0.0f, 100000.0f, 0.0f, 1.0f, 1.0f, P_SEED, "Random seed, selects locations of modes and their bandwidth randomly");
-        RegisterParameter(definition, "Num modes", "", 1.0f, (float)MAXRESONATORS, 10.0f, 1.0f, 1.0f, P_NUMMODES, "Number of modes or partials");
-        RegisterParameter(definition, "Freq shift", "Hz", -3000.0f, 3000.0f, 0.0f, 1.0f, 1.0f, P_FREQSHIFT, "Frequency shift in Hz");
-        RegisterParameter(definition, "Freq shift var", "Hz", -3000.0f, 3000.0f, 0.01f, 1.0f, 1.0f, P_FREQSHIFTVAR, "Randomized frequency shift in Hz");
-        RegisterParameter(definition, "Freq scale", "", -10.0f, 10.0f, 1.0f, 1.0f, 1.0f, P_FREQSCALE, "Frequency scaling in Hz");
-        RegisterParameter(definition, "Freq scale var", "", -10.0f, 10.0f, 0.0f, 1.0, 1.0f, P_FREQSCALEVAR, "Randomized frequency scaling in Hz");
-        RegisterParameter(definition, "BW scale", "", 0.001f, 10.0f, 1.0f, 1.0f, 1.0f, P_BWSCALE, "Bandwidth scaling factor");
-        RegisterParameter(definition, "BW scale var", "", 0.001f, 10.0f, 0.001f, 1.0f, 1.0f, P_BWSCALEVAR, "Randomized bandwidth scaling factor");
-        RegisterParameter(definition, "Gain scale", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_GAINSCALE, "Gain scaling in dB");
-        RegisterParameter(definition, "Gain scale var", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_GAINSCALEVAR, "Randomized gain scaling in dB");
-        RegisterParameter(definition, "ShowSpectrum", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_SHOWSPECTRUM, "Overlay input spectrum (green) and output spectrum (red)");
-        RegisterParameter(definition, "SpectrumDecay", "dB/s", -50.0f, 0.0f, -10.0f, 1.0f, 1.0f, P_SPECTRUMDECAY, "Hold time for overlaid spectra");
-        RegisterParameter(definition, "SpectrumOffset", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_SPECTRUMOFFSET, "Spectrum drawing offset in dB");
+        AudioPluginUtil::RegisterParameter(definition, "Random seed", "", 0.0f, 100000.0f, 0.0f, 1.0f, 1.0f, P_SEED, "Random seed, selects locations of modes and their bandwidth randomly");
+        AudioPluginUtil::RegisterParameter(definition, "Num modes", "", 1.0f, (float)MAXRESONATORS, 10.0f, 1.0f, 1.0f, P_NUMMODES, "Number of modes or partials");
+        AudioPluginUtil::RegisterParameter(definition, "Freq shift", "Hz", -3000.0f, 3000.0f, 0.0f, 1.0f, 1.0f, P_FREQSHIFT, "Frequency shift in Hz");
+        AudioPluginUtil::RegisterParameter(definition, "Freq shift var", "Hz", -3000.0f, 3000.0f, 0.01f, 1.0f, 1.0f, P_FREQSHIFTVAR, "Randomized frequency shift in Hz");
+        AudioPluginUtil::RegisterParameter(definition, "Freq scale", "", -10.0f, 10.0f, 1.0f, 1.0f, 1.0f, P_FREQSCALE, "Frequency scaling in Hz");
+        AudioPluginUtil::RegisterParameter(definition, "Freq scale var", "", -10.0f, 10.0f, 0.0f, 1.0, 1.0f, P_FREQSCALEVAR, "Randomized frequency scaling in Hz");
+        AudioPluginUtil::RegisterParameter(definition, "BW scale", "", 0.001f, 10.0f, 1.0f, 1.0f, 1.0f, P_BWSCALE, "Bandwidth scaling factor");
+        AudioPluginUtil::RegisterParameter(definition, "BW scale var", "", 0.001f, 10.0f, 0.001f, 1.0f, 1.0f, P_BWSCALEVAR, "Randomized bandwidth scaling factor");
+        AudioPluginUtil::RegisterParameter(definition, "Gain scale", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_GAINSCALE, "Gain scaling in dB");
+        AudioPluginUtil::RegisterParameter(definition, "Gain scale var", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_GAINSCALEVAR, "Randomized gain scaling in dB");
+        AudioPluginUtil::RegisterParameter(definition, "ShowSpectrum", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_SHOWSPECTRUM, "Overlay input spectrum (green) and output spectrum (red)");
+        AudioPluginUtil::RegisterParameter(definition, "SpectrumDecay", "dB/s", -50.0f, 0.0f, -10.0f, 1.0f, 1.0f, P_SPECTRUMDECAY, "Hold time for overlaid spectra");
+        AudioPluginUtil::RegisterParameter(definition, "SpectrumOffset", "dB", -100.0f, 100.0f, 0.0f, 1.0f, 1.0f, P_SPECTRUMOFFSET, "Spectrum drawing offset in dB");
         return numparams;
     }
 
@@ -105,7 +105,7 @@ namespace ModalFilter
         effectdata->data.analyzer.spectrumSize = 4096;
         effectdata->data.display1 = new float[MAXRESONATORS * 3];
         effectdata->data.display2 = new float[MAXRESONATORS * 3];
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         return UNITY_AUDIODSP_OK;
     }
 

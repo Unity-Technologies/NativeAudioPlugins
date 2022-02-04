@@ -22,8 +22,8 @@ namespace WahWah
             float p[P_NUM];
             struct Channel
             {
-                StateVariableFilter filter1;
-                StateVariableFilter filter2;
+                AudioPluginUtil::StateVariableFilter filter1;
+                AudioPluginUtil::StateVariableFilter filter2;
                 float env;
             } channels[8];
         };
@@ -38,14 +38,14 @@ namespace WahWah
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-        RegisterParameter(definition, "Attack Time", "s", 0.001f, 2.0f, 0.1f, 1.0f, 3.0f, P_ATK, "Attack time");
-        RegisterParameter(definition, "Release Time", "s", 0.001f, 2.0f, 0.5f, 1.0f, 3.0f, P_REL, "Release time");
-        RegisterParameter(definition, "Base Level", "%", 0.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_BASE, "Base filter level");
-        RegisterParameter(definition, "Sensitivity", "%", -1.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_SENS, "Filter sensitivity");
-        RegisterParameter(definition, "Resonance", "%", 0.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_RESO, "Filter resonance");
-        RegisterParameter(definition, "Type", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_TYPE, "Filter type (0 = lowpass, 1 = bandpass)");
-        RegisterParameter(definition, "Depth", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_DEPTH, "Filter depth (0 = 12 dB, 1 = 24 dB)");
-        RegisterParameter(definition, "Sidechain Mix", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_SIDECHAIN, "Sidechain mix (0 = use input, 1 = use sidechain)");
+        AudioPluginUtil::RegisterParameter(definition, "Attack Time", "s", 0.001f, 2.0f, 0.1f, 1.0f, 3.0f, P_ATK, "Attack time");
+        AudioPluginUtil::RegisterParameter(definition, "Release Time", "s", 0.001f, 2.0f, 0.5f, 1.0f, 3.0f, P_REL, "Release time");
+        AudioPluginUtil::RegisterParameter(definition, "Base Level", "%", 0.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_BASE, "Base filter level");
+        AudioPluginUtil::RegisterParameter(definition, "Sensitivity", "%", -1.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_SENS, "Filter sensitivity");
+        AudioPluginUtil::RegisterParameter(definition, "Resonance", "%", 0.0f, 1.0f, 0.1f, 100.0f, 1.0f, P_RESO, "Filter resonance");
+        AudioPluginUtil::RegisterParameter(definition, "Type", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_TYPE, "Filter type (0 = lowpass, 1 = bandpass)");
+        AudioPluginUtil::RegisterParameter(definition, "Depth", "", 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, P_DEPTH, "Filter depth (0 = 12 dB, 1 = 24 dB)");
+        AudioPluginUtil::RegisterParameter(definition, "Sidechain Mix", "%", 0.0f, 1.0f, 0.0f, 100.0f, 1.0f, P_SIDECHAIN, "Sidechain mix (0 = use input, 1 = use sidechain)");
         definition.flags |= UnityAudioEffectDefinitionFlags_IsSideChainTarget;
         return numparams;
     }
@@ -55,7 +55,7 @@ namespace WahWah
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         state->effectdata = effectdata;
-        InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+        AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         return UNITY_AUDIODSP_OK;
     }
 
@@ -115,7 +115,7 @@ namespace WahWah
                 float s = *src;
                 float a = fabsf(s + (*sc - s) * data->p[P_SIDECHAIN]);
                 ch.env += (a - ch.env) * ((a > ch.env) ? atkconst : relconst);
-                ch.filter1.cutoff = FastClip(data->p[P_BASE] + ch.env * data->p[P_SENS], 0.0f, 1.4f);
+                ch.filter1.cutoff = AudioPluginUtil::FastClip(data->p[P_BASE] + ch.env * data->p[P_SENS], 0.0f, 1.4f);
                 ch.filter2.cutoff = ch.filter1.cutoff;
                 ch.filter2.ProcessLPF(ch.filter1.ProcessLPF(*src));
                 float lpf = ch.filter1.lpf + (ch.filter2.lpf - ch.filter1.lpf) * data->p[P_DEPTH];

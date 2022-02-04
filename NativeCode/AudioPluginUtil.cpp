@@ -30,7 +30,7 @@ template<typename T>
 static void FFTProcess(UnityComplexNumber* data, int numsamples, bool forward)
 {
     unsigned int count = 1, numbits = 0;
-    while (count < (unsigned)numsamples)
+    while ((int)count < numsamples)
     {
         count += count;
         ++numbits;
@@ -261,7 +261,6 @@ void HistoryBuffer::ReadBuffer(float* buffer, int numsamplesTarget, int numsampl
     buffer[numsamplesTarget] = (float)n; // how many samples were written
 }
 
-#ifndef PLATFORM_MUTEX
 Mutex::Mutex()
 {
 #if PLATFORM_WIN
@@ -315,7 +314,6 @@ void Mutex::Unlock()
     pthread_mutex_unlock(&mutex);
 #endif
 }
-#endif
 
 void RegisterParameter(
     UnityAudioEffectDefinition& definition,
@@ -405,7 +403,7 @@ void DeclareEffect(
 #undef DECLARE_EFFECT
 
 #define DECLARE_EFFECT(namestr, ns) \
-DeclareEffect( \
+AudioPluginUtil::DeclareEffect( \
 definition[numeffects++], \
 namestr, \
 ns::CreateCallback, \
@@ -463,13 +461,13 @@ NAP_TESTSUITE(FFT)
         {
             bool highprecision = (test == 1);
 
-            Random r;
+            AudioPluginUtil::Random r;
             for (int b = 4; b <= 20; b++)
             {
                 int num = 1 << b;
 
-                UnityComplexNumber* test1 = new UnityComplexNumber[num];
-                UnityComplexNumber* test2 = new UnityComplexNumber[num];
+                AudioPluginUtil::UnityComplexNumber* test1 = new AudioPluginUtil::UnityComplexNumber[num];
+                AudioPluginUtil::UnityComplexNumber* test2 = new AudioPluginUtil::UnityComplexNumber[num];
 
                 for (int n = 0; n < num; n++)
                 {
@@ -479,8 +477,8 @@ NAP_TESTSUITE(FFT)
                     test2[n].im = test1[n].im;
                 }
 
-                FFT::Forward(test2, num, highprecision);
-                FFT::Backward(test2, num, highprecision);
+                AudioPluginUtil::FFT::Forward(test2, num, highprecision);
+                AudioPluginUtil::FFT::Backward(test2, num, highprecision);
 
                 double errtol = (highprecision) ? 1.0e-6 : 1.5e-3;
                 double maxerr = 0.0f, errsum = 0.0, rms = 0.0;
