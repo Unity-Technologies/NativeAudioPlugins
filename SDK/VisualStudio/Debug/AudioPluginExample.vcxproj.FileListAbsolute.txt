@@ -1,0 +1,1 @@
+\\Mac\Home\Documents\Unity\Native Audio SDK\AudioPluginExample\VisualStudio\Debug\AudioPluginExample.dll

@@ -1,0 +1,9 @@
+﻿  EntryPoints.cpp
+  Plugin_Attenuator.cpp
+  Plugin_NoiseGenerator.cpp
+  Plugin_Reverb.cpp
+  UnityAudioPluginInterface.cpp
+  Generating Code...
+  AudioPluginExample.vcxproj -> \\Mac\Home\Documents\Unity\Native Audio SDK\AudioPluginExample\VisualStudio\x64\Debug\AudioPluginExample.dll
+  \\Mac\Home\Documents\Unity\Native Audio SDK\AudioPluginExample\VisualStudio\x64\Debug\AudioPluginExample.dll
+  1 File(s) copied

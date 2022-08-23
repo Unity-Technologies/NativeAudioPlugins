@@ -1,0 +1,330 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AC41D0F32885C1BE0027C287 /* EntryPoints.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC41D0F22885C1BE0027C287 /* EntryPoints.cpp */; };
+		AC41D0F62885C2270027C287 /* Plugin_Attenuator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC41D0F42885C2270027C287 /* Plugin_Attenuator.cpp */; };
+		AC41D10028883EBE0027C287 /* Plugin_NoiseGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC41D0FF28883EBE0027C287 /* Plugin_NoiseGenerator.cpp */; };
+		AC68075728AE46E500200A57 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = AC68075528AE46E500200A57 /* README.md */; };
+		AC98BC7828A3ED44001FCE9B /* UnityAudioPluginInterface-Raw.inl in Resources */ = {isa = PBXBuildFile; fileRef = AC98BC7728A3ED44001FCE9B /* UnityAudioPluginInterface-Raw.inl */; };
+		AC98BC7A28A3EF69001FCE9B /* UnityAudioPluginInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC98BC7928A3EF69001FCE9B /* UnityAudioPluginInterface.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AC41D0E02885BF840027C287 /* AudioPluginExample.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioPluginExample.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC41D0EE2885C0A50027C287 /* UnityAudioPluginInterface.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = UnityAudioPluginInterface.hpp; path = ../UnityAudioPluginInterface.hpp; sourceTree = "<group>"; };
+		AC41D0F22885C1BE0027C287 /* EntryPoints.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = EntryPoints.cpp; path = ../EntryPoints.cpp; sourceTree = "<group>"; };
+		AC41D0F42885C2270027C287 /* Plugin_Attenuator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_Attenuator.cpp; path = ../Plugin_Attenuator.cpp; sourceTree = "<group>"; };
+		AC41D0FF28883EBE0027C287 /* Plugin_NoiseGenerator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_NoiseGenerator.cpp; path = ../Plugin_NoiseGenerator.cpp; sourceTree = "<group>"; };
+		AC68075528AE46E500200A57 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = "<group>"; };
+		AC98BC7528A3ED44001FCE9B /* UnityAudioPluginInterface-Raw.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = "UnityAudioPluginInterface-Raw.hpp"; path = "../UnityAudioPluginInterface-Raw.hpp"; sourceTree = "<group>"; };
+		AC98BC7628A3ED44001FCE9B /* UnityAudioPluginInterface-Raw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UnityAudioPluginInterface-Raw.h"; path = "../UnityAudioPluginInterface-Raw.h"; sourceTree = "<group>"; };
+		AC98BC7728A3ED44001FCE9B /* UnityAudioPluginInterface-Raw.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "UnityAudioPluginInterface-Raw.inl"; path = "../UnityAudioPluginInterface-Raw.inl"; sourceTree = "<group>"; };
+		AC98BC7928A3EF69001FCE9B /* UnityAudioPluginInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UnityAudioPluginInterface.cpp; path = ../UnityAudioPluginInterface.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AC41D0DD2885BF840027C287 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AC41D0D72885BF840027C287 = {
+			isa = PBXGroup;
+			children = (
+				AC41D0EB2885C06D0027C287 /* Source */,
+				AC41D0E12885BF840027C287 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AC41D0E12885BF840027C287 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AC41D0E02885BF840027C287 /* AudioPluginExample.bundle */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AC41D0EB2885C06D0027C287 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				AC68075528AE46E500200A57 /* README.md */,
+				AC41D0EE2885C0A50027C287 /* UnityAudioPluginInterface.hpp */,
+				AC98BC7928A3EF69001FCE9B /* UnityAudioPluginInterface.cpp */,
+				AC98BC7628A3ED44001FCE9B /* UnityAudioPluginInterface-Raw.h */,
+				AC98BC7528A3ED44001FCE9B /* UnityAudioPluginInterface-Raw.hpp */,
+				AC98BC7728A3ED44001FCE9B /* UnityAudioPluginInterface-Raw.inl */,
+				AC41D0F22885C1BE0027C287 /* EntryPoints.cpp */,
+				AC41D0F42885C2270027C287 /* Plugin_Attenuator.cpp */,
+				AC41D0FF28883EBE0027C287 /* Plugin_NoiseGenerator.cpp */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AC41D0DF2885BF840027C287 /* AudioPluginExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AC41D0E42885BF840027C287 /* Build configuration list for PBXNativeTarget "AudioPluginExample" */;
+			buildPhases = (
+				AC41D0DC2885BF840027C287 /* Sources */,
+				AC41D0DD2885BF840027C287 /* Frameworks */,
+				AC41D0DE2885BF840027C287 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AudioPluginExample;
+			productName = AudioPluginExample;
+			productReference = AC41D0E02885BF840027C287 /* AudioPluginExample.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AC41D0D82885BF840027C287 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1340;
+				TargetAttributes = {
+					AC41D0DF2885BF840027C287 = {
+						CreatedOnToolsVersion = 13.4.1;
+					};
+				};
+			};
+			buildConfigurationList = AC41D0DB2885BF840027C287 /* Build configuration list for PBXProject "UnityAudioPluginSDK" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AC41D0D72885BF840027C287;
+			productRefGroup = AC41D0E12885BF840027C287 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AC41D0DF2885BF840027C287 /* AudioPluginExample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AC41D0DE2885BF840027C287 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC98BC7828A3ED44001FCE9B /* UnityAudioPluginInterface-Raw.inl in Resources */,
+				AC68075728AE46E500200A57 /* README.md in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AC41D0DC2885BF840027C287 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AC41D10028883EBE0027C287 /* Plugin_NoiseGenerator.cpp in Sources */,
+				AC98BC7A28A3EF69001FCE9B /* UnityAudioPluginInterface.cpp in Sources */,
+				AC41D0F32885C1BE0027C287 /* EntryPoints.cpp in Sources */,
+				AC41D0F62885C2270027C287 /* Plugin_Attenuator.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AC41D0E22885BF840027C287 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		AC41D0E32885BF840027C287 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		AC41D0E52885BF840027C287 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEPLOYMENT_LOCATION = YES;
+				DSTROOT = "$(PROJECT_DIR)/../../Assets";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSPrincipalClass = "";
+				INSTALL_PATH = /Plugins;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.AudioPluginExample.AudioPluginExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		AC41D0E62885BF840027C287 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEPLOYMENT_LOCATION = YES;
+				DSTROOT = "$(PROJECT_DIR)/../../Assets";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSPrincipalClass = "";
+				INSTALL_PATH = /Plugins;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.AudioPluginExample.AudioPluginExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AC41D0DB2885BF840027C287 /* Build configuration list for PBXProject "UnityAudioPluginSDK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC41D0E22885BF840027C287 /* Debug */,
+				AC41D0E32885BF840027C287 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AC41D0E42885BF840027C287 /* Build configuration list for PBXNativeTarget "AudioPluginExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC41D0E52885BF840027C287 /* Debug */,
+				AC41D0E62885BF840027C287 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AC41D0D82885BF840027C287 /* Project object */;
+}
