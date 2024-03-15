@@ -154,7 +154,7 @@ typedef signed long long SInt64;
 #if PLATFORM_WIN
     #define UNITY_AUDIODSP_EXPORT_API __declspec(dllexport)
 #else
-    #define UNITY_AUDIODSP_EXPORT_API
+    #define UNITY_AUDIODSP_EXPORT_API __attribute__((visibility("default")))
 #endif
 
 #if defined(__CYGWIN32__)

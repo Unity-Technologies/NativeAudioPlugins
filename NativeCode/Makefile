@@ -28,7 +28,7 @@ Plugin_WahWah.cpp \
 hrtftable.cpp
 OBJS=$(SRCS:.cpp=.o)
 OUTPUT=libAudioPluginDemo.so
-CXXFLAGS=-I. -O2 -fPIC
+CXXFLAGS=-I. -O2 -fPIC -fvisibility=hidden -Wno-attributes
 LDFLAGS=-shared -rdynamic -fPIC
 CXX=g++
 

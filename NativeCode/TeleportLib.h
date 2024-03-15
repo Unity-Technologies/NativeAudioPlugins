@@ -1,11 +1,5 @@
 #pragma once
 
-#if UNITY_WIN
-#define UNITY_AUDIODSP_EXPORT_API __declspec(dllexport)
-#else
-#define UNITY_AUDIODSP_EXPORT_API
-#endif
-
 extern "C"
 {
 typedef UNITY_AUDIODSP_EXPORT_API int (*TeleportFeedFunc)(int stream, float* samples, int numsamples);
