@@ -107,7 +107,7 @@ namespace NoiseBox
             {
                 data->addcount -= addperiod; data->addnoise = data->random.GetFloat(-1.0, 1.0f);
             }
-            data->mulcount += 1.0f; if (data->mulcount >= addperiod)
+            data->mulcount += 1.0f; if (data->mulcount >= mulperiod)
             {
                 data->mulcount -= mulperiod; data->mulnoise = data->random.GetFloat(0.0, 1.0f);
             }
