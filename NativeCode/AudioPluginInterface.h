@@ -1,6 +1,6 @@
 #pragma once
 
-#define UNITY_AUDIO_PLUGIN_API_VERSION 0x010402
+#define UNITY_AUDIO_PLUGIN_API_VERSION 0x010403
 
 #ifndef UNITY_PREFIX_CONFIGURE_H
 
@@ -194,7 +194,8 @@ enum UnityAudioEffectDefinitionFlags
     UnityAudioEffectDefinitionFlags_IsSpatializer               = 1 << 1,   // Should this plugin be inserted at sources and take over panning?
     UnityAudioEffectDefinitionFlags_IsAmbisonicDecoder          = 1 << 2,   // Should this plugin be used for ambisonic decoding? Added in Unity 2017.1, with UNITY_AUDIO_PLUGIN_API_VERSION 0x010400.
     UnityAudioEffectDefinitionFlags_AppliesDistanceAttenuation  = 1 << 3,   // Spatializers Only: Does this spatializer apply distance-based attenuation? Added in Unity 2017.1, with UNITY_AUDIO_PLUGIN_API_VERSION 0x010400.
-    UnityAudioEffectDefinitionFlags_NeedsSpatializerData        = 1 << 4    // For effects that are not spatializers or ambisonic decoders, but want access to UnityAudioSpatializerData. AudioSource-related data will be set to default values for mixer effects. Added in Unity 2018.1, with UNITY_AUDIO_PLUGIN_API_VERSION 0x010402.
+    UnityAudioEffectDefinitionFlags_NeedsSpatializerData        = 1 << 4,   // For effects that are not spatializers or ambisonic decoders, but want access to UnityAudioSpatializerData. AudioSource-related data will be set to default values for mixer effects. Added in Unity 2018.1, with UNITY_AUDIO_PLUGIN_API_VERSION 0x010402.
+    UnityAudioEffectDefinitionFlags_UseOutputChannelCount       = 1 << 5    // Ambisonic decoders only: When set, the process callback receives outchannels equal to the project's output channel count, which may be larger or smaller than the ambisonic clip's channel count (e.g. in = 4 for a 1st-order clip, out = 8 in 7.1, or out = 2 in stereo). The plugin must fill length * outchannels samples. When not set, outchannels == inchannels. Added with UNITY_AUDIO_PLUGIN_API_VERSION 0x010403.
 };
 
 enum UnityAudioEffectStateFlags
@@ -234,7 +235,7 @@ struct UnityAudioAmbisonicData
     float                                           spread;                         // Spread parameter of the audio source (0..360 degrees)
     float                                           stereopan;                      // Stereo panning parameter of the audio source (-1 = fully left, 1 = fully right)
     UnityAudioEffect_DistanceAttenuationCallback    distanceattenuationcallback;    // The ambisonic decoder plugin may override the distance attenuation in order to influence the voice prioritization (leave this callback as NULL to use the built-in audio source attenuation curve)
-    int                                             ambisonicOutChannels;           // This tells ambisonic decoders how many output channels will actually be used.
+    int                                             ambisonicOutChannels;           // This tells ambisonic decoders how many output channels will actually be used. When UnityAudioEffectDefinitionFlags_UseOutputChannelCount is set, this equals the outchannels parameter of the process callback. When the flag is not set, outchannels == inchannels so the layout cannot be used fully.
     float                                           volume;                         // Volume/mute of the audio source. If the the source is muted, volume is set to 0.0; otherwise, it is set to the audio source's volume. Volume is applied after the ambisonic decoder, so this is just informational. Added in Unity 2018.1, with UNITY_AUDIO_PLUGIN_API_VERSION 0x010401.
 };
 
